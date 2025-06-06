@@ -1,24 +1,27 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Resume from './components/Resume';
+import Projects from './components/Projects';
+import Footer from './components/Footer';
+import ScrollToTopButton from './components/ScrollToTopButton';
+import WorksModal from './components/WorksModal';
 import './App.css';
 
 function App() {
+  const [worksOpen, setWorksOpen] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Navbar onWorksClick={() => setWorksOpen(true)} />
+      <Hero />
+      <Resume />
+      <Projects />
+      <Footer />
+      <ScrollToTopButton />
+      <WorksModal open={worksOpen} onClose={() => setWorksOpen(false)} />
+    </Router>
   );
 }
 
