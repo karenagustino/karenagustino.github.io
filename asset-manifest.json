@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/karen.agustino/static/css/main.949be339.css",
-    "main.js": "/karen.agustino/static/js/main.4c32a388.js",
+    "main.js": "/karen.agustino/static/js/main.b56f3836.js",
     "static/js/453.1407b060.chunk.js": "/karen.agustino/static/js/453.1407b060.chunk.js",
     "static/media/cafe-music.mp3": "/karen.agustino/static/media/cafe-music.2963df28b36f48906f87.mp3",
     "static/media/zigzag-resume-bg.png": "/karen.agustino/static/media/zigzag-resume-bg.abd55703289066b5b396.png",
@@ -9,11 +9,11 @@
     "static/media/soil-bg.png": "/karen.agustino/static/media/soil-bg.99d359e4b19b9a54a412.png",
     "index.html": "/karen.agustino/index.html",
     "main.949be339.css.map": "/karen.agustino/static/css/main.949be339.css.map",
-    "main.4c32a388.js.map": "/karen.agustino/static/js/main.4c32a388.js.map",
+    "main.b56f3836.js.map": "/karen.agustino/static/js/main.b56f3836.js.map",
     "453.1407b060.chunk.js.map": "/karen.agustino/static/js/453.1407b060.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.949be339.css",
-    "static/js/main.4c32a388.js"
+    "static/js/main.b56f3836.js"
   ]
 }
