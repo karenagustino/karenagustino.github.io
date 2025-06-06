@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Resume from './components/Resume';
@@ -13,7 +12,7 @@ function App() {
   const [worksOpen, setWorksOpen] = useState(false);
 
   return (
-    <Router>
+    <>
       <Navbar onWorksClick={() => setWorksOpen(true)} />
       <Hero />
       <Resume />
@@ -21,7 +20,7 @@ function App() {
       <Footer />
       <ScrollToTopButton />
       <WorksModal open={worksOpen} onClose={() => setWorksOpen(false)} />
-    </Router>
+    </>
   );
 }
 

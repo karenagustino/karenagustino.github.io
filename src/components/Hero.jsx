@@ -91,14 +91,12 @@ const Hero = () => {
         setWind(false);
         setTimeout(() => setWind(true), 10);
         setTimeout(() => setWind(false), 1200);
-        if (audioRef.current) {
+        if (audioRef && audioRef.current) {
             if (musicPlaying) {
                 audioRef.current.pause();
                 setMusicPlaying(false);
             } else {
-                audioRef.current.play().catch((e) => {
-                    console.log(e)
-                });
+                audioRef.current.play()
                 setMusicPlaying(true);
             }
         }

@@ -1,10 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import logo from '../assets/logo.png'; // Make sure the logo is named logo.png in assets
 
 const Navbar = ({ onWorksClick }) => {
-    const location = useLocation();
-    const logoRef = useRef();
+    const logoRef = useRef(null);
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
