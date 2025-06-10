@@ -129,7 +129,7 @@ const Hero = () => {
                 <div style={{ fontSize: '1.5rem', marginTop: '1.2rem', color: '#49523A', fontFamily: 'Roboto, sans-serif', position: 'relative', fontWeight: 400, textAlign: 'left', maxWidth: 900 }}>
                     a <span style={{ color: '#49523A', position: 'relative', display: 'inline-block' }}>
                         product
-                        <img src={underline} alt="underline" style={{ position: 'absolute', left: 0, bottom: -4, width: '60%', height: 8, pointerEvents: 'none' }} />
+                        <img src={underline} alt="underline" style={{ position: 'absolute', left: 0, bottom: -6, width: '100%', height: 8, pointerEvents: 'none' }} />
                     </span> enthusiast with a love for building.
                 </div>
             </div>

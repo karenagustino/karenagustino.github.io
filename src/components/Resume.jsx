@@ -50,7 +50,7 @@ const experiences = [
         dates: 'Sept 2024 – present',
     },
     {
-        title: 'Hackathon Coordinator',
+        title: 'Hackathon Organizer',
         company: 'nwPlus',
         dates: 'May 2023 – present',
     },
