@@ -1,0 +1,51 @@
+.my-descriptions {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    border: 0px solid #ddd;
+    height: 2.5rem;
+    overflow: hidden;
+    align-items: center;
+}
+
+.my-descriptions span {
+    position: relative;
+    display: inline-block;
+    animation: animation 10s ease infinite;
+    line-height: 2.5rem;
+}
+
+@keyframes animation {
+
+    0%,
+    100% {
+        top: 0;
+    }
+
+    20% {
+        top: 0;
+    }
+
+    25% {
+        top: -2.5rem;
+    }
+
+    45% {
+        top: -2.5rem;
+    }
+
+    50% {
+        top: -5rem;
+    }
+
+    70% {
+        top: -5rem;
+    }
+
+    75% {
+        top: -7.5rem;
+    }
+
+    95% {
+        top: -7.5rem;
+    }
+}
