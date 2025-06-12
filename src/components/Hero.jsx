@@ -131,28 +131,17 @@ const Hero = () => {
                     </span>
                 </div>
                 <div style={{ fontSize: '1.5rem', marginTop: '1.2rem', color: '#49523A', fontFamily: 'Roboto, sans-serif', position: 'relative', fontWeight: 400, textAlign: 'left', maxWidth: 900, display: 'inline-flex', alignItems: 'center' }}>
-                    a {" "} <div class="my-descriptions">
+                    a {" "} <div className="my-descriptions">
                         <span>
-                            {descriptions.map((desc, idx) => (
-                                <div>
-                                    {desc} <br />
-                                    <img src={underline} alt="underline" style={{ width: '100%', height: 8, pointerEvents: 'none' }} />
+                            {descriptions.map((desc) => (
+                                <div className="description">
+                                    {desc}
+                                    <img src={underline} alt="underline" className='underline' />
                                 </div>
                             ))}
-
-                            {/* product <br />
-                            <img src={underline} alt="underline" style={{ position: 'fixed', left: 0, bottom: -6, width: '100%', height: 8 }} />
-                            software <br />
-                            matcha <br />
-                            muay thai <br /> */}
                         </span>
                     </div>
                     enthusiast with a love for building.
-
-                    {/* <span style={{ color: '#49523A', position: 'relative', display: 'inline-block' }} >
-                        product
-                        <img src={underline} alt="underline" style={{ position: 'absolute', left: 0, bottom: -6, width: '100%', height: 8, pointerEvents: 'none' }} />
-                    </span> enthusiast with a love for building. */}
                 </div>
             </div>
             <div style={{ position: 'fixed', bottom: 44, right: 44, zIndex: 10, opacity: showApron ? 1 : 0, pointerEvents: showApron ? 'auto' : 'none', transition: 'opacity 0.4s' }}>

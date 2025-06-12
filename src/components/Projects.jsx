@@ -100,6 +100,18 @@ const iconCircleStyle = {
 
 const Projects = () => {
     const [hovered, setHovered] = React.useState(-1);
+    // Shuffle leaf positions only once
+    const leafPositions = React.useMemo(() => {
+        const leafCorners = [
+            { bottom: 10, left: 10 },
+            { bottom: 10, right: 10 },
+        ];
+        return projects.map(() => {
+            // Pick one random bottom corner for each card
+            const pos = leafCorners[Math.floor(Math.random() * 2)];
+            return [pos];
+        });
+    }, []);
     return (
         <section id="projects-section" style={{
             margin: '0 auto',
@@ -125,16 +137,8 @@ const Projects = () => {
                 maxWidth: 1100,
             }}>
                 {projects.map((proj, idx) => {
-                    // Randomize leaf corners for each card
-                    const leafCorners = [
-                        { bottom: 10, left: 10 },
-                        { bottom: 10, right: 10 },
-                        { top: 10, left: 10 },
-                        { top: 10, right: 10 },
-                    ];
-                    // Shuffle and pick 2-3 corners for each card
-                    const shuffled = leafCorners.sort(() => 0.5 - Math.random());
-                    const leaves = shuffled.slice(0, Math.floor(Math.random() * 2) + 2);
+                    // Use precomputed leaf positions
+                    const leaves = leafPositions[idx];
                     return (
                         <div
                             key={idx}
@@ -153,7 +157,7 @@ const Projects = () => {
                             </div>
                             {/* Pixel decor: randomized corners */}
                             {leaves.map((pos, i) => (
-                                <img key={i} src={leafPixel} alt="leaf pixel" style={{ position: 'absolute', width: 38, height: 38, pointerEvents: 'none', ...pos }} />
+                                <img key={i} src={leafPixel} alt="leaf pixel" style={{ position: 'absolute', width: 70, height: 70, pointerEvents: 'none', ...pos }} />
                             ))}
                         </div>
                     );
