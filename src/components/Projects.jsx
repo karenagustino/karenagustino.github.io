@@ -9,7 +9,7 @@ import mapIcon from '../assets/map.png';
 import checkIcon from '../assets/check.png';
 import vrIcon from '../assets/vr.png';
 import snapIcon from '../assets/snap.png';
-import soilBg from '../assets/soil-bg.png';
+import soilBg from '../assets/patch.png';
 
 const CARD_WIDTH = 380;
 const CARD_HEIGHT = 210;
@@ -20,41 +20,48 @@ const projects = [
     {
         title: "UBC Product Management Club's First Membership Portal",
         tech: "React, TypeScript, Google Firebase",
+        href: "https://ubcpmc.com/",
         icon: pmcIcon,
     },
     {
         title: "Colorpal",
         tech: "Python, React, JavaScript, Figma, OpenAI API",
+        href: "https://github.com/karenagustino/colorpal",
         icon: eyedropperIcon,
     },
     {
         title: "Enspo Lookbook Generator",
         tech: "Python, React, JavaScript, JSON, Express.js",
+        href: "https://github.com/karenagustino/Enspo",
         icon: shirtIcon,
     },
     {
         title: "Vending Machine for Business",
         tech: "Java, JSON, Swing for GUI, Git",
+        href: "https://github.com/karenagustino/VendingMachine",
         icon: vendingIcon,
     },
     {
         title: "Shanghai Virtual Guide",
         tech: "Python, Flask, HTML, CSS, MySQL",
+        href: "https://github.com/karenagustino/ShanghaiVirtualGuide",
         icon: mapIcon,
     },
     {
         title: "Vitae-C",
         tech: "React, JavaScript, HTML, CSS, REST API",
+        href: "https://github.com/karenagustino/Vitae-C",
         icon: checkIcon,
     },
     {
         title: "VirtualPrep",
         tech: "Python, Flask, HTML, CSS, MySQL",
+        href: "https://github.com/karenagustino/nwhacks-project",
         icon: vrIcon,
     },
     {
-        title: "Shanghai Virtual Guide",
-        tech: "Python, Flask, HTML, CSS, MySQL",
+        title: "LingoSnap",
+        tech: "GLSL, JavaScript, TypeScript, Lens Studio",
         icon: snapIcon,
     },
 ];
@@ -62,19 +69,16 @@ const projects = [
 const cardStyle = {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
+    overflow: 'visible',
     background: `url(${soilBg}) center/cover no-repeat`,
-    borderRadius: 36,
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    color: '#fff',
     fontFamily: 'Roboto, sans-serif',
     fontWeight: 500,
     fontSize: '1.1rem',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-    overflow: 'hidden',
     padding: '2.2rem 1.2rem 1.2rem 1.2rem',
     margin: '0 auto',
     transition: 'transform 0.18s cubic-bezier(.4,2,.6,1), box-shadow 0.18s cubic-bezier(.4,2,.6,1)',
@@ -83,7 +87,6 @@ const cardStyle = {
 
 const cardHoverStyle = {
     transform: 'translateY(-8px) scale(1.03)',
-    boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
 };
 
 const iconCircleStyle = {
@@ -103,8 +106,8 @@ const Projects = () => {
     // Shuffle leaf positions only once
     const leafPositions = React.useMemo(() => {
         const leafCorners = [
-            { bottom: 10, left: 10 },
-            { bottom: 10, right: 10 },
+            { bottom: -45, left: 10 },
+            { bottom: -45, right: 10 },
         ];
         return projects.map(() => {
             // Pick one random bottom corner for each card
@@ -134,7 +137,7 @@ const Projects = () => {
                 gap: '2.5rem',
                 justifyItems: 'center',
                 margin: '0 auto',
-                maxWidth: 1100,
+                maxWidth: 1100
             }}>
                 {projects.map((proj, idx) => {
                     // Use precomputed leaf positions
@@ -143,6 +146,7 @@ const Projects = () => {
                         <div
                             key={idx}
                             style={hovered === idx ? { ...cardStyle, ...cardHoverStyle } : cardStyle}
+                            onClick={() => proj.href && window.open(proj.href, '_blank')}
                             onMouseEnter={() => setHovered(idx)}
                             onMouseLeave={() => setHovered(-1)}
                         >
@@ -157,7 +161,7 @@ const Projects = () => {
                             </div>
                             {/* Pixel decor: randomized corners */}
                             {leaves.map((pos, i) => (
-                                <img key={i} src={leafPixel} alt="leaf pixel" style={{ position: 'absolute', width: 70, height: 70, pointerEvents: 'none', ...pos }} />
+                                <img key={i} src={leafPixel} alt="leaf pixel" style={{ position: 'absolute', width: 100, height: 100, pointerEvents: 'none', ...pos }} />
                             ))}
                         </div>
                     );

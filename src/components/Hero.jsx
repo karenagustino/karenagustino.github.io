@@ -120,7 +120,7 @@ const Hero = () => {
 
 
     return (
-        <section id="hero-section" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', background: 'transparent', position: 'relative', maxWidth: 1100, margin: '0 auto' }}>
+        <section id="hero-section" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', background: 'transparent', position: 'relative', maxWidth: 1100, paddingLeft: '5rem', margin: '0 auto' }}>
             <div style={{ marginTop: '10vh', marginBottom: '7vh', textAlign: 'left', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '1.2rem', flexWrap: 'wrap' }}>
                     <h1 id="hero-title" style={{ fontWeight: 400, fontSize: '2.7rem', margin: 0, color: '#49523A', fontFamily: 'Roboto, sans-serif', letterSpacing: '-1px', textAlign: 'left', lineHeight: 1.1, display: 'inline' }}>
