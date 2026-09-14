@@ -127,7 +127,7 @@ const Hero = () => {
                         hello, i'm
                     </h1>
                     <span style={{ fontWeight: 700, color: '#425066', fontSize: '4.5rem', letterSpacing: '-3px', margin: 0, textAlign: 'left', lineHeight: 1, display: 'inline-block' }}>
-                        ALVIN
+                        KAREN
                     </span>
                 </div>
                 <div style={{ fontSize: '1.5rem', marginTop: '1.2rem', color: '#49523A', fontFamily: 'Roboto, sans-serif', position: 'relative', fontWeight: 400, textAlign: 'left', maxWidth: 900, display: 'inline-flex', alignItems: 'center' }}>

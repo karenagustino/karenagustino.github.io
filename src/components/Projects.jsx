@@ -1,5 +1,4 @@
 import React from 'react';
-import plantPixel from '../assets/plant-pixel.png';
 import leafPixel from '../assets/leaf-pixel.png';
 import pmcIcon from '../assets/pmc.png';
 import eyedropperIcon from '../assets/eyedropper.png';
