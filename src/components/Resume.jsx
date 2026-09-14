@@ -1,33 +1,5 @@
 import React from 'react';
-let zigzagBg;
-try {
-    zigzagBg = require('../assets/zigzag-resume-bg.png');
-} catch {
-    zigzagBg = '';
-}
-
-const resumeContentStyle = {
-    background: `url(${zigzagBg}) repeat-x`,
-    width: '99%',
-    height: '100%',
-    padding: '7.5rem 3rem 2.5rem 3rem', // Reduced padding to align text closer to the top
-    color: '#49523A',
-    fontFamily: 'Roboto, sans-serif',
-    zIndex: 2,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    boxSizing: 'border-box',
-    overflowY: 'auto',
-};
-
-const skillsSectionStyle = {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap', // Enable wrapping for responsive design
-    gap: 32,
-    width: '100%',
-};
+import './Resume.css';
 
 const sectionTitleStyle = {
     fontWeight: 700,
@@ -127,18 +99,9 @@ const skills = [
 ];
 
 const Resume = () => (
-    <section id="resume-section" style={{
-        margin: '2.5rem auto 4rem auto',
-        position: 'relative',
-        minHeight: 700,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingLeft: '5rem',
-        paddingRight: '5rem'
-    }}>
-        <div style={resumeContentStyle}>
+    <section id="resume-section" className="resume-section">
+        <div className="resume-zigzag-edge" aria-hidden="true" />
+        <div className="resume-content">
             <h2 style={sectionTitleStyle}>EDUCATION</h2>
             <div style={sectionBlockStyle}>
                 {education.map((edu, idx) => (
@@ -159,7 +122,7 @@ const Resume = () => (
                 ))}
             </div>
             <h2 style={sectionTitleStyle}>SKILLS</h2>
-            <div style={skillsSectionStyle}>
+            <div className="resume-skills-section">
                 {skills.map((skill, idx) => (
                     <div key={idx} style={{ minWidth: 120, textAlign: 'left' }}>
                         <div style={{ fontWeight: 600, marginBottom: 4 }}>{skill.category}</div>

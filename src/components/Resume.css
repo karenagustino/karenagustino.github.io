@@ -1,0 +1,80 @@
+.resume-section {
+    margin: 2.5rem auto 4rem auto;
+    position: relative;
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 5rem;
+    padding-right: 5rem;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Torn-paper zigzag edge, vector-shaped so its peaks stay proportional
+   to the current width instead of tiling/cropping a fixed-size image. */
+.resume-zigzag-edge {
+    width: 99%;
+    max-width: 900px;
+    height: 48px;
+    flex-shrink: 0;
+    background-color: #fdfdfb;
+    clip-path: polygon(0% 100%, 10% 0%, 20% 100%, 30% 0%, 40% 100%, 50% 0%, 60% 100%, 70% 0%, 80% 100%, 90% 0%, 100% 100%, 0% 100%);
+}
+
+.resume-content {
+    background-color: #fdfdfb;
+    color: #49523A;
+    width: 99%;
+    max-width: 900px;
+    padding: 2.5rem 3rem 2.5rem 3rem;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+.resume-skills-section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 32px;
+    width: 100%;
+}
+
+@media (max-width: 700px) {
+    .resume-section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        margin: 1.5rem auto 2.5rem auto;
+        min-height: unset;
+    }
+
+    .resume-zigzag-edge {
+        height: 36px;
+    }
+
+    .resume-content {
+        padding: 1.75rem 1.25rem 2rem 1.25rem;
+    }
+
+    .resume-skills-section {
+        gap: 24px;
+    }
+}
+
+@media (max-width: 420px) {
+    .resume-zigzag-edge {
+        height: 28px;
+    }
+
+    .resume-content {
+        padding: 1.5rem 1rem 1.75rem 1rem;
+    }
+
+    .resume-skills-section {
+        gap: 18px;
+    }
+}
