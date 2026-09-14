@@ -5,7 +5,7 @@ const sectionTitleStyle = {
     fontWeight: 700,
     fontSize: '1.6rem',
     marginBottom: 12,
-    color: '#49523A',
+    color: 'var(--color-text-primary)',
     letterSpacing: 1,
 };
 
@@ -106,9 +106,9 @@ const Resume = () => (
             <div style={sectionBlockStyle}>
                 {education.map((edu, idx) => (
                     <div key={idx} style={{ textAlign: 'left' }}>
-                        <div style={{ fontWeight: 600, fontSize: '1.08rem', textAlign: 'left' }}>{edu.school} <span style={{ fontWeight: 400, fontSize: '1rem', color: '#888' }}>· {edu.detail}</span></div>
-                        <div style={{ fontStyle: 'italic', fontSize: '1rem', color: '#49523A', marginBottom: 3, marginTop: 3, textAlign: 'left' }}>{edu.degree}</div>
-                        <div style={{ fontSize: '0.97rem', color: '#888', textAlign: 'left' }}>{edu.grad}</div>
+                        <div style={{ fontWeight: 600, fontSize: '1.08rem', textAlign: 'left' }}>{edu.school} <span style={{ fontWeight: 400, fontSize: '1rem', color: 'var(--color-text-muted)' }}>· {edu.detail}</span></div>
+                        <div style={{ fontStyle: 'italic', fontSize: '1rem', color: 'var(--color-text-primary)', marginBottom: 3, marginTop: 3, textAlign: 'left' }}>{edu.degree}</div>
+                        <div style={{ fontSize: '0.97rem', color: 'var(--color-text-muted)', textAlign: 'left' }}>{edu.grad}</div>
                     </div>
                 ))}
             </div>
@@ -116,8 +116,8 @@ const Resume = () => (
             <div style={sectionBlockStyle}>
                 {experiences.map((exp, idx) => (
                     <div key={idx} style={{ marginBottom: 22, textAlign: 'left' }}>
-                        <div style={{ fontWeight: 600, fontSize: '1.08rem', textAlign: 'left' }}>{exp.title} <span style={{ fontWeight: 400, fontSize: '1rem', color: '#888' }}> - {exp.company}</span></div>
-                        <div style={{ fontSize: '0.97rem', color: '#888', marginBottom: 3, marginTop: 3, textAlign: 'left' }}>{exp.dates}</div>
+                        <div style={{ fontWeight: 600, fontSize: '1.08rem', textAlign: 'left' }}>{exp.title} <span style={{ fontWeight: 400, fontSize: '1rem', color: 'var(--color-text-muted)' }}> - {exp.company}</span></div>
+                        <div style={{ fontSize: '0.97rem', color: 'var(--color-text-muted)', marginBottom: 3, marginTop: 3, textAlign: 'left' }}>{exp.dates}</div>
                     </div>
                 ))}
             </div>

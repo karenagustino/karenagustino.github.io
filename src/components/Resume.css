@@ -19,13 +19,15 @@
     max-width: 900px;
     height: 48px;
     flex-shrink: 0;
-    background-color: #fdfdfb;
+    background-color: var(--color-surface);
+    transition: background-color 0.25s ease;
     clip-path: polygon(0% 100%, 10% 0%, 20% 100%, 30% 0%, 40% 100%, 50% 0%, 60% 100%, 70% 0%, 80% 100%, 90% 0%, 100% 100%, 0% 100%);
 }
 
 .resume-content {
-    background-color: #fdfdfb;
-    color: #49523A;
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
     width: 99%;
     max-width: 900px;
     padding: 2.5rem 3rem 2.5rem 3rem;

@@ -34,7 +34,8 @@ const ScrollToTopButton = () => {
                 position: 'fixed',
                 bottom: 32,
                 right: 32,
-                background: 'white',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
                 border: 'none',
                 borderRadius: '50%',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
@@ -44,7 +45,7 @@ const ScrollToTopButton = () => {
                 fontSize: 24,
                 zIndex: 1000,
                 opacity: 0.65,
-                transition: 'opacity 0.3s',
+                transition: 'opacity 0.3s, background-color 0.25s ease, color 0.25s ease',
             }}
             aria-label="Scroll to top"
         >

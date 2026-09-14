@@ -124,10 +124,10 @@ const Projects = () => {
             boxShadow: 'none',
             position: 'relative',
         }}>
-            <h2 style={{ textAlign: 'center', color: '#49523A', fontFamily: 'Roboto, sans-serif', fontWeight: 800, fontSize: '2rem', marginBottom: 0 }}>
+            <h2 style={{ textAlign: 'center', color: 'var(--color-text-primary)', fontFamily: 'Roboto, sans-serif', fontWeight: 800, fontSize: '2rem', marginBottom: 0 }}>
                 <span role="img" aria-label="sunflower">🌻</span> the garden of projects
             </h2>
-            <p style={{ textAlign: 'center', color: '#B6BFA6', fontFamily: 'Roboto, sans-serif', fontStyle: 'italic', marginTop: '0.5rem', marginBottom: '1.5rem', fontSize: '1.05rem' }}>
+            <p style={{ textAlign: 'center', color: 'var(--color-sage)', fontFamily: 'Roboto, sans-serif', fontStyle: 'italic', marginTop: '0.5rem', marginBottom: '1.5rem', fontSize: '1.05rem' }}>
                 where my technical experiments grow
             </p>
             <div style={{

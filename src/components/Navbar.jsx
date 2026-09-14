@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import logo from '../assets/logo.png'; // Make sure the logo is named logo.png in assets
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = ({ onWorksClick }) => {
     const logoRef = useRef(null);
@@ -44,8 +45,7 @@ const Navbar = ({ onWorksClick }) => {
             gap: 80,
             padding: '2rem 0 1.2rem 0',
             fontSize: '1.1rem',
-            background: scrolled ? 'rgba(255,255,255,0.85)' : 'transparent',
-            boxShadow: scrolled ? '0 2px 12px rgba(60,70,80,0.07)' : 'none',
+            background: scrolled ? 'var(--color-nav-scrolled-bg)' : 'transparent',
             width: '100vw',
             left: 0,
             position: 'sticky',
@@ -54,9 +54,10 @@ const Navbar = ({ onWorksClick }) => {
             transition: 'background 0.3s, box-shadow 0.3s',
             backdropFilter: scrolled ? 'blur(4px)' : 'none',
         }}>
-            <span style={{ cursor: 'pointer', color: '#49523A', fontWeight: 700, fontFamily: 'Roboto, sans-serif' }} onClick={onWorksClick}>works</span>
+            <span style={{ cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: 700, fontFamily: 'Roboto, sans-serif' }} onClick={onWorksClick}>works</span>
             <img ref={logoRef} src={logo} alt="Karen Agustino Logo" style={{ height: 54, margin: '0 18px', cursor: 'pointer' }} onClick={handleLogoClick} />
-            <span style={{ cursor: 'pointer', color: '#49523A', fontWeight: 700, fontFamily: 'Roboto, sans-serif' }} onClick={handleGardenClick}>garden</span>
+            <span style={{ cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: 700, fontFamily: 'Roboto, sans-serif' }} onClick={handleGardenClick}>garden</span>
+            <ThemeToggle />
         </nav>
     );
 };

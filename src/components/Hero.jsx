@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import underline from '../assets/underline.png';
-import apron from '../assets/apron.png';
 import leafPixel from '../assets/leaf-pixel.png';
 import music from '../assets/cafe-music.mp3';
 import './Hero.css';
@@ -123,14 +122,14 @@ const Hero = () => {
         <section id="hero-section" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', background: 'transparent', position: 'relative', maxWidth: 1100, paddingLeft: '5rem', margin: '0 auto' }}>
             <div style={{ marginTop: '10vh', marginBottom: '7vh', textAlign: 'left', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '1.2rem', flexWrap: 'wrap' }}>
-                    <h1 id="hero-title" style={{ fontWeight: 400, fontSize: '2.7rem', margin: 0, color: '#49523A', fontFamily: 'Roboto, sans-serif', letterSpacing: '-1px', textAlign: 'left', lineHeight: 1.1, display: 'inline' }}>
+                    <h1 id="hero-title" style={{ fontWeight: 400, fontSize: '2.7rem', margin: 0, color: 'var(--color-text-primary)', fontFamily: 'Roboto, sans-serif', letterSpacing: '-1px', textAlign: 'left', lineHeight: 1.1, display: 'inline' }}>
                         hello, i'm
                     </h1>
-                    <span style={{ fontWeight: 700, color: '#425066', fontSize: '4.5rem', letterSpacing: '-3px', margin: 0, textAlign: 'left', lineHeight: 1, display: 'inline-block' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--color-text-navy)', fontSize: '4.5rem', letterSpacing: '-3px', margin: 0, textAlign: 'left', lineHeight: 1, display: 'inline-block' }}>
                         KAREN
                     </span>
                 </div>
-                <div style={{ fontSize: '1.5rem', marginTop: '1.2rem', color: '#49523A', fontFamily: 'Roboto, sans-serif', position: 'relative', fontWeight: 400, textAlign: 'left', maxWidth: 900, display: 'inline-flex', alignItems: 'center' }}>
+                <div style={{ fontSize: '1.5rem', marginTop: '1.2rem', color: 'var(--color-text-primary)', fontFamily: 'Roboto, sans-serif', position: 'relative', fontWeight: 400, textAlign: 'left', maxWidth: 900, display: 'inline-flex', alignItems: 'center' }}>
                     a {" "} <div className="my-descriptions">
                         <span>
                             {descriptions.map((desc) => (
@@ -145,10 +144,10 @@ const Hero = () => {
                 </div>
             </div>
             <div style={{ position: 'fixed', bottom: 44, right: 44, zIndex: 10, opacity: showApron ? 1 : 0, pointerEvents: showApron ? 'auto' : 'none', transition: 'opacity 0.4s' }}>
-                <img
-                    src={apron}
-                    alt="apron"
-                    style={{ width: 90, cursor: 'pointer', display: 'block', filter: 'drop-shadow(0 2px 6px #b6bfa655)' }}
+                <div
+                    className="apron-icon"
+                    role="img"
+                    aria-label="apron"
                     onClick={triggerWind}
                 />
                 <audio ref={audioRef} src={music} type='audio/mp3' loop />

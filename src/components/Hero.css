@@ -29,6 +29,27 @@
     pointer-events: none;
 }
 
+.apron-icon {
+    width: 90px;
+    aspect-ratio: 102 / 117;
+    display: block;
+    cursor: pointer;
+    background-color: var(--color-text-navy);
+    -webkit-mask-image: url('../assets/apron.png');
+    mask-image: url('../assets/apron.png');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition: background-color 0.25s ease;
+}
+
+[data-theme="dark"] .apron-icon {
+    background-color: #D9741E;
+}
+
 @keyframes animation {
 
     0%,

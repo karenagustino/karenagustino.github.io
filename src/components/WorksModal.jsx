@@ -16,7 +16,7 @@ const modalBackdropStyle = {
 };
 
 const modalContentStyle = {
-    background: 'white',
+    background: 'var(--color-surface)',
     borderRadius: 24,
     boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
     padding: '2.5rem 2.5rem 2rem 2.5rem',
@@ -39,7 +39,7 @@ const closeBtnStyle = {
     background: 'none',
     border: 'none',
     fontSize: 24,
-    color: '#425066',
+    color: 'var(--color-text-navy)',
     cursor: 'pointer',
     zIndex: 2,
     transition: 'opacity 0.3s, transform 0.3s',
