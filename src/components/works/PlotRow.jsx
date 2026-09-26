@@ -2,13 +2,14 @@ import React, { useRef } from 'react';
 import CaseStudyCard from './CaseStudyCard';
 import './PlotRow.css';
 
-const CARD_WIDTH = 280;
+const CARD_WIDTH = 380;
 const CARD_GAP = 24;
 const SCROLL_AMOUNT = CARD_WIDTH + CARD_GAP;
+const DRAG_THRESHOLD = 5;
 
 const PlotRow = ({ caseStudies }) => {
     const trackRef = useRef(null);
-    const dragState = useRef({ dragging: false, startX: 0, startScrollLeft: 0 });
+    const dragState = useRef({ dragging: false, startX: 0, startScrollLeft: 0, wasDrag: false });
 
     const scrollByAmount = (amount) => {
         trackRef.current?.scrollBy({ left: amount, behavior: 'smooth' });
@@ -22,6 +23,7 @@ const PlotRow = ({ caseStudies }) => {
             dragging: true,
             startX: event.clientX,
             startScrollLeft: track.scrollLeft,
+            wasDrag: false,
         };
         track.setPointerCapture?.(event.pointerId);
     };
@@ -30,12 +32,23 @@ const PlotRow = ({ caseStudies }) => {
         const track = trackRef.current;
         if (!track || !dragState.current.dragging) return;
         const delta = event.clientX - dragState.current.startX;
+        if (Math.abs(delta) > DRAG_THRESHOLD) {
+            dragState.current.wasDrag = true;
+        }
         track.scrollLeft = dragState.current.startScrollLeft - delta;
     };
 
     const handlePointerUp = (event) => {
         dragState.current.dragging = false;
         trackRef.current?.releasePointerCapture?.(event.pointerId);
+    };
+
+    const handleTrackClickCapture = (event) => {
+        if (dragState.current.wasDrag) {
+            event.preventDefault();
+            event.stopPropagation();
+            dragState.current.wasDrag = false;
+        }
     };
 
     const handleKeyDown = (event) => {
@@ -68,6 +81,7 @@ const PlotRow = ({ caseStudies }) => {
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
+                onClickCapture={handleTrackClickCapture}
             >
                 {caseStudies.map((caseStudy) => (
                     <li key={caseStudy.id} style={{ listStyle: 'none' }}>
