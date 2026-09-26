@@ -48,3 +48,9 @@ test('clicking the close button collapses the expanded card', () => {
     expect(screen.getByText('A sample tagline')).toBeInTheDocument();
     expect(screen.queryByText(sampleCaseStudy.problem)).not.toBeInTheDocument();
 });
+
+test('pressing Enter on a collapsed card expands it', () => {
+    render(<CaseStudyCard caseStudy={sampleCaseStudy} />);
+    fireEvent.keyDown(screen.getByText('Sample Project').closest('[role="button"]'), { key: 'Enter' });
+    expect(screen.getByText(sampleCaseStudy.problem)).toBeInTheDocument();
+});

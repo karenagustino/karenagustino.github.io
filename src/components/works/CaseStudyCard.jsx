@@ -34,12 +34,30 @@ const CaseStudyCard = ({ caseStudy }) => {
         setExpanded(false);
     };
 
+    const handleExpandedKeyDown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleClose(event);
+        }
+    };
+
+    const handleCollapsedKeyDown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setExpanded(true);
+        }
+    };
+
     if (expanded) {
         return (
             <div
                 className="case-study-card case-study-card--expanded"
                 style={cardStyle}
+                role="button"
+                tabIndex={0}
+                aria-expanded={true}
                 onClick={handleClose}
+                onKeyDown={handleExpandedKeyDown}
             >
                 <button
                     type="button"
@@ -74,7 +92,11 @@ const CaseStudyCard = ({ caseStudy }) => {
         <div
             className="case-study-card"
             style={cardStyle}
+            role="button"
+            tabIndex={0}
+            aria-expanded={false}
             onClick={() => setExpanded(true)}
+            onKeyDown={handleCollapsedKeyDown}
         >
             <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#fff', marginBottom: 6, lineHeight: 1.2 }}>
                 {caseStudy.title}

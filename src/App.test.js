@@ -7,17 +7,21 @@ test('renders the home page content', () => {
 });
 
 test('clicking "works" scrolls to the works section', () => {
-    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+    const scrollSpy = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollSpy;
     render(<App />);
     fireEvent.click(screen.getByText('works'));
     const worksSection = document.getElementById('works-section');
-    expect(worksSection.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
+    expect(scrollSpy).toHaveBeenCalledWith({ behavior: 'smooth' });
+    expect(scrollSpy.mock.instances[0]).toBe(worksSection);
 });
 
 test('clicking "garden" scrolls to the projects section', () => {
-    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+    const scrollSpy = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollSpy;
     render(<App />);
     fireEvent.click(screen.getByText('garden'));
     const projectsSection = document.getElementById('projects-section');
-    expect(projectsSection.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
+    expect(scrollSpy).toHaveBeenCalledWith({ behavior: 'smooth' });
+    expect(scrollSpy.mock.instances[0]).toBe(projectsSection);
 });

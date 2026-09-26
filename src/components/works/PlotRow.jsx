@@ -25,7 +25,6 @@ const PlotRow = ({ caseStudies }) => {
             startScrollLeft: track.scrollLeft,
             wasDrag: false,
         };
-        track.setPointerCapture?.(event.pointerId);
     };
 
     const handlePointerMove = (event) => {
@@ -40,7 +39,6 @@ const PlotRow = ({ caseStudies }) => {
 
     const handlePointerUp = (event) => {
         dragState.current.dragging = false;
-        trackRef.current?.releasePointerCapture?.(event.pointerId);
     };
 
     const handleTrackClickCapture = (event) => {
