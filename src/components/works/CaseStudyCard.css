@@ -1,0 +1,20 @@
+.case-study-card {
+    transition: transform 0.18s cubic-bezier(0.4, 2, 0.6, 1), width 0.3s ease;
+}
+
+.case-study-card:hover:not(.case-study-card--expanded) {
+    transform: translateY(-8px) scale(1.03);
+}
+
+.case-study-card-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+}
