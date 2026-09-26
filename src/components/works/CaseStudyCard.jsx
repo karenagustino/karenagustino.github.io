@@ -23,7 +23,7 @@ const CaseStudyCard = ({ caseStudy }) => (
         <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#fff', marginBottom: 6, lineHeight: 1.2 }}>
             {caseStudy.title}
         </div>
-        <div style={{ fontWeight: 400, fontSize: '0.95rem', color: 'var(--color-sage)', marginBottom: 8 }}>
+        <div style={{ fontWeight: 400, fontSize: '0.95rem', color: '#F3E9D2', marginBottom: 8 }}>
             {caseStudy.tagline}
         </div>
         <div style={{ fontSize: '0.85rem', color: '#F3E9D2' }}>

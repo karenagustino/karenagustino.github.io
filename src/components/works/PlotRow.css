@@ -5,9 +5,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     padding: 1rem 3.5rem;
-    scroll-behavior: smooth;
     cursor: grab;
-    touch-action: pan-x;
     list-style: none;
     margin: 0;
 }

@@ -15,6 +15,7 @@ const PlotRow = ({ caseStudies }) => {
     };
 
     const handlePointerDown = (event) => {
+        if (event.pointerType !== 'mouse') return;
         const track = trackRef.current;
         if (!track) return;
         dragState.current = {

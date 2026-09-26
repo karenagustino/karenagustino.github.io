@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -14,10 +14,19 @@ const MAX_SCROLL_RETRIES = 20;
 export function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
+  const previousPathnameRef = useRef(location.pathname);
 
   useEffect(() => {
     const target = location.state?.scrollTarget;
-    if (!target) return undefined;
+    const pathnameChanged = location.pathname !== previousPathnameRef.current;
+    previousPathnameRef.current = location.pathname;
+
+    if (!target) {
+      if (pathnameChanged) {
+        window.scrollTo(0, 0);
+      }
+      return undefined;
+    }
 
     let attempts = 0;
     let frameId;
