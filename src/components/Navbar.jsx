@@ -1,13 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo.png'; // Make sure the logo is named logo.png in assets
 import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
     const logoRef = useRef(null);
     const [scrolled, setScrolled] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
 
     useEffect(() => {
         const onScroll = () => {
@@ -19,22 +16,14 @@ const Navbar = () => {
     }, []);
 
     const handleWorksClick = () => {
-        navigate('/works');
+        document.getElementById('works-section')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleGardenClick = () => {
-        if (location.pathname !== '/') {
-            navigate('/', { state: { scrollTarget: 'projects-section' } });
-            return;
-        }
         document.getElementById('projects-section')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleLogoClick = () => {
-        if (location.pathname !== '/') {
-            navigate('/', { state: { scrollTarget: 'hero-section' } });
-            return;
-        }
         const hero = document.getElementById('hero-section');
         if (hero) {
             const top = hero.getBoundingClientRect().top + window.scrollY;

@@ -1,34 +1,23 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { AppContent } from './App';
+import { fireEvent, render, screen } from '@testing-library/react';
+import App from './App';
 
-test('renders the home route by default', () => {
-    render(
-        <MemoryRouter initialEntries={['/']}>
-            <AppContent />
-        </MemoryRouter>
-    );
+test('renders the home page content', () => {
+    render(<App />);
     expect(screen.getByText(/hello, i'm/i)).toBeInTheDocument();
 });
 
-test('clicking "works" navigates to the works page', () => {
-    render(
-        <MemoryRouter initialEntries={['/']}>
-            <AppContent />
-        </MemoryRouter>
-    );
+test('clicking "works" scrolls to the works section', () => {
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+    render(<App />);
     fireEvent.click(screen.getByText('works'));
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('works');
+    const worksSection = document.getElementById('works-section');
+    expect(worksSection.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
 });
 
-test('clicking "garden" while on /works navigates home and scrolls to the projects section', async () => {
+test('clicking "garden" scrolls to the projects section', () => {
     window.HTMLElement.prototype.scrollIntoView = jest.fn();
-    render(
-        <MemoryRouter initialEntries={['/works']}>
-            <AppContent />
-        </MemoryRouter>
-    );
+    render(<App />);
     fireEvent.click(screen.getByText('garden'));
-    expect(await screen.findByText(/hello, i'm/i)).toBeInTheDocument();
-    await waitFor(() => expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled());
+    const projectsSection = document.getElementById('projects-section');
+    expect(projectsSection.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
 });
