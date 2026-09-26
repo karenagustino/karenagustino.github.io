@@ -13,6 +13,8 @@ const CaseStudyOverlay = ({ caseStudy, onClose }) => {
     return (
         <div
             className="case-study-overlay"
+            role="dialog"
+            aria-modal="true"
             style={{
                 position: 'absolute',
                 top: '50%',

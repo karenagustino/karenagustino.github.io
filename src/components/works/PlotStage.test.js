@@ -81,3 +81,48 @@ test('a drag that does not cross the midpoint snaps back to the original card', 
     fireEvent.pointerUp(track);
     expect(screen.getByLabelText('A — open full screen')).toHaveAttribute('tabindex', '0');
 });
+
+test('a drag released outside the track still finishes, and does not stay stuck', () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    const track = screen.getByLabelText('Case studies — drag, click a card, or use arrow keys to browse');
+    fireEvent.pointerDown(track, { pointerType: 'mouse', clientX: 200 });
+    fireEvent.pointerMove(window, { clientX: 200 - 161 });
+    // Release over the arrow button, outside the <ul>.
+    fireEvent.pointerUp(screen.getByLabelText('Next case study'));
+    expect(screen.getByLabelText('B — open full screen')).toHaveAttribute('tabindex', '0');
+
+    // A bare pointermove with no button held must no longer move the carousel.
+    fireEvent.pointerMove(window, { clientX: 200 - 500 });
+    expect(screen.getByLabelText('B — open full screen')).toHaveAttribute('tabindex', '0');
+});
+
+test('dragging while the overlay is open cannot swap the case study behind it', () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    expect(screen.getByText('Problem A')).toBeInTheDocument();
+
+    const track = screen.getByLabelText('Case studies — drag, click a card, or use arrow keys to browse');
+    fireEvent.pointerDown(track, { pointerType: 'mouse', clientX: 200 });
+    fireEvent.pointerMove(window, { clientX: 200 - 500 });
+    fireEvent.pointerUp(window);
+
+    expect(screen.getByText('Problem A')).toBeInTheDocument();
+    expect(screen.queryByText('Problem C')).not.toBeInTheDocument();
+});
+
+test('the arrow buttons are disabled while the overlay is open', () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    expect(screen.getByLabelText('Next case study')).not.toBeDisabled();
+    fireEvent.click(screen.getByText('A'));
+    expect(screen.getByLabelText('Next case study')).toBeDisabled();
+    expect(screen.getByLabelText('Previous case study')).toBeDisabled();
+});
+
+test('Escape closes the overlay even when focus has moved off the track', () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    expect(screen.getByText('Problem A')).toBeInTheDocument();
+    // Focus has moved away from the track — the key press lands on the body.
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+    expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
+});

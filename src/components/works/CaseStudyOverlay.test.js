@@ -20,6 +20,12 @@ test('renders the case study detail text', () => {
     expect(screen.getByText(sampleCaseStudy.outcome)).toBeInTheDocument();
 });
 
+test('the overlay exposes modal dialog semantics', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+});
+
 test('clicking the close button calls onClose', () => {
     const handleClose = jest.fn();
     render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={handleClose} />);
