@@ -1,5 +1,5 @@
 import React from 'react';
-import PlotRow from './works/PlotRow';
+import PlotStage from './works/PlotStage';
 import caseStudies from '../data/caseStudies';
 
 const Works = () => (
@@ -18,7 +18,7 @@ const Works = () => (
         <p style={{ textAlign: 'center', color: 'var(--color-sage)', fontFamily: 'Roboto, sans-serif', fontStyle: 'italic', marginTop: '0.5rem', marginBottom: '1.5rem', fontSize: '1.05rem' }}>
             deeper roots behind the garden
         </p>
-        <PlotRow caseStudies={caseStudies} />
+        <PlotStage caseStudies={caseStudies} />
     </section>
 );
 

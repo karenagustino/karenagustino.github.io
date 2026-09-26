@@ -1,20 +1,17 @@
-.plot-row-track {
-    display: flex;
-    flex-direction: row;
-    gap: 24px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 1rem 3.5rem;
-    cursor: grab;
+.plot-stage-track {
+    position: relative;
+    height: 100%;
+    perspective: 1200px;
     list-style: none;
     margin: 0;
+    padding: 0;
 }
 
-.plot-row-track:active {
-    cursor: grabbing;
+.plot-stage-track--dragging .case-study-card {
+    transition: none !important;
 }
 
-.plot-row-arrow {
+.plot-stage-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -30,21 +27,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
+    z-index: 250;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-.plot-row-arrow-left {
+.plot-stage-arrow-left {
     left: 0.5rem;
 }
 
-.plot-row-arrow-right {
+.plot-stage-arrow-right {
     right: 0.5rem;
-}
-
-@media (max-width: 700px) {
-    .plot-row-track {
-        padding: 1rem 3rem;
-        gap: 16px;
-    }
 }
