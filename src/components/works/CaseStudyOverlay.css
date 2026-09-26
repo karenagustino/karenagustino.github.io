@@ -1,0 +1,27 @@
+.case-study-overlay {
+    animation: case-study-overlay-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes case-study-overlay-in {
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.case-study-overlay-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+}
