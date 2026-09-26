@@ -1,110 +1,55 @@
-import React, { useState } from 'react';
-import soilBg from '../../assets/patch.png';
+import React from 'react';
 import './CaseStudyCard.css';
 
 const CARD_WIDTH = 380;
 const CARD_HEIGHT = 260;
-const EXPANDED_WIDTH = 640;
 
-const collapsedBackground = `url(${soilBg}) center/cover no-repeat`;
-const expandedBackground = `linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url(${soilBg}) center/cover no-repeat`;
+const cardBackground = 'linear-gradient(135deg, #1B1F2A 0%, #262B36 100%)';
 
-const CaseStudyCard = ({ caseStudy }) => {
-    const [expanded, setExpanded] = useState(false);
+const CaseStudyCard = ({ caseStudy, positionStyle, isActive, onClick }) => {
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onClick();
+        }
+    };
 
     const cardStyle = {
-        width: expanded ? `min(${EXPANDED_WIDTH}px, 90vw)` : CARD_WIDTH,
+        width: CARD_WIDTH,
         height: CARD_HEIGHT,
-        flexShrink: 0,
-        background: expanded ? expandedBackground : collapsedBackground,
+        position: 'absolute',
+        top: 0,
+        left: '50%',
+        marginLeft: -CARD_WIDTH / 2,
+        background: cardBackground,
         borderRadius: 12,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: expanded ? 'flex-start' : 'flex-end',
+        justifyContent: 'flex-end',
         padding: '1.2rem',
         boxSizing: 'border-box',
         fontFamily: 'Roboto, sans-serif',
-        position: 'relative',
-        overflowY: expanded ? 'auto' : 'hidden',
         cursor: 'pointer',
+        ...positionStyle,
     };
-
-    const handleClose = (event) => {
-        event.stopPropagation();
-        setExpanded(false);
-    };
-
-    const handleExpandedKeyDown = (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            handleClose(event);
-        }
-    };
-
-    const handleCollapsedKeyDown = (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            setExpanded(true);
-        }
-    };
-
-    if (expanded) {
-        return (
-            <div
-                className="case-study-card case-study-card--expanded"
-                style={cardStyle}
-                role="button"
-                tabIndex={0}
-                aria-expanded={true}
-                onClick={handleClose}
-                onKeyDown={handleExpandedKeyDown}
-            >
-                <button
-                    type="button"
-                    className="case-study-card-close"
-                    aria-label="Collapse case study"
-                    onClick={handleClose}
-                >
-                    ×
-                </button>
-                <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#fff', marginBottom: 4, lineHeight: 1.2 }}>
-                    {caseStudy.title}
-                </div>
-                <div style={{ fontWeight: 400, fontSize: '0.85rem', color: '#F3E9D2', marginBottom: 10 }}>
-                    {caseStudy.role} · {caseStudy.timeframe}
-                </div>
-                <div style={{ fontSize: '0.9rem', color: '#fff', marginBottom: 8 }}>
-                    {caseStudy.problem}
-                </div>
-                <ul style={{ margin: '0 0 8px 0', paddingLeft: 18, fontSize: '0.85rem', color: '#F3E9D2' }}>
-                    {caseStudy.process.map((step) => (
-                        <li key={step}>{step}</li>
-                    ))}
-                </ul>
-                <div style={{ fontSize: '0.9rem', color: '#fff' }}>
-                    {caseStudy.outcome}
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div
             className="case-study-card"
             style={cardStyle}
             role="button"
-            tabIndex={0}
-            aria-expanded={false}
-            onClick={() => setExpanded(true)}
-            onKeyDown={handleCollapsedKeyDown}
+            tabIndex={isActive ? 0 : -1}
+            aria-label={`${caseStudy.title} — open full screen`}
+            onClick={onClick}
+            onKeyDown={handleKeyDown}
         >
             <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#fff', marginBottom: 6, lineHeight: 1.2 }}>
                 {caseStudy.title}
             </div>
-            <div style={{ fontWeight: 400, fontSize: '0.95rem', color: '#F3E9D2', marginBottom: 8 }}>
+            <div style={{ fontWeight: 400, fontSize: '0.95rem', color: '#A9B8D6', marginBottom: 8 }}>
                 {caseStudy.tagline}
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#F3E9D2' }}>
+            <div style={{ fontSize: '0.85rem', color: '#A9B8D6' }}>
                 {caseStudy.tech.join(' · ')}
             </div>
         </div>
