@@ -1,10 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo.png'; // Make sure the logo is named logo.png in assets
 import ThemeToggle from './ThemeToggle';
 
-const Navbar = ({ onWorksClick }) => {
+const Navbar = () => {
     const logoRef = useRef(null);
     const [scrolled, setScrolled] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const onScroll = () => {
@@ -15,11 +18,23 @@ const Navbar = ({ onWorksClick }) => {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
+    const handleWorksClick = () => {
+        navigate('/works');
+    };
+
     const handleGardenClick = () => {
+        if (location.pathname !== '/') {
+            navigate('/', { state: { scrollTarget: 'projects-section' } });
+            return;
+        }
         document.getElementById('projects-section')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleLogoClick = () => {
+        if (location.pathname !== '/') {
+            navigate('/', { state: { scrollTarget: 'hero-section' } });
+            return;
+        }
         const hero = document.getElementById('hero-section');
         if (hero) {
             const top = hero.getBoundingClientRect().top + window.scrollY;
@@ -54,7 +69,7 @@ const Navbar = ({ onWorksClick }) => {
             transition: 'background 0.3s, box-shadow 0.3s',
             backdropFilter: scrolled ? 'blur(4px)' : 'none',
         }}>
-            <span style={{ cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: 700, fontFamily: 'Roboto, sans-serif' }} onClick={onWorksClick}>works</span>
+            <span style={{ cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: 700, fontFamily: 'Roboto, sans-serif' }} onClick={handleWorksClick}>works</span>
             <img ref={logoRef} src={logo} alt="Karen Agustino Logo" style={{ height: 54, margin: '0 18px', cursor: 'pointer' }} onClick={handleLogoClick} />
             <span style={{ cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: 700, fontFamily: 'Roboto, sans-serif' }} onClick={handleGardenClick}>garden</span>
             <ThemeToggle />
@@ -62,4 +77,4 @@ const Navbar = ({ onWorksClick }) => {
     );
 };
 
-export default Navbar; 
+export default Navbar;

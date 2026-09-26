@@ -60,7 +60,6 @@ const PlotRow = ({ caseStudies }) => {
             <ul
                 className="plot-row-track"
                 ref={trackRef}
-                role="list"
                 aria-label="Case studies — scroll, drag, or use arrow keys to browse"
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
