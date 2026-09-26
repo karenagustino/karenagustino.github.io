@@ -11,10 +11,13 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    /* The track handles all of its own pointer gestures. Without this the
-       browser claims touch gestures for native panning and fires
-       pointercancel, which aborts a drag before it starts. */
-    touch-action: none;
+    /* The carousel drag is horizontal-only. `pan-y` claims horizontal touch
+       gestures for the track — without it the browser takes them for native
+       panning and fires pointercancel, aborting a drag before it starts —
+       while still letting a vertical swipe scroll the page natively. (`none`
+       would also fix the drag, but it deadens vertical page scrolling
+       anywhere over the carousel.) */
+    touch-action: pan-y;
 }
 
 /* `perspective` only applies to an element's DIRECT children. Without
