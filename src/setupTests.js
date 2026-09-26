@@ -16,3 +16,17 @@ if (typeof window.matchMedia !== 'function') {
         dispatchEvent: () => false,
     });
 }
+
+if (typeof window.PointerEvent === 'undefined') {
+    class PointerEvent extends MouseEvent {
+        constructor(type, params = {}) {
+            super(type, params);
+            this.pointerId = params.pointerId ?? 0;
+            this.pointerType = params.pointerType ?? '';
+            this.width = params.width ?? 1;
+            this.height = params.height ?? 1;
+            this.isPrimary = params.isPrimary ?? true;
+        }
+    }
+    window.PointerEvent = PointerEvent;
+}
