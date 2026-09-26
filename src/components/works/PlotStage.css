@@ -17,6 +17,14 @@
     touch-action: none;
 }
 
+/* `perspective` only applies to an element's DIRECT children. Without
+   preserve-3d on the <li> wrappers, each card's translateZ/rotateY is
+   flattened by its <li> before the track's perspective can apply, and the
+   coverflow renders as a flat orthographic projection. */
+.plot-stage-track > li {
+    transform-style: preserve-3d;
+}
+
 .plot-stage-track--dragging .case-study-card {
     transition: none !important;
 }
