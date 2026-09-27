@@ -10,10 +10,20 @@ import vrIcon from '../assets/vr.png';
 import snapIcon from '../assets/snap.png';
 import soilBg from '../assets/patch.png';
 
-const CARD_WIDTH = 380;
-const CARD_HEIGHT = 210;
-const ICON_SIZE = 70;
-const CIRCLE_SIZE = 120;
+// patch.png is 558x375. The card used to be 380x210 (a wider ratio), so
+// `center/cover` scaled the artwork to fill the box and cropped roughly 45px
+// off the top and bottom — cutting the hand-drawn rough edges that give the
+// patch its shape. Driving the card off the artwork's own ratio keeps the
+// whole patch visible, and doing it with aspect-ratio rather than a fixed
+// height keeps that true at every width, not just the widest one.
+const PATCH_WIDTH = 558;
+const PATCH_HEIGHT = 375;
+const CARD_WIDTH = 440;
+// Fluid so the content still fits inside the patch's proportions on a phone.
+// aspect-ratio yields to content that doesn't fit, so fixed sizes here would
+// stretch the card taller than the artwork and bring the cropping back.
+const ICON_SIZE = 'clamp(50px, 14vw, 82px)';
+const CIRCLE_SIZE = 'clamp(84px, 23vw, 140px)';
 
 const projects = [
     {
@@ -74,7 +84,7 @@ const cardStyle = {
     // Without border-box the 1.2rem side padding is added on top of width:100%,
     // so the card renders wider than its own grid column.
     boxSizing: 'border-box',
-    height: CARD_HEIGHT,
+    aspectRatio: `${PATCH_WIDTH} / ${PATCH_HEIGHT}`,
     overflow: 'visible',
     background: `url(${soilBg}) center/cover no-repeat`,
     position: 'relative',
@@ -85,7 +95,9 @@ const cardStyle = {
     fontFamily: 'Roboto, sans-serif',
     fontWeight: 500,
     fontSize: '1.1rem',
-    padding: '2.2rem 1.2rem 1.2rem 1.2rem',
+    // Symmetric: the old 2.2rem top against a 1.2rem bottom pushed the centred
+    // content half a rem below the patch's actual middle.
+    padding: 'clamp(1rem, 3vw, 1.6rem)',
     margin: '0 auto',
     transition: 'transform 0.18s cubic-bezier(.4,2,.6,1), box-shadow 0.18s cubic-bezier(.4,2,.6,1)',
     cursor: 'pointer',
@@ -103,7 +115,8 @@ const iconCircleStyle = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: '0 auto 18px auto',
+    margin: '0 auto clamp(10px, 2.5vw, 20px) auto',
+    flexShrink: 0,
     boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
 };
 
@@ -144,7 +157,9 @@ const Projects = () => {
                 // forces a 380px track even in a 390px viewport, which is what
                 // pushed the page into horizontal scroll.
                 gridTemplateColumns: `repeat(auto-fit, minmax(min(${CARD_WIDTH}px, 100%), 1fr))`,
-                gap: '2.5rem',
+                // Rows get the extra room: the leaf decorations hang ~45px below
+                // each patch, so a tighter row gap crowds them into the next row.
+                gap: '4rem 3.25rem',
                 justifyItems: 'center',
                 margin: '0 auto',
                 maxWidth: 1100,
@@ -166,10 +181,10 @@ const Projects = () => {
                             <div style={iconCircleStyle}>
                                 {proj.icon && <img src={proj.icon} alt="icon" style={{ width: ICON_SIZE, height: ICON_SIZE, objectFit: 'contain', display: 'block' }} />}
                             </div>
-                            <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#fff', textAlign: 'center', marginBottom: 6, lineHeight: 1.2 }}>
+                            <div style={{ fontWeight: 700, fontSize: 'clamp(0.95rem, 3vw, 1.25rem)', color: '#fff', textAlign: 'center', marginBottom: 8, lineHeight: 1.2 }}>
                                 {proj.title}
                             </div>
-                            <div style={{ fontWeight: 400, fontSize: '1rem', color: '#F3E9D2', textAlign: 'center', lineHeight: 1.1 }}>
+                            <div style={{ fontWeight: 400, fontSize: 'clamp(0.82rem, 2.6vw, 1.05rem)', color: '#F3E9D2', textAlign: 'center', lineHeight: 1.15 }}>
                                 {proj.tech}
                             </div>
                             {/* Pixel decor: randomized corners */}
