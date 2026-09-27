@@ -24,6 +24,17 @@ const CARD_WIDTH = 440;
 // stretch the card taller than the artwork and bring the cropping back.
 const ICON_SIZE = 'clamp(50px, 14vw, 82px)';
 const CIRCLE_SIZE = 'clamp(84px, 23vw, 140px)';
+// The leaves used to hang 45px clear of the patch, which read as floating
+// below it. Dipping only slightly past the edge makes them look like they're
+// resting on the soil. Raising them does put them at the same height as the
+// tech line, so they sit a layer behind it (see LEAF_Z / CONTENT_LAYER) and
+// hug the outer corners rather than covering the text.
+const LEAF_SIZE = 'clamp(82px, 26vw, 118px)';
+const LEAF_DIP = -12;
+const LEAF_INSET = -4;
+const LEAF_Z = 0;
+// Keeps the title and tech line painted above the leaves.
+const CONTENT_LAYER = { position: 'relative', zIndex: 1 };
 
 const projects = [
     {
@@ -125,8 +136,8 @@ const Projects = () => {
     // Shuffle leaf positions only once
     const leafPositions = React.useMemo(() => {
         const leafCorners = [
-            { bottom: -45, left: 10 },
-            { bottom: -45, right: 10 },
+            { bottom: LEAF_DIP, left: LEAF_INSET },
+            { bottom: LEAF_DIP, right: LEAF_INSET },
         ];
         return projects.map(() => {
             // Pick one random bottom corner for each card
@@ -181,15 +192,15 @@ const Projects = () => {
                             <div style={iconCircleStyle}>
                                 {proj.icon && <img src={proj.icon} alt="icon" style={{ width: ICON_SIZE, height: ICON_SIZE, objectFit: 'contain', display: 'block' }} />}
                             </div>
-                            <div style={{ fontWeight: 700, fontSize: 'clamp(0.95rem, 3vw, 1.25rem)', color: '#fff', textAlign: 'center', marginBottom: 8, lineHeight: 1.2 }}>
+                            <div style={{ ...CONTENT_LAYER, fontWeight: 700, fontSize: 'clamp(0.95rem, 3vw, 1.25rem)', color: '#fff', textAlign: 'center', marginBottom: 8, lineHeight: 1.2 }}>
                                 {proj.title}
                             </div>
-                            <div style={{ fontWeight: 400, fontSize: 'clamp(0.82rem, 2.6vw, 1.05rem)', color: '#F3E9D2', textAlign: 'center', lineHeight: 1.15 }}>
+                            <div style={{ ...CONTENT_LAYER, fontWeight: 400, fontSize: 'clamp(0.82rem, 2.6vw, 1.05rem)', color: '#F3E9D2', textAlign: 'center', lineHeight: 1.15 }}>
                                 {proj.tech}
                             </div>
                             {/* Pixel decor: randomized corners */}
                             {leaves.map((pos, i) => (
-                                <img key={i} src={leafPixel} alt="leaf pixel" style={{ position: 'absolute', width: 100, height: 100, pointerEvents: 'none', ...pos }} />
+                                <img key={i} src={leafPixel} alt="leaf pixel" style={{ position: 'absolute', width: LEAF_SIZE, height: LEAF_SIZE, zIndex: LEAF_Z, pointerEvents: 'none', ...pos }} />
                             ))}
                         </div>
                     );
