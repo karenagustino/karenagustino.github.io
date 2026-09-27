@@ -87,6 +87,11 @@
 .plot-stage-arrow:disabled {
     opacity: 0.35;
     cursor: default;
+    /* A disabled button swallows mouse events outright, so a click on one would
+       never reach the document-level outside-click handler and the overlay
+       would stay open. Taking the arrows out of hit-testing while they're
+       disabled lets that click fall through to the stage and dismiss. */
+    pointer-events: none;
 }
 
 .plot-stage-arrow-left {

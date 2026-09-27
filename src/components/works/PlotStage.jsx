@@ -102,6 +102,28 @@ const PlotStage = ({ caseStudies }) => {
         return () => document.removeEventListener('keydown', onKeyDown);
     }, [overlayOpen]);
 
+    // Clicking anywhere outside the overlay dismisses it, back to the carousel.
+    // The listener is attached a tick late on purpose: the very click that opens
+    // the overlay is still propagating toward the document when this effect
+    // runs, and would otherwise close it again immediately. Anything the click
+    // lands on stays inert, because the card/arrow/key handlers all bail out
+    // while `overlayOpen` is true and this listener runs after them.
+    useEffect(() => {
+        if (!overlayOpen) return undefined;
+        const onDocumentClick = (event) => {
+            const target = event.target;
+            if (target instanceof Element && target.closest('.case-study-overlay')) return;
+            setOverlayOpen(false);
+        };
+        const timer = setTimeout(() => {
+            document.addEventListener('click', onDocumentClick);
+        }, 0);
+        return () => {
+            clearTimeout(timer);
+            document.removeEventListener('click', onDocumentClick);
+        };
+    }, [overlayOpen]);
+
     const handleTrackClickCapture = (event) => {
         if (dragStateRef.current.wasDrag) {
             event.preventDefault();

@@ -1,5 +1,14 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import PlotStage from './PlotStage';
+
+// The outside-click listener is attached a tick after the overlay opens, so the
+// opening click doesn't immediately close it again. Tests that click outside
+// have to let that tick elapse first.
+const flushOutsideClickListener = async () => {
+    await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+};
 
 const sampleCaseStudies = [
     { id: 'a', title: 'A', tagline: 'Tagline A', tech: ['React'], role: 'Dev', timeframe: '2024', problem: 'Problem A', process: ['Step A1'], outcome: 'Outcome A' },
@@ -125,4 +134,47 @@ test('Escape closes the overlay even when focus has moved off the track', () => 
     // Focus has moved away from the track — the key press lands on the body.
     fireEvent.keyDown(document.body, { key: 'Escape' });
     expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
+});
+
+test('clicking outside the overlay closes it', async () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    expect(screen.getByText('Problem A')).toBeInTheDocument();
+
+    await flushOutsideClickListener();
+    fireEvent.click(document.body);
+
+    expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
+});
+
+test('the click that opens the overlay does not immediately close it again', async () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+
+    await flushOutsideClickListener();
+
+    expect(screen.getByText('Problem A')).toBeInTheDocument();
+});
+
+test('clicking inside the overlay panel does not close it via the outside-click handler', async () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    await flushOutsideClickListener();
+
+    // The close button lives inside the panel: it closes through its own
+    // handler, not by being mistaken for an outside click.
+    fireEvent.click(screen.getByLabelText('Close case study'));
+
+    expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
+});
+
+test('clicking a side card while the overlay is open only closes it, without switching cards', async () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    await flushOutsideClickListener();
+
+    fireEvent.click(screen.getByText('C'));
+
+    expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('A — open full screen')).toHaveAttribute('tabindex', '0');
 });
