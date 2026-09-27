@@ -1,3 +1,23 @@
+/* Geometry lives here rather than inline so it can follow the fluid
+   --card-width/--card-height defined on .plot-stage. The negative margins are
+   half the card's own size, which is what actually centres it on the stage's
+   midpoint once `top`/`left` put its corner there. */
 .case-study-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--card-width);
+    height: var(--card-height);
+    margin-left: calc(var(--card-width) / -2);
+    margin-top: calc(var(--card-height) / -2);
+    box-sizing: border-box;
+    padding: 1.2rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1B1F2A 0%, #262B36 100%);
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
     transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
 }

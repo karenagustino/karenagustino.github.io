@@ -46,7 +46,10 @@ const Navbar = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 80,
+            // Fixed 80px pushed the "garden" link past the right edge on a
+            // 375px phone; this keeps the desktop spacing and tightens it only
+            // where the viewport can't afford it.
+            gap: 'clamp(16px, 8vw, 80px)',
             padding: '2rem 0 1.2rem 0',
             fontSize: '1.1rem',
             background: scrolled ? 'var(--color-nav-scrolled-bg)' : 'transparent',

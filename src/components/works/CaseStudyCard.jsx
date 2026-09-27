@@ -1,11 +1,6 @@
 import React from 'react';
 import './CaseStudyCard.css';
 
-const CARD_WIDTH = 380;
-const CARD_HEIGHT = 260;
-
-const cardBackground = 'linear-gradient(135deg, #1B1F2A 0%, #262B36 100%)';
-
 const CaseStudyCard = ({ caseStudy, positionStyle, isActive, onClick }) => {
     const handleKeyDown = (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -14,24 +9,10 @@ const CaseStudyCard = ({ caseStudy, positionStyle, isActive, onClick }) => {
         }
     };
 
-    const cardStyle = {
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT,
-        position: 'absolute',
-        top: 0,
-        left: '50%',
-        marginLeft: -CARD_WIDTH / 2,
-        background: cardBackground,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-        padding: '1.2rem',
-        boxSizing: 'border-box',
-        fontFamily: 'Roboto, sans-serif',
-        cursor: 'pointer',
-        ...positionStyle,
-    };
+    // Size, position and skin all live in CaseStudyCard.css so they can follow
+    // the fluid --card-* custom properties; only the per-frame coverflow values
+    // (transform/opacity/zIndex/pointerEvents) are set inline.
+    const cardStyle = { ...positionStyle };
 
     return (
         <div

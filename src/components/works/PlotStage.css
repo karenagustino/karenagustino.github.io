@@ -1,4 +1,23 @@
 .plot-stage {
+    /* Single source of truth for the carousel's geometry. Everything below is
+       fluid: the card scales with the viewport between a phone-sized floor and
+       the design's full size, and the stage/overlay are derived from it, so
+       there is no fixed-pixel layout to fall out of sync. */
+    --card-width: clamp(260px, 44vw, 638px);
+    /* Keeps the design's 638 x 478 card proportions at every size. */
+    --card-height: calc(var(--card-width) * 0.749);
+    /* Breathing room above and below the card, so it sits centred in the stage
+       with real space between it and the section heading above. */
+    --stage-padding: clamp(48px, 7vw, 110px);
+    --stage-height: calc(var(--card-height) + 2 * var(--stage-padding));
+    /* Larger than a card, but deliberately shorter than the stage so it floats
+       centred with clearance top and bottom rather than filling it edge to edge. */
+    --overlay-width: clamp(300px, 52vw, 760px);
+    --overlay-height: calc(var(--card-height) * 1.12);
+
+    position: relative;
+    width: 100%;
+    height: var(--stage-height);
     /* Side cards fan out well past the stage bounds; contain them here so they
        never leak into page-level horizontal scrolling on narrow viewports. */
     overflow: hidden;
@@ -23,9 +42,21 @@
 /* `perspective` only applies to an element's DIRECT children. Without
    preserve-3d on the <li> wrappers, each card's translateZ/rotateY is
    flattened by its <li> before the track's perspective can apply, and the
-   coverflow renders as a flat orthographic projection. */
+   coverflow renders as a flat orthographic projection.
+   `preserve-3d` also makes the <li> a containing block for its absolutely
+   positioned card, so the <li> MUST be stretched over the whole stage: left as
+   a default zero-height static block, the card's `top: 50%` resolves against 0
+   and every card hangs above the stage instead of centring in it. */
 .plot-stage-track > li {
+    position: absolute;
+    inset: 0;
     transform-style: preserve-3d;
+    /* Each <li> now covers the whole stage, and they stack on top of each
+       other, so a bare <li> would swallow every click before it reached the
+       card inside an earlier sibling. The wrappers are pure geometry — let
+       pointer events fall through them to the cards, which set their own
+       pointer-events (auto when visible, none once faded out). */
+    pointer-events: none;
 }
 
 .plot-stage-track--dragging .case-study-card {

@@ -66,7 +66,14 @@ const projects = [
 ];
 
 const cardStyle = {
-    width: CARD_WIDTH,
+    // Fluid rather than a hard 380px: on a phone a fixed width pushed the card
+    // (and its leaf decorations) past the viewport and scrolled the whole page
+    // sideways.
+    width: '100%',
+    maxWidth: CARD_WIDTH,
+    // Without border-box the 1.2rem side padding is added on top of width:100%,
+    // so the card renders wider than its own grid column.
+    boxSizing: 'border-box',
     height: CARD_HEIGHT,
     overflow: 'visible',
     background: `url(${soilBg}) center/cover no-repeat`,
@@ -132,11 +139,18 @@ const Projects = () => {
             </p>
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: `repeat(auto-fit, minmax(${CARD_WIDTH}px, 1fr))`,
+                // `min(CARD_WIDTH, 100%)` lets a column shrink below the card's
+                // design width on narrow screens; a bare minmax(380px, ...)
+                // forces a 380px track even in a 390px viewport, which is what
+                // pushed the page into horizontal scroll.
+                gridTemplateColumns: `repeat(auto-fit, minmax(min(${CARD_WIDTH}px, 100%), 1fr))`,
                 gap: '2.5rem',
                 justifyItems: 'center',
                 margin: '0 auto',
-                maxWidth: 1100
+                maxWidth: 1100,
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+                boxSizing: 'border-box'
             }}>
                 {projects.map((proj, idx) => {
                     // Use precomputed leaf positions

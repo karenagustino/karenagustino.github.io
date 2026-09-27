@@ -4,7 +4,6 @@ import CaseStudyOverlay from './CaseStudyOverlay';
 import { cardTransformStyle } from './coverflowMath';
 import './PlotStage.css';
 
-const STAGE_HEIGHT = 340;
 const PIXELS_PER_CARD = 160;
 const DRAG_THRESHOLD = 5;
 
@@ -125,7 +124,7 @@ const PlotStage = ({ caseStudies }) => {
     };
 
     return (
-        <div className="plot-stage" style={{ position: 'relative', width: '100%', height: STAGE_HEIGHT }}>
+        <div className="plot-stage">
             <button
                 type="button"
                 className="plot-stage-arrow plot-stage-arrow-left"

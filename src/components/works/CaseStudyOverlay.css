@@ -1,4 +1,23 @@
+/* Sized from the same fluid custom properties as the cards (see PlotStage.css):
+   wider and taller than a card, but deliberately shorter than the stage, so it
+   floats centred with clearance above and below instead of running to the edge. */
 .case-study-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--overlay-width);
+    height: var(--overlay-height);
+    margin-left: calc(var(--overlay-width) / -2);
+    margin-top: calc(var(--overlay-height) / -2);
+    z-index: 200;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1B1F2A 0%, #262B36 100%);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    font-family: 'Roboto', sans-serif;
+    overflow-y: auto;
+    cursor: pointer;
     animation: case-study-overlay-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
