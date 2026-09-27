@@ -10,6 +10,13 @@ const flushOutsideClickListener = async () => {
     });
 };
 
+// Closing the overlay plays a fade-out first; it only unmounts once that
+// animation reports finishing. jsdom never runs CSS animations, so tests have
+// to end it by hand.
+const finishOverlayExit = () => {
+    fireEvent.animationEnd(screen.getByRole('dialog'));
+};
+
 const sampleCaseStudies = [
     { id: 'a', title: 'A', tagline: 'Tagline A', tech: ['React'], role: 'Dev', timeframe: '2024', problem: 'Problem A', process: ['Step A1'], outcome: 'Outcome A' },
     { id: 'b', title: 'B', tagline: 'Tagline B', tech: ['Flask'], role: 'Dev', timeframe: '2024', problem: 'Problem B', process: ['Step B1'], outcome: 'Outcome B' },
@@ -70,6 +77,7 @@ test('pressing Escape while the overlay is open closes it', () => {
     fireEvent.click(screen.getByText('A'));
     expect(screen.getByText('Problem A')).toBeInTheDocument();
     fireEvent.keyDown(screen.getByLabelText('Case studies — drag, click a card, or use arrow keys to browse'), { key: 'Escape' });
+    finishOverlayExit();
     expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
 });
 
@@ -133,6 +141,7 @@ test('Escape closes the overlay even when focus has moved off the track', () => 
     expect(screen.getByText('Problem A')).toBeInTheDocument();
     // Focus has moved away from the track — the key press lands on the body.
     fireEvent.keyDown(document.body, { key: 'Escape' });
+    finishOverlayExit();
     expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
 });
 
@@ -143,8 +152,37 @@ test('clicking outside the overlay closes it', async () => {
 
     await flushOutsideClickListener();
     fireEvent.click(document.body);
+    finishOverlayExit();
 
     expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
+});
+
+test('the overlay fades out before unmounting rather than vanishing', async () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    await flushOutsideClickListener();
+
+    fireEvent.click(document.body);
+
+    // Still on screen, now playing its exit animation.
+    const panel = screen.getByRole('dialog');
+    expect(panel).toHaveClass('case-study-overlay--closing');
+    expect(screen.getByText('Problem A')).toBeInTheDocument();
+
+    fireEvent.animationEnd(panel);
+    expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
+});
+
+test('an animation ending on a child does not cut the exit short', async () => {
+    render(<PlotStage caseStudies={sampleCaseStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    await flushOutsideClickListener();
+    fireEvent.click(document.body);
+
+    // Bubbles to the panel's handler, but originates on a child.
+    fireEvent.animationEnd(screen.getByText('Problem A'));
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
 });
 
 test('the click that opens the overlay does not immediately close it again', async () => {
@@ -164,6 +202,7 @@ test('clicking inside the overlay panel does not close it via the outside-click 
     // The close button lives inside the panel: it closes through its own
     // handler, not by being mistaken for an outside click.
     fireEvent.click(screen.getByLabelText('Close case study'));
+    finishOverlayExit();
 
     expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
 });
@@ -174,6 +213,7 @@ test('clicking a side card while the overlay is open only closes it, without swi
     await flushOutsideClickListener();
 
     fireEvent.click(screen.getByText('C'));
+    finishOverlayExit();
 
     expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
     expect(screen.getByLabelText('A — open full screen')).toHaveAttribute('tabindex', '0');

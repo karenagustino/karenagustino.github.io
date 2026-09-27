@@ -39,3 +39,22 @@ test('clicking the overlay body calls onClose', () => {
     fireEvent.click(screen.getByText(sampleCaseStudy.outcome));
     expect(handleClose).toHaveBeenCalledTimes(1);
 });
+
+test('reports its exit only once the closing animation has finished', () => {
+    const handleExited = jest.fn();
+    const { rerender } = render(
+        <CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} onExited={handleExited} />
+    );
+
+    // While open, a finished entry animation must not be mistaken for an exit.
+    fireEvent.animationEnd(screen.getByRole('dialog'));
+    expect(handleExited).not.toHaveBeenCalled();
+
+    rerender(
+        <CaseStudyOverlay caseStudy={sampleCaseStudy} closing onClose={() => {}} onExited={handleExited} />
+    );
+    expect(screen.getByRole('dialog')).toHaveClass('case-study-overlay--closing');
+
+    fireEvent.animationEnd(screen.getByRole('dialog'));
+    expect(handleExited).toHaveBeenCalledTimes(1);
+});

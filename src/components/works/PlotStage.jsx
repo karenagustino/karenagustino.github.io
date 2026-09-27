@@ -13,7 +13,18 @@ const PlotStage = ({ caseStudies }) => {
     const [dragOffset, setDragOffset] = useState(0);
     const [dragging, setDragging] = useState(false);
     const [overlayOpen, setOverlayOpen] = useState(false);
+    // The panel fades out rather than vanishing, so closing is a two-step:
+    // `overlayClosing` plays the exit animation, and the overlay reports back
+    // when it has finished so it can actually be unmounted.
+    const [overlayClosing, setOverlayClosing] = useState(false);
     const dragStateRef = useRef({ startX: 0, wasDrag: false, offset: 0 });
+
+    const requestCloseOverlay = () => setOverlayClosing(true);
+
+    const handleOverlayExited = () => {
+        setOverlayOpen(false);
+        setOverlayClosing(false);
+    };
 
     const goToPrevious = () => {
         if (overlayOpen) return;
@@ -95,7 +106,7 @@ const PlotStage = ({ caseStudies }) => {
         const onKeyDown = (event) => {
             if (event.key === 'Escape') {
                 event.preventDefault();
-                setOverlayOpen(false);
+                setOverlayClosing(true);
             }
         };
         document.addEventListener('keydown', onKeyDown);
@@ -113,7 +124,7 @@ const PlotStage = ({ caseStudies }) => {
         const onDocumentClick = (event) => {
             const target = event.target;
             if (target instanceof Element && target.closest('.case-study-overlay')) return;
-            setOverlayOpen(false);
+            setOverlayClosing(true);
         };
         const timer = setTimeout(() => {
             document.addEventListener('click', onDocumentClick);
@@ -191,7 +202,9 @@ const PlotStage = ({ caseStudies }) => {
             {overlayOpen && (
                 <CaseStudyOverlay
                     caseStudy={caseStudies[activeIndex]}
-                    onClose={() => setOverlayOpen(false)}
+                    closing={overlayClosing}
+                    onClose={requestCloseOverlay}
+                    onExited={handleOverlayExited}
                 />
             )}
         </div>

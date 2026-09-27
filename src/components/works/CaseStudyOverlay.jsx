@@ -1,18 +1,28 @@
 import React from 'react';
 import './CaseStudyOverlay.css';
 
-const CaseStudyOverlay = ({ caseStudy, onClose }) => {
+const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
     const handleBodyClick = (event) => {
         event.stopPropagation();
         onClose();
     };
 
+    // The panel stays mounted while it fades out; the parent unmounts it once
+    // that animation reports back here. Guarded on the event's own target so a
+    // future animation on a child can't end the exit early by bubbling up.
+    const handleAnimationEnd = (event) => {
+        if (closing && event.target === event.currentTarget) {
+            onExited();
+        }
+    };
+
     return (
         <div
-            className="case-study-overlay"
+            className={`case-study-overlay${closing ? ' case-study-overlay--closing' : ''}`}
             role="dialog"
             aria-modal="true"
             onClick={handleBodyClick}
+            onAnimationEnd={handleAnimationEnd}
         >
             <button
                 type="button"
