@@ -30,7 +30,10 @@ const CIRCLE_SIZE = 'clamp(84px, 23vw, 140px)';
 // tech line, so they sit a layer behind it (see LEAF_Z / CONTENT_LAYER) and
 // hug the outer corners rather than covering the text.
 const LEAF_SIZE = 'clamp(82px, 26vw, 118px)';
-const LEAF_DIP = -12;
+// Expressed as a share of the leaf rather than a fixed pixel drop, so the patch
+// edge cuts through the same point of the leaf at every size: roughly a third
+// of it below the line, the rest resting on the soil.
+const LEAF_DIP = `calc(${LEAF_SIZE} * -0.32)`;
 const LEAF_INSET = -4;
 const LEAF_Z = 0;
 // Keeps the title and tech line painted above the leaves.
