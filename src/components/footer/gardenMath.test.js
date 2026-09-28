@@ -73,3 +73,101 @@ test('ridgeDither doubles up on alternate columns so the edge reads as a dither'
     expect(countAt(4)).toBe(1);
     expect(countAt(8)).toBe(2);
 });
+
+import {
+    clumpAnchors, nearestStemPoint, withinReach, cappedGrowth, stepDroplet,
+    GROW_REACH, MAX_PLANT_SCALE, ANCHOR_MIN_PCT, ANCHOR_MAX_PCT,
+} from './gardenMath';
+
+// A deterministic stand-in for the seeded RNG, so anchor tests don't depend on
+// the generator's internals.
+const sequenceRng = (values) => {
+    let i = 0;
+    return () => values[i++ % values.length];
+};
+
+const plantAt = (overrides = {}) => ({
+    xPx: 500, baseY: 300, fullHeight: 100, scale: 1, ...overrides,
+});
+
+test('clumpAnchors returns the requested number of anchors', () => {
+    expect(clumpAnchors(20, 5, sequenceRng([0.5]))).toHaveLength(20);
+});
+
+test('clumpAnchors keeps every anchor inside the visible band', () => {
+    const rng = sequenceRng([0, 0.25, 0.5, 0.75, 1]);
+    for (const anchor of clumpAnchors(40, 5, rng)) {
+        expect(anchor).toBeGreaterThanOrEqual(ANCHOR_MIN_PCT);
+        expect(anchor).toBeLessThanOrEqual(ANCHOR_MAX_PCT);
+    }
+});
+
+test('clumpAnchors bunches plants rather than spreading them evenly', () => {
+    // With a mid-range rng the clump centres are evenly spaced, so anchors
+    // should repeat those centres rather than march across in even steps.
+    const anchors = clumpAnchors(10, 5, sequenceRng([0.5]));
+    expect(anchors[0]).toBeCloseTo(anchors[5], 5);
+});
+
+test('nearestStemPoint clamps to the stem base when the pointer is below it', () => {
+    expect(nearestStemPoint({ x: 500, y: 9999 }, plantAt()).y).toBe(300);
+});
+
+test('nearestStemPoint clamps to the stem tip when the pointer is above it', () => {
+    // baseY 300, fullHeight 100, scale 1 -> tip at 200, minus the 8px of slack
+    expect(nearestStemPoint({ x: 500, y: -9999 }, plantAt()).y).toBe(192);
+});
+
+test('withinReach is true just inside the radius and false just outside', () => {
+    const plant = plantAt();
+    expect(withinReach({ x: 500 + GROW_REACH - 1, y: 300 }, plant)).toBe(true);
+    expect(withinReach({ x: 500 + GROW_REACH + 1, y: 300 }, plant)).toBe(false);
+});
+
+test('cappedGrowth grows a short plant by the full delta', () => {
+    expect(cappedGrowth(plantAt({ scale: 0.6 }), 0.2, -Infinity)).toBeCloseTo(0.8);
+});
+
+test('cappedGrowth never lets a plant top breach the ceiling', () => {
+    const plant = plantAt({ scale: 0.9 });
+    const ceilingY = 200;
+    const scale = cappedGrowth(plant, 0.9, ceilingY);
+    expect(plant.baseY - plant.fullHeight * scale).toBeGreaterThanOrEqual(ceilingY);
+});
+
+test('cappedGrowth never exceeds MAX_PLANT_SCALE even with headroom', () => {
+    expect(cappedGrowth(plantAt({ scale: 1.7 }), 5, -Infinity)).toBe(MAX_PLANT_SCALE);
+});
+
+test('cappedGrowth returns the current scale unchanged once capped', () => {
+    const plant = plantAt({ scale: MAX_PLANT_SCALE });
+    expect(cappedGrowth(plant, 0.2, -Infinity)).toBe(MAX_PLANT_SCALE);
+});
+
+test('cappedGrowth never shrinks a plant that is already past a tight ceiling', () => {
+    const plant = plantAt({ scale: 1.5 });
+    // ceiling sits below the plant's current tip: headroom is smaller than scale
+    expect(cappedGrowth(plant, 0.2, 280)).toBe(1.5);
+});
+
+test('stepDroplet accelerates downward while it is in the air', () => {
+    const drop = { x: 10, y: 0, vx: 1, vy: 0, alpha: 1, dead: false };
+    stepDroplet(drop, 0.42, () => 1000);
+    expect(drop.vy).toBeCloseTo(0.42);
+    expect(drop.y).toBeCloseTo(0.42);
+    expect(drop.x).toBeCloseTo(11);
+    expect(drop.dead).toBe(false);
+});
+
+test('stepDroplet settles a droplet onto the ridge and fades it there', () => {
+    const drop = { x: 10, y: 99, vx: 1, vy: 5, alpha: 1, dead: false };
+    stepDroplet(drop, 0.42, () => 100);
+    expect(drop.y).toBe(100);
+    expect(drop.alpha).toBeLessThan(1);
+});
+
+test('stepDroplet reports dead once it has fully faded', () => {
+    const drop = { x: 10, y: 200, vx: 0, vy: 0, alpha: 0.1, dead: false };
+    stepDroplet(drop, 0.42, () => 100);
+    expect(drop.dead).toBe(true);
+});

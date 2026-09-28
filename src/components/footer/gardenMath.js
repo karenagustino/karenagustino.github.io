@@ -66,3 +66,91 @@ export function ridgeDither(bandWidth, bandHeight, cell) {
     }
     return cells;
 }
+
+/** Click/hover radius around a stem, in px. Shared by the hint and the click,
+ *  so the "click to grow" label only ever promises what a click delivers. */
+export const GROW_REACH = 80;
+
+/** A plant may never grow past this, ceiling or no ceiling. */
+export const MAX_PLANT_SCALE = 1.75;
+
+export const DROPLET_GRAVITY = 0.42;
+
+// Anchors are percentages of the band width; these margins keep a plant's
+// sprite from being clipped by the band's edge.
+export const ANCHOR_MIN_PCT = 2;
+export const ANCHOR_MAX_PCT = 98;
+
+/**
+ * Horizontal positions for a bed of plants, in percent. Plants are bunched
+ * around a handful of clump centres rather than scattered uniformly — an even
+ * spread reads as a planted row, whereas clumps read as something that seeded
+ * itself.
+ */
+export function clumpAnchors(count, clumpCount, rng) {
+    const centers = [];
+    for (let c = 0; c < clumpCount; c++) {
+        centers.push(clamp(((c + 0.5) / clumpCount) * 100 + (rng() * 10 - 5), 7, 93));
+    }
+    const anchors = [];
+    for (let i = 0; i < count; i++) {
+        anchors.push(
+            clamp(centers[i % clumpCount] + (rng() * 12 - 6), ANCHOR_MIN_PCT, ANCHOR_MAX_PCT)
+        );
+    }
+    return anchors;
+}
+
+/**
+ * The point on a plant's stem closest to the pointer. Measuring to the stem
+ * rather than to the plant's base means a tall plant is reachable along its
+ * whole height, not only down at the soil.
+ */
+export function nearestStemPoint(pointer, plant) {
+    const tipY = plant.baseY - plant.fullHeight * plant.scale - 8;
+    return { x: plant.xPx, y: clamp(pointer.y, Math.min(tipY, plant.baseY), plant.baseY) };
+}
+
+export function withinReach(pointer, plant, reach = GROW_REACH) {
+    const point = nearestStemPoint(pointer, plant);
+    return Math.hypot(pointer.x - point.x, pointer.y - point.y) < reach;
+}
+
+/**
+ * The growth ceiling. Plants stop just under the footer's text block instead of
+ * climbing over it, so watering can never make the copy unreadable.
+ *
+ * Returns the CURRENT scale unchanged when the plant is already capped — the
+ * caller reads that as "pulse the bloom instead of growing".
+ */
+export function cappedGrowth(plant, delta, ceilingY) {
+    const maxScale = plant.maxScale ?? MAX_PLANT_SCALE;
+    const headroom = Number.isFinite(ceilingY)
+        ? (plant.baseY - ceilingY) / plant.fullHeight
+        : Infinity;
+    const cap = Math.min(maxScale, headroom);
+    if (plant.scale >= cap) return plant.scale;
+    return Math.min(cap, plant.scale + delta);
+}
+
+/**
+ * One integration step for a water droplet. Mutates `drop` in place: these run
+ * ~90 at a time every frame, and allocating a replacement object per droplet
+ * per frame is churn the GC doesn't need.
+ *
+ * `ridgeYAtX` maps a band-local x to the soil height there, so droplets splash
+ * on the actual terrain rather than at a flat line.
+ */
+export function stepDroplet(drop, gravity, ridgeYAtX) {
+    drop.vy += gravity;
+    drop.x += drop.vx;
+    drop.y += drop.vy;
+    const ground = ridgeYAtX(drop.x);
+    if (drop.y >= ground) {
+        drop.y = ground;
+        drop.alpha -= 0.16;
+        drop.vx *= 0.7;
+    }
+    drop.dead = drop.alpha <= 0;
+    return drop;
+}
