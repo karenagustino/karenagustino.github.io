@@ -740,7 +740,7 @@ export function buildPlant(rng) {
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `CI=true npx react-scripts test --watchAll=false --testPathPattern=pixelPlants`
-Expected: PASS, 22 tests (3 RNG + 6 shared × 3 builders + 1 kinds).
+Expected: PASS, 19 tests (3 RNG + 5 shared × 3 builders + 1 kinds).
 
 - [ ] **Step 5: Commit**
 
@@ -893,7 +893,7 @@ export function buildBed(count, seed = GARDEN_SEED) {
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `CI=true npx react-scripts test --watchAll=false --testPathPattern=pixelPlants`
-Expected: PASS, 31 tests.
+Expected: PASS, 28 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -2421,7 +2421,7 @@ Expected: PASS, 29 tests.
 - [ ] **Step 6: Run the whole suite**
 
 Run: `CI=true npx react-scripts test --watchAll=false`
-Expected: PASS. Expect 12 suites and ~154 tests (63 pre-existing + 91 new: 24 gardenMath, 31 pixelPlants, 29 GardenFooter, 5 Footer). Exact totals may differ by a test or two; what matters is that nothing that passed before now fails.
+Expected: PASS. Expect 12 suites and ~149 tests (63 pre-existing + 86 new: 24 gardenMath, 28 pixelPlants, 29 GardenFooter, 5 Footer). Exact totals may differ by a test or two; what matters is that nothing that passed before now fails.
 
 - [ ] **Step 7: Verify the build compiles**
 
