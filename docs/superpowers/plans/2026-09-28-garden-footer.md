@@ -923,7 +923,7 @@ EOF
 
 **Interfaces:**
 - Consumes: `buildBed`, `CELL` (Tasks 3–4), `ridgeY`, `ridgePath`, `ridgeDither` (Task 1).
-- Produces: default export `GardenFooter({ heading, children })`. Renders `.gf-footer > [.gf-band > .gf-soil, .gf-bed, .gf-fx, .gf-content]`. `useMediaQuery(query): boolean` from `src/hooks/useMediaQuery.js`.
+- Produces: default export `GardenFooter({ heading, children })` plus named exports `FALLBACK_WIDTH: 1024` and `FALLBACK_HEIGHT: 360`. Renders `.gf-footer > [.gf-band > .gf-soil, .gf-bed, .gf-fx, .gf-content]`. `useMediaQuery(query): boolean` from `src/hooks/useMediaQuery.js`. The test file also produces the shared helpers `renderGarden()` and `pointerAtPlant(index, count)`, which Tasks 10 and 11 reuse.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -931,7 +931,9 @@ Create `src/components/footer/GardenFooter.test.js`:
 
 ```js
 import { render, screen } from '@testing-library/react';
-import GardenFooter from './GardenFooter';
+import GardenFooter, { FALLBACK_WIDTH, FALLBACK_HEIGHT } from './GardenFooter';
+import { buildBed } from './pixelPlants';
+import { ridgeY } from './gardenMath';
 
 const renderGarden = () =>
     render(
@@ -939,6 +941,19 @@ const renderGarden = () =>
             <p>thank you for making it this far</p>
         </GardenFooter>
     );
+
+// jsdom has no layout, so the component falls back to a nominal band and roots
+// its plants against THAT — not at the origin. Firing pointer events at (0, 0)
+// would therefore be ~240px from the nearest stem, outside the 80px reach.
+// Compute a coordinate that genuinely lands on a plant instead: the bed is
+// seeded, so this is exact and stable.
+const pointerAtPlant = (index = 0, count = 20) => {
+    const plant = buildBed(count)[index];
+    return {
+        clientX: (plant.xPct / 100) * FALLBACK_WIDTH,
+        clientY: ridgeY(plant.xPct / 100, FALLBACK_HEIGHT) + plant.sink - 10,
+    };
+};
 
 test('renders the heading and its children', () => {
     renderGarden();
@@ -1044,8 +1059,10 @@ const TOUCH_PLANT_COUNT = 12;
 // jsdom, a hidden footer and the first paint before layout all report 0x0.
 // Falling back to a plausible band keeps the ridge maths finite and the markup
 // free of NaN, rather than scattering broken transforms through the DOM.
-const FALLBACK_WIDTH = 1024;
-const FALLBACK_HEIGHT = 360;
+// Exported so tests can compute coordinates that actually land on a plant
+// under jsdom, where nothing has a real size.
+export const FALLBACK_WIDTH = 1024;
+export const FALLBACK_HEIGHT = 360;
 
 const GardenFooter = ({ heading, children }) => {
     const bandRef = useRef(null);
@@ -2037,9 +2054,7 @@ test('growing a plant raises its scale', () => {
     const band = bandOf(container);
     const plants = [...container.querySelectorAll('.gf-plant')];
     const before = plants.map(scaleOf);
-    // jsdom puts every element at 0,0, so a click at the origin is within reach
-    // of the whole bed — which is exactly what makes this assertion simple.
-    fireEvent.pointerDown(band, { clientX: 0, clientY: 0 });
+    fireEvent.pointerDown(band, pointerAtPlant());
     const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
     expect(after.some((scale, i) => scale > before[i])).toBe(true);
 });
@@ -2048,7 +2063,7 @@ test('shows the hint when the pointer is within reach of a plant', () => {
     const { container } = renderGarden();
     const band = bandOf(container);
     fireEvent.pointerEnter(band);
-    fireEvent.pointerMove(band, { clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(band, pointerAtPlant());
     expect(container.querySelector('.gf-hint')).toHaveClass('is-on');
 });
 
@@ -2058,7 +2073,7 @@ test('caps growth and pulses the bloom instead once a plant is full', () => {
     const { container } = renderGarden();
     const band = bandOf(container);
     for (let i = 0; i < 30; i++) {
-        fireEvent.pointerDown(band, { clientX: 0, clientY: 0 });
+        fireEvent.pointerDown(band, pointerAtPlant());
     }
     for (const plant of container.querySelectorAll('.gf-plant')) {
         expect(scaleOf(plant)).toBeLessThanOrEqual(1.75);
@@ -2069,9 +2084,9 @@ test('caps growth and pulses the bloom instead once a plant is full', () => {
 test('does not shrink plants that are already at the cap', () => {
     const { container } = renderGarden();
     const band = bandOf(container);
-    for (let i = 0; i < 30; i++) fireEvent.pointerDown(band, { clientX: 0, clientY: 0 });
+    for (let i = 0; i < 30; i++) fireEvent.pointerDown(band, pointerAtPlant());
     const settled = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
-    fireEvent.pointerDown(band, { clientX: 0, clientY: 0 });
+    fireEvent.pointerDown(band, pointerAtPlant());
     const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
     expect(after).toEqual(settled);
 });
@@ -2319,7 +2334,7 @@ test('still grows plants when tapped on a touch device', () => {
     const restore = withMediaQuery((q) => q.includes('coarse'));
     const { container } = renderGarden();
     const before = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
-    fireEvent.pointerDown(bandOf(container), { clientX: 0, clientY: 0 });
+    fireEvent.pointerDown(bandOf(container), pointerAtPlant(0, 12));
     const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
     expect(after.some((scale, i) => scale > before[i])).toBe(true);
     restore();
@@ -2339,7 +2354,7 @@ test('still grows plants under reduced motion', () => {
     const restore = withMediaQuery((q) => q.includes('reduced-motion'));
     const { container } = renderGarden();
     const before = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
-    fireEvent.pointerDown(bandOf(container), { clientX: 0, clientY: 0 });
+    fireEvent.pointerDown(bandOf(container), pointerAtPlant());
     const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
     expect(after.some((scale, i) => scale > before[i])).toBe(true);
     restore();
