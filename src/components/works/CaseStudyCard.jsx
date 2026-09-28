@@ -1,7 +1,9 @@
 import React from 'react';
 import './CaseStudyCard.css';
 
-const CaseStudyCard = ({ caseStudy, positionStyle, isActive, onClick }) => {
+const pad = (value) => String(value).padStart(2, '0');
+
+const CaseStudyCard = ({ caseStudy, positionStyle, isActive, index = 0, onClick }) => {
     const handleKeyDown = (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
@@ -24,15 +26,10 @@ const CaseStudyCard = ({ caseStudy, positionStyle, isActive, onClick }) => {
             onClick={onClick}
             onKeyDown={handleKeyDown}
         >
-            <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#fff', marginBottom: 6, lineHeight: 1.2 }}>
-                {caseStudy.title}
-            </div>
-            <div style={{ fontWeight: 400, fontSize: '0.95rem', color: '#A9B8D6', marginBottom: 8 }}>
-                {caseStudy.tagline}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#A9B8D6' }}>
-                {caseStudy.tech.join(' · ')}
-            </div>
+            <span className="case-study-card-eyebrow" aria-hidden="true">CASE FILE {pad(index + 1)}</span>
+            <div className="case-study-card-title">{caseStudy.title}</div>
+            <div className="case-study-card-tagline">{caseStudy.tagline}</div>
+            <div className="case-study-card-tech">{caseStudy.tech.join(' · ')}</div>
         </div>
     );
 };

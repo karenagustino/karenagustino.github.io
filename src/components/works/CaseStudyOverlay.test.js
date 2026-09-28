@@ -136,3 +136,25 @@ test('an animation ending on a child does not report the exit', () => {
     fireEvent.animationEnd(screen.getByText('Users could not find the checkout button.'));
     expect(handleExited).not.toHaveBeenCalled();
 });
+
+test('labels the case file with its position in the set', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} index={2} total={4} onClose={() => {}} />);
+    expect(screen.getByText('CASE FILE 03 / 04')).toBeInTheDocument();
+});
+
+test('numbers the chapters and the section headings in step', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
+    // Two numbered chips per section: one in the chapter list, one on the heading.
+    expect(screen.getAllByText('01')).toHaveLength(2);
+    expect(screen.getAllByText('03')).toHaveLength(2);
+});
+
+// jsdom reports every element as zero-sized, so the meter can only be checked
+// for its starting state and its wiring here; the scrolled values are verified
+// in a real browser.
+test('exposes reading progress as a progressbar starting at zero', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
+    const meter = screen.getByRole('progressbar', { name: 'Reading progress' });
+    expect(meter).toHaveAttribute('aria-valuenow', '0');
+    expect(screen.getByText('00%')).toBeInTheDocument();
+});

@@ -7,6 +7,22 @@
   --color-accent-orange: #C46A13;
   --color-sage: #B6BFA6;
   --color-nav-scrolled-bg: rgba(255, 255, 255, 0.85);
+
+  /* Game-panel surface. The case study card and its overlay are built as one
+     framed widget, so they share a face, an inset-tile colour, a chunky frame
+     and their own ink rather than borrowing the page's body colours. */
+  --color-panel: #FFFDF7;
+  --color-panel-alt: #F2EFE4;
+  --color-panel-frame: #49523A;
+  --color-panel-line: rgba(73, 82, 58, 0.18);
+  --color-panel-ink: #49523A;
+  --color-panel-muted: #7A8168;
+  --color-panel-shadow: rgba(73, 82, 58, 0.28);
+  /* Darker than --color-accent-orange, which only reaches 3.4:1 on the panel's
+     cream. The panel prints it at pixel-label sizes, so it needs to clear 4.5. */
+  --color-panel-accent: #9A5310;
+  --color-scrim: rgba(73, 82, 58, 0.42);
+  --font-pixel: 'Silkscreen', 'Courier New', monospace;
 }
 
 [data-theme="dark"] {
@@ -18,6 +34,16 @@
   --color-accent-orange: #E08A3C;
   --color-sage: #8A9478;
   --color-nav-scrolled-bg: rgba(38, 43, 54, 0.85);
+
+  --color-panel: #262B36;
+  --color-panel-alt: #1E2330;
+  --color-panel-frame: #7D8AA8;
+  --color-panel-line: rgba(169, 184, 214, 0.16);
+  --color-panel-ink: #E8E6DE;
+  --color-panel-muted: #9AA3B2;
+  --color-panel-shadow: rgba(0, 0, 0, 0.55);
+  --color-panel-accent: #E08A3C;
+  --color-scrim: rgba(9, 12, 19, 0.74);
 }
 
 body {

@@ -6,6 +6,12 @@ import './CaseStudyOverlay.css';
 // behind while scrolling down.
 const SPY_OFFSET = 96;
 
+// Cells in the progress meter. A segmented bar reads as a game HUD where a
+// smooth one reads as a loading spinner.
+const PROGRESS_CELLS = 12;
+
+const pad = (value) => String(value).padStart(2, '0');
+
 // Blocks are keyed by index on purpose: the data is static and never reordered,
 // and placeholder entries legitimately repeat the same label and value, which
 // would collide if the content were used as the key.
@@ -44,9 +50,10 @@ const renderBlock = (block, index) => {
     );
 };
 
-const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
+const CaseStudyOverlay = ({ caseStudy, index = 0, total = 0, closing, onClose, onExited }) => {
     const sections = caseStudy.sections || [];
     const [activeSection, setActiveSection] = useState(sections.length ? sections[0].id : null);
+    const [progress, setProgress] = useState(0);
     const contentRef = useRef(null);
     const sectionRefs = useRef({});
 
@@ -73,11 +80,12 @@ const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
         }
     };
 
-    // Keeps the sidebar in step with the reader: the last heading to have passed
-    // the threshold is the section they're in.
+    // Keeps the sidebar and the meter in step with the reader: the last heading
+    // to have passed the threshold is the section they're in.
     const handleScroll = () => {
         const container = contentRef.current;
         if (!container || !sections.length) return;
+
         const containerTop = container.getBoundingClientRect().top;
         let current = sections[0].id;
         sections.forEach((section) => {
@@ -87,7 +95,13 @@ const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
             }
         });
         setActiveSection(current);
+
+        const scrollable = container.scrollHeight - container.clientHeight;
+        setProgress(scrollable > 0 ? Math.min(1, container.scrollTop / scrollable) : 1);
     };
+
+    const percent = Math.round(progress * 100);
+    const filledCells = Math.round(progress * PROGRESS_CELLS);
 
     return (
         <>
@@ -107,43 +121,69 @@ const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
                 onAnimationEnd={handleAnimationEnd}
             >
                 <header className="case-study-header">
-                    <div className="case-study-header-identity">
-                        <h2 className="case-study-title">{caseStudy.title}</h2>
-                        <p className="case-study-subtitle">
-                            {caseStudy.role} · {caseStudy.timeframe}
-                        </p>
-                        {caseStudy.tags && caseStudy.tags.length > 0 && (
-                            <div className="case-study-tags">
-                                {caseStudy.tags.map((tag, index) => (
-                                    <span className="case-study-tag" key={index}>{tag}</span>
+                    <div className="case-study-header-top">
+                        <div className="case-study-header-identity">
+                            <span className="case-study-eyebrow">
+                                CASE FILE {pad(index + 1)}{total > 0 && ` / ${pad(total)}`}
+                            </span>
+                            <h2 className="case-study-title">{caseStudy.title}</h2>
+                            <p className="case-study-subtitle">
+                                {caseStudy.role} · {caseStudy.timeframe}
+                            </p>
+                            {caseStudy.tags && caseStudy.tags.length > 0 && (
+                                <div className="case-study-tags">
+                                    {caseStudy.tags.map((tag, tagIndex) => (
+                                        <span className="case-study-tag" key={tagIndex}>{tag}</span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        {caseStudy.stats && caseStudy.stats.length > 0 && (
+                            <div className="case-study-header-stats">
+                                {caseStudy.stats.map((stat, statIndex) => (
+                                    <div className="case-study-stat" key={statIndex}>
+                                        <span className="case-study-stat-value">{stat.value}</span>
+                                        <span className="case-study-stat-label">{stat.label}</span>
+                                    </div>
                                 ))}
                             </div>
                         )}
+                        <button
+                            type="button"
+                            className="case-study-overlay-close"
+                            aria-label="Close case study"
+                            onClick={onClose}
+                        >
+                            ×
+                        </button>
                     </div>
-                    {caseStudy.stats && caseStudy.stats.length > 0 && (
-                        <div className="case-study-header-stats">
-                            {caseStudy.stats.map((stat, index) => (
-                                <div className="case-study-stat" key={index}>
-                                    <span className="case-study-stat-value">{stat.value}</span>
-                                    <span className="case-study-stat-label">{stat.label}</span>
-                                </div>
+
+                    <div className="case-study-progress">
+                        <span className="case-study-progress-label">PROGRESS</span>
+                        <span
+                            className="case-study-progress-track"
+                            role="progressbar"
+                            aria-label="Reading progress"
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-valuenow={percent}
+                        >
+                            {Array.from({ length: PROGRESS_CELLS }, (unused, cell) => (
+                                <span
+                                    key={cell}
+                                    className={`case-study-progress-cell${cell < filledCells ? ' case-study-progress-cell--filled' : ''}`}
+                                />
                             ))}
-                        </div>
-                    )}
-                    <button
-                        type="button"
-                        className="case-study-overlay-close"
-                        aria-label="Close case study"
-                        onClick={onClose}
-                    >
-                        ×
-                    </button>
+                        </span>
+                        <span className="case-study-progress-value">{pad(percent)}%</span>
+                    </div>
                 </header>
 
                 <div className="case-study-body">
                     <nav className="case-study-nav" aria-label="Case study sections">
+                        <span className="case-study-nav-heading">CHAPTERS</span>
                         <ul>
-                            {sections.map((section) => {
+                            {sections.map((section, sectionIndex) => {
                                 const isActive = section.id === activeSection;
                                 return (
                                     <li key={section.id}>
@@ -153,6 +193,7 @@ const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
                                             aria-current={isActive ? 'true' : undefined}
                                             onClick={() => jumpToSection(section.id)}
                                         >
+                                            <span className="case-study-nav-index" aria-hidden="true">{pad(sectionIndex + 1)}</span>
                                             <span className="case-study-nav-icon" aria-hidden="true">{section.icon}</span>
                                             <span className="case-study-nav-label">{section.title}</span>
                                         </button>
@@ -163,7 +204,7 @@ const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
                     </nav>
 
                     <div className="case-study-content" ref={contentRef} onScroll={handleScroll}>
-                        {sections.map((section) => {
+                        {sections.map((section, sectionIndex) => {
                             const headingId = `${caseStudy.id}-${section.id}`;
                             return (
                                 <section
@@ -173,10 +214,13 @@ const CaseStudyOverlay = ({ caseStudy, closing, onClose, onExited }) => {
                                     ref={(node) => { sectionRefs.current[section.id] = node; }}
                                 >
                                     <h3 className="case-study-section-heading" id={headingId}>
+                                        <span className="case-study-section-index" aria-hidden="true">{pad(sectionIndex + 1)}</span>
                                         <span className="case-study-section-icon" aria-hidden="true">{section.icon}</span>
                                         {section.title}
                                     </h3>
-                                    {(section.blocks || []).map(renderBlock)}
+                                    <div className="case-study-section-body">
+                                        {(section.blocks || []).map(renderBlock)}
+                                    </div>
                                 </section>
                             );
                         })}

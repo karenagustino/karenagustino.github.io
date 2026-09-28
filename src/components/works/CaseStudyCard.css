@@ -1,7 +1,11 @@
 /* Geometry lives here rather than inline so it can follow the fluid
    --card-width/--card-height defined on .plot-stage. The negative margins are
    half the card's own size, which is what actually centres it on the stage's
-   midpoint once `top`/`left` put its corner there. */
+   midpoint once `top`/`left` put its corner there.
+
+   Colour comes from the --color-panel-* tokens, the same set the overlay uses,
+   so a card reads as the closed state of the panel it opens into and both
+   follow the page between daylight and night. */
 .case-study-card {
     position: absolute;
     top: 50%;
@@ -12,12 +16,54 @@
     margin-top: calc(var(--card-height) / -2);
     box-sizing: border-box;
     padding: 1.2rem;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #1B1F2A 0%, #262B36 100%);
+    border: 3px solid var(--color-panel-frame);
+    border-radius: 8px;
+    background: var(--color-panel);
+    box-shadow:
+        0 0 0 3px var(--color-panel),
+        0 0 0 6px var(--color-panel-frame),
+        0 18px 40px var(--color-panel-shadow);
     font-family: 'Roboto', sans-serif;
+    color: var(--color-panel-ink);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+}
+
+/* Matches the overlay's CASE FILE line, so opening a card continues a label the
+   reader has already seen rather than introducing one. */
+.case-study-card-eyebrow {
+    position: absolute;
+    top: 1rem;
+    left: 1.2rem;
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: var(--color-panel-accent);
+}
+
+.case-study-card-title {
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-panel-ink);
+}
+
+.case-study-card-tagline {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: var(--color-panel-muted);
+}
+
+.case-study-card-tech {
+    padding-top: 0.6rem;
+    border-top: 2px dashed var(--color-panel-line);
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    line-height: 1.7;
+    color: var(--color-panel-muted);
 }

@@ -184,6 +184,7 @@ const PlotStage = ({ caseStudies }) => {
                                 caseStudy={caseStudy}
                                 positionStyle={cardTransformStyle(distance, isActive)}
                                 isActive={isActive}
+                                index={index}
                                 onClick={() => handleCardClick(index)}
                             />
                         </li>
@@ -202,6 +203,8 @@ const PlotStage = ({ caseStudies }) => {
             {overlayOpen && (
                 <CaseStudyOverlay
                     caseStudy={caseStudies[activeIndex]}
+                    index={activeIndex}
+                    total={total}
                     closing={overlayClosing}
                     onClose={requestCloseOverlay}
                     onExited={handleOverlayExited}

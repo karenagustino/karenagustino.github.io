@@ -4,12 +4,16 @@
    clip safely here because nothing between this element and the viewport sets a
    transform, filter or perspective, which is what would otherwise turn an
    ancestor into the containing block. (.plot-stage-track does set perspective,
-   but the overlay is a sibling of the track, not a descendant.) */
+   but the overlay is a sibling of the track, not a descendant.)
+
+   Everything below is drawn from the --color-panel-* tokens in index.css, so
+   the same rules render a cream panel with dark green ink in daylight and a
+   slate panel with warm off-white ink at night. */
 .case-study-backdrop {
     position: fixed;
     inset: 0;
     z-index: 900;
-    background: rgba(9, 12, 19, 0.74);
+    background: var(--color-scrim);
     animation: case-study-backdrop-in 0.3s ease;
 }
 
@@ -31,10 +35,17 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    background: linear-gradient(160deg, #1B1F2A 0%, #232833 100%);
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    /* A cabinet frame: hard inner border, a gap of panel colour, then the outer
+       rule. Two solid rings read as a game window where one soft edge reads as
+       a document. */
+    border: 3px solid var(--color-panel-frame);
+    border-radius: 8px;
+    background: var(--color-panel);
+    box-shadow:
+        0 0 0 3px var(--color-panel),
+        0 0 0 6px var(--color-panel-frame),
+        0 24px 70px var(--color-panel-shadow);
+    color: var(--color-panel-ink);
     font-family: 'Roboto', sans-serif;
     animation: case-study-overlay-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -78,97 +89,153 @@
     to { opacity: 0; }
 }
 
-/* ---------- header bar ---------- */
+/* ---------- header: the status banner ---------- */
 
 .case-study-header {
-    position: relative;
     flex-shrink: 0;
+    border-bottom: 3px solid var(--color-panel-frame);
+    background: var(--color-panel-alt);
+}
+
+.case-study-header-top {
+    position: relative;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1.5rem;
-    padding: 1.5rem 3.25rem 1.25rem 1.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.02);
+    padding: 1.25rem 3.25rem 1.1rem 1.5rem;
+}
+
+.case-study-eyebrow {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-pixel);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-panel-accent);
 }
 
 .case-study-title {
     margin: 0;
     font-size: clamp(1.25rem, 3vw, 1.6rem);
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.2;
-    color: #fff;
+    color: var(--color-panel-ink);
 }
 
 .case-study-subtitle {
-    margin: 0.35rem 0 0 0;
+    margin: 0.3rem 0 0 0;
     font-size: 0.85rem;
-    color: #8E9BB5;
+    color: var(--color-panel-muted);
 }
 
 .case-study-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.75rem;
+    gap: 0.35rem;
+    margin-top: 0.7rem;
 }
 
 .case-study-tag {
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-    background: rgba(169, 184, 214, 0.12);
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 0.09em;
-    color: #A9B8D6;
+    padding: 0.18rem 0.45rem;
+    border: 2px solid var(--color-panel-line);
+    background: var(--color-panel);
+    font-family: var(--font-pixel);
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    color: var(--color-panel-muted);
 }
 
+/* Stat tiles, read as a character sheet rather than a byline. */
 .case-study-header-stats {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
-    text-align: right;
+    gap: 0.5rem;
 }
 
 .case-study-stat {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.25rem;
+    min-width: 88px;
+    padding: 0.5rem 0.65rem;
+    border: 2px solid var(--color-panel-line);
+    background: var(--color-panel);
 }
 
 .case-study-stat-value {
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-family: var(--font-pixel);
+    font-size: 1.05rem;
     line-height: 1;
-    color: #fff;
+    color: var(--color-panel-ink);
 }
 
 .case-study-stat-label {
-    font-size: 0.66rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-family: var(--font-pixel);
+    font-size: 0.55rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #8E9BB5;
+    color: var(--color-panel-muted);
 }
 
 .case-study-overlay-close {
     position: absolute;
-    top: 0.9rem;
-    right: 0.9rem;
-    padding: 0 0.35rem;
-    border: none;
-    background: none;
-    color: #8E9BB5;
-    font-size: 1.5rem;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 2px solid var(--color-panel-line);
+    background: var(--color-panel);
+    color: var(--color-panel-muted);
+    font-size: 1.05rem;
     line-height: 1;
     cursor: pointer;
 }
 
 .case-study-overlay-close:hover {
-    color: #fff;
+    border-color: var(--color-panel-accent);
+    color: var(--color-panel-accent);
 }
 
-/* ---------- body: sidebar + scrolling content ---------- */
+/* ---------- progress meter ---------- */
+
+.case-study-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.5rem 0.65rem 1.5rem;
+    border-top: 2px solid var(--color-panel-line);
+}
+
+.case-study-progress-label,
+.case-study-progress-value {
+    font-family: var(--font-pixel);
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    color: var(--color-panel-muted);
+}
+
+.case-study-progress-track {
+    display: flex;
+    flex: 1;
+    gap: 2px;
+    min-width: 0;
+}
+
+.case-study-progress-cell {
+    flex: 1;
+    height: 9px;
+    border: 1px solid var(--color-panel-line);
+    background: var(--color-panel);
+}
+
+.case-study-progress-cell--filled {
+    border-color: var(--color-panel-accent);
+    background: var(--color-panel-accent);
+}
+
+/* ---------- body: chapter list + scrolling content ---------- */
 
 .case-study-body {
     flex: 1;
@@ -180,10 +247,21 @@
 
 .case-study-nav {
     flex-shrink: 0;
-    width: 190px;
-    padding: 1.25rem 0.75rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    width: 208px;
+    padding: 1rem 0.75rem;
+    border-right: 3px solid var(--color-panel-frame);
+    background: var(--color-panel-alt);
     overflow-y: auto;
+}
+
+.case-study-nav-heading {
+    display: block;
+    padding: 0 0.5rem;
+    margin-bottom: 0.7rem;
+    font-family: var(--font-pixel);
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: var(--color-panel-muted);
 }
 
 .case-study-nav ul {
@@ -192,50 +270,90 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.3rem;
 }
 
 .case-study-nav-item {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.5rem;
     width: 100%;
-    padding: 0.5rem 0.65rem;
-    border: none;
-    border-radius: 8px;
+    padding: 0.45rem 0.5rem;
+    border: 2px solid transparent;
     background: none;
     font-family: inherit;
     font-size: 0.85rem;
     text-align: left;
-    color: #8E9BB5;
+    color: var(--color-panel-muted);
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .case-study-nav-item:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--color-panel-line);
+    color: var(--color-panel-ink);
 }
 
+/* The selected chapter, lit the way a menu cursor lights a row. */
 .case-study-nav-item--active {
-    color: #fff;
-    background: rgba(169, 184, 214, 0.14);
+    border-color: var(--color-panel-frame);
+    background: var(--color-panel);
+    color: var(--color-panel-ink);
+    font-weight: 700;
+}
+
+/* A numbered chip, so the chapters read as ordered stages rather than links. */
+.case-study-nav-index {
+    flex-shrink: 0;
+    width: 22px;
+    padding: 2px 0;
+    border: 2px solid var(--color-panel-line);
+    background: var(--color-panel);
+    font-family: var(--font-pixel);
+    font-size: 0.55rem;
+    text-align: center;
+    color: var(--color-panel-muted);
+}
+
+.case-study-nav-item--active .case-study-nav-index {
+    border-color: var(--color-panel-accent);
+    background: var(--color-panel-accent);
+    color: var(--color-panel);
 }
 
 .case-study-nav-icon {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.case-study-nav-label {
+    min-width: 0;
 }
 
 .case-study-content {
     flex: 1;
     min-width: 0;
-    padding: 1.75rem 2rem 2.5rem 2rem;
+    padding: 1.5rem 1.75rem 2.5rem 1.75rem;
     overflow-y: auto;
     scroll-behavior: smooth;
 }
 
+.case-study-content::-webkit-scrollbar {
+    width: 12px;
+}
+
+.case-study-content::-webkit-scrollbar-track {
+    background: var(--color-panel-alt);
+}
+
+.case-study-content::-webkit-scrollbar-thumb {
+    border: 3px solid var(--color-panel-alt);
+    background: var(--color-panel-frame);
+}
+
+/* ---------- sections as numbered stages ---------- */
+
 .case-study-section + .case-study-section {
-    margin-top: 2.25rem;
+    margin-top: 2rem;
 }
 
 .case-study-section-heading {
@@ -243,120 +361,145 @@
     align-items: center;
     gap: 0.55rem;
     margin: 0 0 0.85rem 0;
+    padding-bottom: 0.55rem;
+    border-bottom: 2px dashed var(--color-panel-line);
     font-size: 1.05rem;
-    font-weight: 700;
-    color: #fff;
+    font-weight: 800;
+    color: var(--color-panel-ink);
+}
+
+.case-study-section-index {
+    flex-shrink: 0;
+    padding: 0.25rem 0.4rem;
+    border: 2px solid var(--color-panel-frame);
+    background: var(--color-panel-alt);
+    font-family: var(--font-pixel);
+    font-size: 0.66rem;
+    line-height: 1;
+    color: var(--color-panel-ink);
 }
 
 .case-study-section-icon {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+}
+
+/* A rail down the left of each stage's contents, so the eye can see where one
+   stage's material starts and stops without reading the headings. */
+.case-study-section-body {
+    padding-left: 1.1rem;
+    border-left: 2px dotted var(--color-panel-line);
 }
 
 .case-study-prose {
-    margin: 0 0 0.9rem 0;
+    margin: 0 0 0.85rem 0;
     font-size: 0.95rem;
-    line-height: 1.75;
-    color: #C7D0E0;
+    line-height: 1.7;
+    color: var(--color-panel-ink);
 }
 
 .case-study-prose:last-child {
     margin-bottom: 0;
 }
 
-/* ---------- row list ---------- */
+/* ---------- row list, drawn as slots ---------- */
 
 .case-study-rows {
     list-style: none;
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.85rem 0;
     padding: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 
 .case-study-row {
     display: grid;
-    grid-template-columns: 150px 1fr;
-    gap: 0.25rem 1.25rem;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    grid-template-columns: 132px 1fr;
+    gap: 0.25rem 1rem;
+    padding: 0.7rem 0.85rem;
+    border: 2px solid var(--color-panel-line);
+    background: var(--color-panel-alt);
 }
 
 .case-study-row-label {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #fff;
+    font-family: var(--font-pixel);
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    color: var(--color-panel-accent);
 }
 
 .case-study-row-text {
     font-size: 0.9rem;
     line-height: 1.6;
-    color: #A9B8D6;
+    color: var(--color-panel-ink);
 }
 
-/* ---------- metric cards ---------- */
+/* ---------- metric tiles ---------- */
 
 .case-study-metrics {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
-    gap: 0.75rem;
-    margin: 0 0 1.25rem 0;
+    gap: 0.5rem;
+    margin: 0 0 1rem 0;
 }
 
 .case-study-metric {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.04);
+    padding: 0.85rem;
+    border: 2px solid var(--color-panel-line);
+    border-top: 4px solid var(--color-panel-accent);
+    background: var(--color-panel-alt);
 }
 
 .case-study-metric-value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-family: var(--font-pixel);
+    font-size: 1.3rem;
     line-height: 1;
-    color: #fff;
+    color: var(--color-panel-ink);
 }
 
 .case-study-metric-label {
     font-size: 0.8rem;
-    font-weight: 600;
-    color: #C7D0E0;
+    font-weight: 700;
+    color: var(--color-panel-ink);
 }
 
 .case-study-metric-caption {
     font-size: 0.72rem;
-    color: #7F8CA5;
+    color: var(--color-panel-muted);
 }
 
 .case-study-note {
-    margin: 2.25rem 0 0 0;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    margin: 2rem 0 0 0;
+    padding: 0.7rem 0.85rem;
+    border: 2px dashed var(--color-panel-line);
     font-size: 0.78rem;
     font-style: italic;
-    color: #6F7B92;
+    color: var(--color-panel-muted);
 }
 
 /* ---------- narrow screens ---------- */
 
-/* The sidebar becomes a scrollable strip of pills above the content: a 190px
-   rail plus readable prose does not fit in a phone's width. */
+/* The chapter list becomes a scrollable strip of chips above the content: a
+   208px rail plus readable prose does not fit in a phone's width. */
 @media (max-width: 760px) {
     .case-study-overlay {
         width: 94vw;
         height: 90vh;
     }
 
-    .case-study-header {
+    .case-study-header-top {
         flex-direction: column;
-        gap: 1rem;
-        padding: 1.25rem 2.75rem 1rem 1.25rem;
+        gap: 0.9rem;
+        padding: 1.1rem 2.75rem 1rem 1.1rem;
     }
 
-    .case-study-header-stats {
-        gap: 1.25rem;
-        text-align: left;
+    .case-study-progress {
+        padding-left: 1.1rem;
+        padding-right: 1.1rem;
     }
 
     .case-study-body {
@@ -365,11 +508,15 @@
 
     .case-study-nav {
         width: auto;
-        padding: 0.65rem 0.75rem;
+        padding: 0.6rem 0.75rem;
         border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 3px solid var(--color-panel-frame);
         overflow-x: auto;
         overflow-y: hidden;
+    }
+
+    .case-study-nav-heading {
+        display: none;
     }
 
     .case-study-nav ul {
@@ -380,11 +527,16 @@
     .case-study-nav-item {
         width: auto;
         white-space: nowrap;
-        border-radius: 999px;
+        border-color: var(--color-panel-line);
+        background: var(--color-panel);
     }
 
     .case-study-content {
-        padding: 1.25rem 1.25rem 2rem 1.25rem;
+        padding: 1.1rem 1.1rem 2rem 1.1rem;
+    }
+
+    .case-study-section-body {
+        padding-left: 0.8rem;
     }
 
     .case-study-row {
