@@ -1,0 +1,104 @@
+/* Garden footer. All tokens live on .gf-footer rather than on .gf-band, because
+   the watering can and its hint are fixed-position siblings of the band and
+   still need to read them. */
+.gf-footer {
+    position: relative;
+    --gf-soil: #B2875F;
+    --gf-soil-edge: #8E6A48;
+    --gf-drop: #6CC2EE;
+    --gf-can-body: #C08663;
+    --gf-can-rim: #8E5F3F;
+}
+
+[data-theme="dark"] .gf-footer {
+    --gf-soil: #4A3B2C;
+    --gf-soil-edge: #33291E;
+    --gf-drop: #7FD4FF;
+    --gf-can-body: #D8A07C;
+    --gf-can-rim: #A06E4C;
+}
+
+.gf-band {
+    position: relative;
+    width: 100%;
+    height: clamp(320px, 38vw, 460px);
+    overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .gf-band { height: clamp(240px, 56vw, 320px); }
+}
+
+.gf-soil {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.gf-bed { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.gf-fx  { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+
+.gf-content {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    padding: clamp(1.5rem, 4vw, 3rem) 1rem 0;
+    color: var(--color-text-navy);
+}
+
+.gf-heading {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: clamp(0.95rem, 2.4vw, 1.4rem);
+    letter-spacing: 0.04em;
+    color: var(--color-text-primary);
+    margin: 0 0 1.1rem 0;
+    /* Scroll-scrubbed by JS (Task 7); starts collapsed. */
+    transform: scale(var(--gf-grow, 0));
+    transform-origin: center;
+    will-change: transform;
+}
+
+.gf-plant {
+    position: absolute;
+    transform: translateX(-50%) scale(var(--gf-scale, 0.7));
+    transform-origin: bottom center;
+    transition: transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gf-plant svg { display: block; overflow: visible; }
+
+/* Sway lives on a wrapper so the plant's own growth transform and its idle
+   rotation never fight over the same property. */
+.gf-sway {
+    transform-origin: bottom center;
+    animation: gf-sway var(--gf-sway-t, 5s) ease-in-out infinite alternate;
+    animation-delay: var(--gf-sway-d, 0s);
+}
+
+@keyframes gf-sway {
+    from { transform: rotate(calc(var(--gf-sway-a, 2deg) * -1)); }
+    to   { transform: rotate(var(--gf-sway-a, 2deg)); }
+}
+
+.gf-head { transform-box: fill-box; transform-origin: center; }
+
+.gf-head.is-blooming {
+    animation: gf-bloom 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes gf-bloom {
+    0%   { transform: scale(0.92); }
+    45%  { transform: scale(1.22); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gf-sway { animation: none; }
+    .gf-plant { transition: none; }
+    .gf-head.is-blooming { animation: none; }
+    .gf-heading { transform: none; }
+}
