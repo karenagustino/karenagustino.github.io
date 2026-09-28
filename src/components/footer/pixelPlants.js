@@ -4,6 +4,8 @@
 // bed are the same height, bend or colour, and it keeps the bloom pulse able to
 // animate a flower head on its own — which a flat PNG could not.
 
+import { clumpAnchors } from './gardenMath';
+
 /** Size of one art pixel, in CSS px. */
 export const CELL = 4;
 
@@ -136,4 +138,43 @@ export function buildPlant(rng) {
     if (roll < 0.5) return { kind: 'daisy', ...buildDaisy(rng) };
     if (roll < 0.78) return { kind: 'lavender', ...buildLavender(rng) };
     return { kind: 'sprout', ...buildSprout(rng) };
+}
+
+/**
+ * Fixed seed. The bed is therefore identical on every visit — this is one
+ * recognisable garden rather than a fresh scattering each load — and identical
+ * in tests.
+ */
+export const GARDEN_SEED = 20260928;
+
+/** Number of clump centres the plants bunch around. */
+const CLUMP_COUNT = 5;
+
+/**
+ * Everything the component needs to place and animate one bed of plants. All
+ * randomness is drawn from a single seeded stream, so the whole bed is one
+ * reproducible arrangement.
+ */
+export function buildBed(count, seed = GARDEN_SEED) {
+    const rng = mulberry32(seed);
+    return clumpAnchors(count, CLUMP_COUNT, rng).map((xPct, id) => {
+        const built = buildPlant(rng);
+        return {
+            id,
+            xPct,
+            kind: built.kind,
+            cells: built.cells,
+            width: built.width,
+            height: built.height,
+            // Sunk a few px below the ridge so stems emerge FROM the soil
+            // instead of standing on top of it.
+            sink: 2 + rng() * 4,
+            startScale: 0.55 + rng() * 0.4,
+            swayAmplitude: Number((1.4 + rng() * 2).toFixed(1)),
+            swayPeriod: Number((4 + rng() * 3).toFixed(1)),
+            // Negative delays start each plant partway through its sway, so the
+            // bed isn't caught mid-salute on load.
+            swayDelay: Number((-rng() * 3).toFixed(1)),
+        };
+    });
 }
