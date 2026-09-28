@@ -17,12 +17,28 @@ const finishOverlayExit = () => {
     fireEvent.animationEnd(screen.getByRole('dialog'));
 };
 
-const sampleCaseStudies = [
-    { id: 'a', title: 'A', tagline: 'Tagline A', tech: ['React'], role: 'Dev', timeframe: '2024', problem: 'Problem A', process: ['Step A1'], outcome: 'Outcome A' },
-    { id: 'b', title: 'B', tagline: 'Tagline B', tech: ['Flask'], role: 'Dev', timeframe: '2024', problem: 'Problem B', process: ['Step B1'], outcome: 'Outcome B' },
-    { id: 'c', title: 'C', tagline: 'Tagline C', tech: ['Vue'], role: 'Dev', timeframe: '2024', problem: 'Problem C', process: ['Step C1'], outcome: 'Outcome C' },
-    { id: 'd', title: 'D', tagline: 'Tagline D', tech: ['Node'], role: 'Dev', timeframe: '2024', problem: 'Problem D', process: ['Step D1'], outcome: 'Outcome D' },
-];
+// Only the fields PlotStage and its children actually read. The overlay renders
+// from `sections`, so each entry carries one, and 'Problem A' below is the text
+// the overlay-visibility assertions key off.
+const sampleCaseStudy = (letter) => ({
+    id: letter.toLowerCase(),
+    title: letter,
+    tagline: `Tagline ${letter}`,
+    tech: ['React'],
+    role: 'Dev',
+    timeframe: '2024',
+    sections: [
+        {
+            id: 'overview',
+            icon: '\u{1F4D6}',
+            title: 'Overview',
+            blocks: [{ type: 'prose', text: `Problem ${letter}` }],
+        },
+    ],
+});
+
+const sampleCaseStudies = ['A', 'B', 'C', 'D'].map(sampleCaseStudy);
+
 
 test('renders one card per case study', () => {
     render(<PlotStage caseStudies={sampleCaseStudies} />);

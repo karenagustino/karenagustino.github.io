@@ -1,23 +1,41 @@
-/* Sized from the same fluid custom properties as the cards (see PlotStage.css):
-   wider and taller than a card, but deliberately shorter than the stage, so it
-   floats centred with clearance above and below instead of running to the edge. */
+/* The panel is a viewport-level modal rather than a card-sized tile inside the
+   stage: a sectioned document needs far more room than the stage's height
+   allows, and .plot-stage clips its own overflow. `position: fixed` escapes that
+   clip safely here because nothing between this element and the viewport sets a
+   transform, filter or perspective, which is what would otherwise turn an
+   ancestor into the containing block. (.plot-stage-track does set perspective,
+   but the overlay is a sibling of the track, not a descendant.) */
+.case-study-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    background: rgba(9, 12, 19, 0.74);
+    animation: case-study-backdrop-in 0.3s ease;
+}
+
+.case-study-backdrop--closing {
+    animation: case-study-backdrop-out 0.3s ease forwards;
+}
+
 .case-study-overlay {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
-    width: var(--overlay-width);
-    height: var(--overlay-height);
-    margin-left: calc(var(--overlay-width) / -2);
-    margin-top: calc(var(--overlay-height) / -2);
-    z-index: 200;
+    /* Folded into the keyframes too: a bare `scale()` there would replace this
+       translate and throw the panel off centre for the whole animation. */
+    transform: translate(-50%, -50%);
+    width: min(1040px, 94vw);
+    height: min(860px, 88vh);
+    z-index: 901;
     box-sizing: border-box;
-    padding: 1.5rem;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #1B1F2A 0%, #262B36 100%);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    background: linear-gradient(160deg, #1B1F2A 0%, #232833 100%);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
     font-family: 'Roboto', sans-serif;
-    overflow-y: auto;
-    cursor: pointer;
     animation: case-study-overlay-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -31,34 +49,345 @@
 @keyframes case-study-overlay-in {
     from {
         opacity: 0;
-        transform: scale(0.85);
+        transform: translate(-50%, -50%) scale(0.94);
     }
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: translate(-50%, -50%) scale(1);
     }
 }
 
 @keyframes case-study-overlay-out {
     from {
         opacity: 1;
-        transform: scale(1);
+        transform: translate(-50%, -50%) scale(1);
     }
     to {
         opacity: 0;
-        transform: scale(0.85);
+        transform: translate(-50%, -50%) scale(0.94);
     }
+}
+
+@keyframes case-study-backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes case-study-backdrop-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* ---------- header bar ---------- */
+
+.case-study-header {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.5rem 3.25rem 1.25rem 1.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.case-study-title {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.case-study-subtitle {
+    margin: 0.35rem 0 0 0;
+    font-size: 0.85rem;
+    color: #8E9BB5;
+}
+
+.case-study-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.case-study-tag {
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(169, 184, 214, 0.12);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    color: #A9B8D6;
+}
+
+.case-study-header-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    text-align: right;
+}
+
+.case-study-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.case-study-stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.case-study-stat-label {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8E9BB5;
 }
 
 .case-study-overlay-close {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
+    top: 0.9rem;
+    right: 0.9rem;
+    padding: 0 0.35rem;
     border: none;
-    color: #fff;
-    font-size: 1.4rem;
+    background: none;
+    color: #8E9BB5;
+    font-size: 1.5rem;
     line-height: 1;
     cursor: pointer;
-    padding: 4px 8px;
+}
+
+.case-study-overlay-close:hover {
+    color: #fff;
+}
+
+/* ---------- body: sidebar + scrolling content ---------- */
+
+.case-study-body {
+    flex: 1;
+    display: flex;
+    /* Without min-height:0 the flex child refuses to shrink below its content,
+       so the content pane grows past the panel instead of scrolling inside it. */
+    min-height: 0;
+}
+
+.case-study-nav {
+    flex-shrink: 0;
+    width: 190px;
+    padding: 1.25rem 0.75rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-y: auto;
+}
+
+.case-study-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.case-study-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    text-align: left;
+    color: #8E9BB5;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.case-study-nav-item:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.case-study-nav-item--active {
+    color: #fff;
+    background: rgba(169, 184, 214, 0.14);
+}
+
+.case-study-nav-icon {
+    font-size: 0.95rem;
+}
+
+.case-study-content {
+    flex: 1;
+    min-width: 0;
+    padding: 1.75rem 2rem 2.5rem 2rem;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.case-study-section + .case-study-section {
+    margin-top: 2.25rem;
+}
+
+.case-study-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0 0 0.85rem 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.case-study-section-icon {
+    font-size: 1.15rem;
+}
+
+.case-study-prose {
+    margin: 0 0 0.9rem 0;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: #C7D0E0;
+}
+
+.case-study-prose:last-child {
+    margin-bottom: 0;
+}
+
+/* ---------- row list ---------- */
+
+.case-study-rows {
+    list-style: none;
+    margin: 0 0 1rem 0;
+    padding: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.case-study-row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 0.25rem 1.25rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.case-study-row-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.case-study-row-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #A9B8D6;
+}
+
+/* ---------- metric cards ---------- */
+
+.case-study-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    gap: 0.75rem;
+    margin: 0 0 1.25rem 0;
+}
+
+.case-study-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.case-study-metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.case-study-metric-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #C7D0E0;
+}
+
+.case-study-metric-caption {
+    font-size: 0.72rem;
+    color: #7F8CA5;
+}
+
+.case-study-note {
+    margin: 2.25rem 0 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 0.78rem;
+    font-style: italic;
+    color: #6F7B92;
+}
+
+/* ---------- narrow screens ---------- */
+
+/* The sidebar becomes a scrollable strip of pills above the content: a 190px
+   rail plus readable prose does not fit in a phone's width. */
+@media (max-width: 760px) {
+    .case-study-overlay {
+        width: 94vw;
+        height: 90vh;
+    }
+
+    .case-study-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem 2.75rem 1rem 1.25rem;
+    }
+
+    .case-study-header-stats {
+        gap: 1.25rem;
+        text-align: left;
+    }
+
+    .case-study-body {
+        flex-direction: column;
+    }
+
+    .case-study-nav {
+        width: auto;
+        padding: 0.65rem 0.75rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .case-study-nav ul {
+        flex-direction: row;
+        gap: 0.35rem;
+    }
+
+    .case-study-nav-item {
+        width: auto;
+        white-space: nowrap;
+        border-radius: 999px;
+    }
+
+    .case-study-content {
+        padding: 1.25rem 1.25rem 2rem 1.25rem;
+    }
+
+    .case-study-row {
+        grid-template-columns: 1fr;
+    }
 }
