@@ -151,6 +151,20 @@ const GardenFooter = ({ heading, children }) => {
         };
     }, [reducedMotion]);
 
+    // Around twenty sway animations run forever once the bed is mounted. Park
+    // them while the footer is off screen: it is a play-state toggle only, so
+    // nothing about the animations themselves changes.
+    useEffect(() => {
+        const band = bandRef.current;
+        if (!band || typeof IntersectionObserver !== 'function') return undefined;
+        const observer = new IntersectionObserver(
+            ([entry]) => band.classList.toggle('gf-idle', !entry.isIntersecting),
+            { rootMargin: '120px 0px' }
+        );
+        observer.observe(band);
+        return () => observer.disconnect();
+    }, []);
+
     // The can replaces the native cursor, so it is desktop-only: a touch device
     // has no hover state to reveal it with, and it would just be a sprite stuck
     // to the screen.

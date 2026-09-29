@@ -142,6 +142,9 @@
 .gf-can.is-on,
 .gf-hint.is-on { opacity: 1; }
 
+.gf-idle,
+.gf-idle * { animation-play-state: paused !important; }
+
 .gf-drop {
     position: absolute;
     top: 0;

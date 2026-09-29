@@ -261,3 +261,80 @@ test('compounds growth from two pointerDown events fired without a render betwee
     // clobbered second write would leave the total at a single step's size.
     expect(after - before).toBeGreaterThan(0.24);
 });
+
+// Overrides the setupTests polyfill, which answers false to everything.
+const withMediaQuery = (matcher) => {
+    const original = window.matchMedia;
+    window.matchMedia = (query) => ({
+        matches: matcher(query),
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+    });
+    return () => { window.matchMedia = original; };
+};
+
+test('plants a smaller bed on touch devices', () => {
+    const restore = withMediaQuery((q) => q.includes('coarse'));
+    const { container } = renderGarden();
+    expect(container.querySelectorAll('.gf-plant')).toHaveLength(12);
+    restore();
+});
+
+test('leaves out the watering can on touch devices', () => {
+    const restore = withMediaQuery((q) => q.includes('coarse'));
+    const { container } = renderGarden();
+    expect(container.querySelector('.gf-can')).toBeNull();
+    expect(container.querySelector('.gf-hint')).toBeNull();
+    restore();
+});
+
+test('still grows plants when tapped on a touch device', () => {
+    const restore = withMediaQuery((q) => q.includes('coarse'));
+    const { container } = renderGarden();
+    const before = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    fireEvent.pointerDown(bandOf(container), pointerAtPlant(0, 12));
+    const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    expect(after.some((scale, i) => scale > before[i])).toBe(true);
+    restore();
+});
+
+test('pins the heading open and skips the mist under reduced motion', () => {
+    const restore = withMediaQuery((q) => q.includes('reduced-motion'));
+    const { container } = renderGarden();
+    expect(screen.getByText("let's grow something").style.getPropertyValue('--gf-grow')).toBe('1');
+    fireEvent.pointerEnter(bandOf(container));
+    fireEvent.pointerMove(bandOf(container), { clientX: 200, clientY: 200 });
+    expect(container.querySelectorAll('.gf-drop')).toHaveLength(0);
+    restore();
+});
+
+test('still grows plants under reduced motion', () => {
+    const restore = withMediaQuery((q) => q.includes('reduced-motion'));
+    const { container } = renderGarden();
+    const before = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    fireEvent.pointerDown(bandOf(container), pointerAtPlant());
+    const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    expect(after.some((scale, i) => scale > before[i])).toBe(true);
+    restore();
+});
+
+test('parks the sway animations while the footer is off screen', () => {
+    const observers = [];
+    window.IntersectionObserver = class {
+        constructor(callback) { this.callback = callback; observers.push(this); }
+        observe() {}
+        disconnect() {}
+    };
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    observers[0].callback([{ isIntersecting: false }]);
+    expect(band).toHaveClass('gf-idle');
+    observers[0].callback([{ isIntersecting: true }]);
+    expect(band).not.toHaveClass('gf-idle');
+    delete window.IntersectionObserver;
+});
