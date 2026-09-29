@@ -1502,7 +1502,6 @@ Add this effect after the measuring effect:
             heading.style.setProperty('--gf-grow', '1');
             return undefined;
         }
-        let last = null;
         const update = () => {
             const viewportHeight = window.innerHeight || 1;
             const rect = heading.getBoundingClientRect();
@@ -1511,10 +1510,14 @@ Add this effect after the measuring effect:
                 1,
                 Math.max(0, (viewportHeight - centre) / (viewportHeight * 0.5))
             );
+            // Compared against the element's own live value rather than a
+            // closure cache: a cache goes stale the moment anything else
+            // writes the property, and then silently suppresses the next
+            // real update. Reading .style is an inline-style read, so it
+            // costs no layout flush.
             const value = progress.toFixed(4);
-            if (value !== last) {
+            if (value !== heading.style.getPropertyValue('--gf-grow')) {
                 heading.style.setProperty('--gf-grow', value);
-                last = value;
             }
         };
         window.addEventListener('scroll', update, { passive: true });
