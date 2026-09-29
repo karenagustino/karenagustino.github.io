@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import GardenFooter, { FALLBACK_WIDTH, FALLBACK_HEIGHT } from './GardenFooter';
 import { buildBed } from './pixelPlants';
 import { ridgeY } from './gardenMath';
@@ -65,4 +65,28 @@ test('gives every plant a head group that can pulse on its own', () => {
     for (const plant of plants) {
         expect(plant.querySelector('.gf-head')).toBeInTheDocument();
     }
+});
+
+test('drives the heading scale from scroll position', () => {
+    renderGarden();
+    const heading = screen.getByText("let's grow something");
+    // jsdom reports a zero-height rect, which puts the heading's centre at the
+    // very top of the viewport — i.e. fully past the scrub's end point.
+    expect(heading.style.getPropertyValue('--gf-grow')).toBe('1.0000');
+});
+
+test('keeps updating the heading as the page scrolls', () => {
+    renderGarden();
+    const heading = screen.getByText("let's grow something");
+    heading.style.setProperty('--gf-grow', '0');
+    fireEvent.scroll(window);
+    expect(heading.style.getPropertyValue('--gf-grow')).toBe('1.0000');
+});
+
+test('stops listening to scroll once unmounted', () => {
+    const remove = jest.spyOn(window, 'removeEventListener');
+    const { unmount } = renderGarden();
+    unmount();
+    expect(remove).toHaveBeenCalledWith('scroll', expect.any(Function));
+    remove.mockRestore();
 });

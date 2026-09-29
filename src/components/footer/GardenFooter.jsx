@@ -17,9 +17,11 @@ export const FALLBACK_HEIGHT = 360;
 
 const GardenFooter = ({ heading, children }) => {
     const bandRef = useRef(null);
+    const headingRef = useRef(null);
     const [measured, setMeasured] = useState({ width: 0, height: 0 });
 
     const isTouch = useMediaQuery('(pointer: coarse)');
+    const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
     const width = measured.width || FALLBACK_WIDTH;
     const height = measured.height || FALLBACK_HEIGHT;
@@ -45,6 +47,42 @@ const GardenFooter = ({ heading, children }) => {
         observer.observe(band);
         return () => observer.disconnect();
     }, []);
+
+    // Scroll-scrubbed heading: scales 0 -> 1 as its centre travels from the
+    // bottom of the viewport to the middle. Written straight to the element as
+    // a custom property rather than held in state — this fires on every scroll
+    // frame, and a setState here would re-render the whole bed each time.
+    useEffect(() => {
+        const heading = headingRef.current;
+        if (!heading) return undefined;
+        if (reducedMotion) {
+            heading.style.setProperty('--gf-grow', '1');
+            return undefined;
+        }
+        const update = () => {
+            const viewportHeight = window.innerHeight || 1;
+            const rect = heading.getBoundingClientRect();
+            const centre = (rect.top + rect.bottom) / 2;
+            const progress = Math.min(
+                1,
+                Math.max(0, (viewportHeight - centre) / (viewportHeight * 0.5))
+            );
+            const value = progress.toFixed(4);
+            // Compare against the DOM's own current value, not a cached one —
+            // that keeps this self-correcting while still skipping the
+            // redundant write on every unchanged frame.
+            if (heading.style.getPropertyValue('--gf-grow') !== value) {
+                heading.style.setProperty('--gf-grow', value);
+            }
+        };
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update, { passive: true });
+        update();
+        return () => {
+            window.removeEventListener('scroll', update);
+            window.removeEventListener('resize', update);
+        };
+    }, [reducedMotion]);
 
     return (
         <div className="gf-footer">
@@ -122,7 +160,7 @@ const GardenFooter = ({ heading, children }) => {
                 <div className="gf-fx" aria-hidden="true" />
 
                 <div className="gf-content">
-                    <h2 className="gf-heading">{heading}</h2>
+                    <h2 className="gf-heading" ref={headingRef}>{heading}</h2>
                     {children}
                 </div>
             </div>
