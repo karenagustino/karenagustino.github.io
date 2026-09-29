@@ -169,3 +169,76 @@ test('cancels the droplet loop and clears droplets on unmount', () => {
     expect(cancel).toHaveBeenCalled();
     cancel.mockRestore();
 });
+
+const scaleOf = (plantEl) => Number(plantEl.style.getPropertyValue('--gf-scale'));
+
+test('growing a plant raises its scale', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    const plants = [...container.querySelectorAll('.gf-plant')];
+    const before = plants.map(scaleOf);
+    fireEvent.pointerDown(band, pointerAtPlant());
+    const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    expect(after.some((scale, i) => scale > before[i])).toBe(true);
+});
+
+test('shows the hint when the pointer is within reach of a plant', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    fireEvent.pointerEnter(band);
+    fireEvent.pointerMove(band, pointerAtPlant());
+    expect(container.querySelector('.gf-hint')).toHaveClass('is-on');
+});
+
+// Review Focus 3 — watering an already-maxed plant must pulse, not creep past
+// the cap, however many times it happens.
+test('caps growth and pulses the bloom instead once a plant is full', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    for (let i = 0; i < 30; i++) {
+        fireEvent.pointerDown(band, pointerAtPlant());
+    }
+    for (const plant of container.querySelectorAll('.gf-plant')) {
+        expect(scaleOf(plant)).toBeLessThanOrEqual(1.75);
+    }
+    expect(container.querySelector('.gf-head.is-blooming')).toBeInTheDocument();
+});
+
+test('does not shrink plants that are already at the cap', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    for (let i = 0; i < 30; i++) fireEvent.pointerDown(band, pointerAtPlant());
+    const settled = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    fireEvent.pointerDown(band, pointerAtPlant());
+    const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    expect(after).toEqual(settled);
+});
+
+// Review Focus 2 — clicking the contact link must be an ordinary click.
+test('does not water or grow when the contact link is clicked', () => {
+    const { container } = render(
+        <GardenFooter heading="let's grow something">
+            <a href="mailto:someone@example.com">here</a>
+        </GardenFooter>
+    );
+    const link = screen.getByRole('link', { name: 'here' });
+    const before = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    fireEvent.pointerDown(link, { clientX: 0, clientY: 0, bubbles: true });
+    const after = [...container.querySelectorAll('.gf-plant')].map(scaleOf);
+    expect(after).toEqual(before);
+    expect(container.querySelectorAll('.gf-drop')).toHaveLength(0);
+});
+
+test('does not show the grow hint while over the contact link', () => {
+    const { container } = render(
+        <GardenFooter heading="let's grow something">
+            <a href="mailto:someone@example.com">here</a>
+        </GardenFooter>
+    );
+    const band = bandOf(container);
+    fireEvent.pointerEnter(band);
+    fireEvent.pointerMove(screen.getByRole('link', { name: 'here' }), {
+        clientX: 0, clientY: 0, bubbles: true,
+    });
+    expect(container.querySelector('.gf-hint')).not.toHaveClass('is-on');
+});

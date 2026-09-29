@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { buildBed, CELL } from './pixelPlants';
-import { ridgePath, ridgeDither, ridgeY, stepDroplet, DROPLET_GRAVITY } from './gardenMath';
+import {
+    ridgePath, ridgeDither, ridgeY, stepDroplet, withinReach, cappedGrowth,
+    DROPLET_GRAVITY, MAX_PLANT_SCALE,
+} from './gardenMath';
 import './GardenFooter.css';
 
 const DESKTOP_PLANT_COUNT = 20;
@@ -10,6 +13,10 @@ const DROPLET_CAP = 90;
 const MIST_INTERVAL_MS = 120;
 const CLICK_BURST = 16;
 const REDUCED_CLICK_BURST = 5;
+const GROWTH_DELTA_MIN = 0.14;
+const GROWTH_DELTA_MAX = 0.24;
+// Plants stop this far below the text block rather than climbing over it.
+const CEILING_PADDING = 18;
 
 // jsdom, a hidden footer and the first paint before layout all report 0x0.
 // Falling back to a plausible band keeps the ridge maths finite and the markup
@@ -74,6 +81,15 @@ const GardenFooter = ({ heading, children }) => {
         () => buildBed(isTouch ? TOUCH_PLANT_COUNT : DESKTOP_PLANT_COUNT),
         [isTouch]
     );
+
+    const [scales, setScales] = useState(() => plants.map((p) => p.startScale));
+    const [bloomTicks, setBloomTicks] = useState(() => plants.map(() => 0));
+    const contentRef = useRef(null);
+
+    useEffect(() => {
+        setScales(plants.map((p) => p.startScale));
+        setBloomTicks(plants.map(() => 0));
+    }, [plants]);
 
     // Measure the band so plants can be rooted against the ridge at whatever
     // width the viewport happens to be.
@@ -208,6 +224,20 @@ const GardenFooter = ({ heading, children }) => {
         dropsRef.current = [];
     }, []);
 
+    // The plant record the maths module works in: band-local pixels, current
+    // scale included, so reach is measured against the plant as it looks now.
+    const plantGeometry = (plant, index) => ({
+        xPx: (plant.xPct / 100) * width,
+        baseY: ridgeY(plant.xPct / 100, height) + plant.sink,
+        fullHeight: plant.height,
+        scale: scales[index] ?? plant.startScale,
+        maxScale: MAX_PLANT_SCALE,
+    });
+
+    // Real controls are clicks, not waterings: pressing the contact link must
+    // never spray or shove the plants around underneath it.
+    const onControl = (target) => !!(target?.closest && target.closest('a, button'));
+
     const handlePointerEnter = () => {
         if (!showCan) return;
         bandRef.current?.classList.add('is-live');
@@ -230,6 +260,13 @@ const GardenFooter = ({ heading, children }) => {
             // the left of the tip, so that is the one side always left clear.
             hintRef.current.style.transform =
                 `translate(${event.clientX + 16}px, ${event.clientY + 4}px)`;
+            // Shown only where a click would actually do something, so the
+            // label never promises growth over empty sky or over the link.
+            const point = toBand(event);
+            const inReach =
+                !onControl(event.target) &&
+                plants.some((plant, index) => withinReach(point, plantGeometry(plant, index)));
+            hintRef.current.classList.toggle('is-on', inReach);
         }
         if (reducedMotion) return;
         const now = performance.now();
@@ -241,8 +278,40 @@ const GardenFooter = ({ heading, children }) => {
     };
 
     const handlePointerDown = (event) => {
+        if (onControl(event.target)) return;
         const point = toBand(event);
         emit(point.x, point.y + 6, reducedMotion ? REDUCED_CLICK_BURST : CLICK_BURST, 2.6, 0.6);
+
+        const bandRect = bandRef.current?.getBoundingClientRect();
+        const contentRect = contentRef.current?.getBoundingClientRect();
+        const ceilingY = bandRect && contentRect
+            ? contentRect.bottom - bandRect.top + CEILING_PADDING
+            : -Infinity;
+
+        // Computed synchronously from the closed-over `scales`, not via the
+        // setState-updater form: a functional updater's callback runs later,
+        // during React's render phase, so a `bloomed` array only populated in
+        // there would still read empty at the check below. This handler is
+        // recreated fresh each render and fires once per event, so reading
+        // `scales` directly here is safe and lets bloomed detection happen in
+        // the same tick as the growth it is reporting on.
+        const bloomed = [];
+        const nextScales = scales.map((scale, index) => {
+            const plant = plants[index];
+            if (!plant) return scale;
+            const geometry = { ...plantGeometry(plant, index), scale };
+            if (!withinReach(point, geometry)) return scale;
+            const delta = GROWTH_DELTA_MIN + Math.random() * (GROWTH_DELTA_MAX - GROWTH_DELTA_MIN);
+            const grown = cappedGrowth(geometry, delta, ceilingY);
+            if (grown === scale) bloomed.push(index);
+            return grown;
+        });
+        setScales(nextScales);
+        if (bloomed.length) {
+            setBloomTicks((current) =>
+                current.map((tick, index) => (bloomed.includes(index) ? tick + 1 : tick))
+            );
+        }
     };
 
     return (
@@ -289,7 +358,7 @@ const GardenFooter = ({ heading, children }) => {
                                     left: `${plant.xPct}%`,
                                     bottom: `${(height - baseY).toFixed(1)}px`,
                                     zIndex: 1 + (index % 3),
-                                    '--gf-scale': plant.startScale.toFixed(3),
+                                    '--gf-scale': (scales[index] ?? plant.startScale).toFixed(3),
                                 }}
                             >
                                 <div
@@ -311,7 +380,14 @@ const GardenFooter = ({ heading, children }) => {
                                             .map((c, i) => (
                                                 <rect key={`s${i}`} x={c.x} y={c.y} width={c.w} height={c.h} fill={c.fill} />
                                             ))}
-                                        <g className="gf-head">
+                                        {/* Remounting the group on each tick is
+                                            what restarts the CSS animation — a
+                                            plant at full height pulses again
+                                            every time it is watered. */}
+                                        <g
+                                            key={bloomTicks[index]}
+                                            className={bloomTicks[index] > 0 ? 'gf-head is-blooming' : 'gf-head'}
+                                        >
                                             {plant.cells
                                                 .filter((c) => c.part === 'head')
                                                 .map((c, i) => (
@@ -327,7 +403,7 @@ const GardenFooter = ({ heading, children }) => {
 
                 <div className="gf-fx" ref={fxRef} aria-hidden="true" />
 
-                <div className="gf-content">
+                <div className="gf-content" ref={contentRef}>
                     <h2 className="gf-heading" ref={headingRef}>{heading}</h2>
                     {children}
                 </div>
