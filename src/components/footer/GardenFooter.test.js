@@ -90,3 +90,43 @@ test('stops listening to scroll once unmounted', () => {
     expect(remove).toHaveBeenCalledWith('scroll', expect.any(Function));
     remove.mockRestore();
 });
+
+test('shows the watering can only while the pointer is over the garden', () => {
+    const { container } = renderGarden();
+    const band = container.querySelector('.gf-band');
+    const can = container.querySelector('.gf-can');
+    expect(can).toBeInTheDocument();
+    expect(can).not.toHaveClass('is-on');
+
+    fireEvent.pointerEnter(band);
+    expect(can).toHaveClass('is-on');
+    expect(band).toHaveClass('is-live');
+
+    fireEvent.pointerLeave(band);
+    expect(can).not.toHaveClass('is-on');
+    expect(band).not.toHaveClass('is-live');
+});
+
+test('moves the can to follow the pointer', () => {
+    const { container } = renderGarden();
+    const band = container.querySelector('.gf-band');
+    const can = container.querySelector('.gf-can');
+    fireEvent.pointerEnter(band);
+    fireEvent.pointerMove(band, { clientX: 300, clientY: 220 });
+    expect(can.style.transform).toContain('translate(');
+    expect(can.style.transform).not.toContain('NaN');
+});
+
+test('keeps the can and hint out of assistive technology', () => {
+    const { container } = renderGarden();
+    expect(container.querySelector('.gf-can')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelector('.gf-hint')).toHaveAttribute('aria-hidden', 'true');
+});
+
+test('keeps the can outside the heading so its fixed position tracks the viewport', () => {
+    const { container } = renderGarden();
+    // A transformed ancestor becomes the containing block for position:fixed,
+    // and the heading is scaled — so the can must not live inside it.
+    expect(container.querySelector('.gf-heading .gf-can')).toBeNull();
+    expect(container.querySelector('.gf-footer > .gf-can')).toBeInTheDocument();
+});

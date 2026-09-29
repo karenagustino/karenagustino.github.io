@@ -15,9 +15,49 @@ const TOUCH_PLANT_COUNT = 12;
 export const FALLBACK_WIDTH = 1024;
 export const FALLBACK_HEIGHT = 360;
 
+// Pixel watering can, tilted to pour down-right. Rows are written out as a
+// legible little picture rather than a list of coordinates:
+//   h = handle, d = rim/shadow, b = body, s = spout, r = spout rose
+const CAN_ROWS = [
+    '...hhhh.........',
+    '..h....h........',
+    '..dddddd........',
+    '..dbbbbd........',
+    '..dbbbbd........',
+    '..dbbbbdss......',
+    '..dbbbbd.sss....',
+    '..dbbbbd...srr..',
+    '..dbbbbd....rr..',
+    '...dddd.........',
+];
+const CAN_FILL = {
+    h: 'var(--gf-can-rim)',
+    d: 'var(--gf-can-rim)',
+    b: 'var(--gf-can-body)',
+    s: 'var(--gf-can-body)',
+    r: 'var(--gf-can-rim)',
+};
+const CAN_UNIT = 3;
+// Where water leaves the rose, in rendered px from the sprite's top-left. The
+// can is positioned so this point sits on the pointer.
+const CAN_TIP_X = 13.5 * CAN_UNIT;
+const CAN_TIP_Y = 9 * CAN_UNIT;
+
+const canCells = () => {
+    const cells = [];
+    CAN_ROWS.forEach((row, y) => {
+        row.split('').forEach((ch, x) => {
+            if (CAN_FILL[ch]) cells.push({ x, y, fill: CAN_FILL[ch] });
+        });
+    });
+    return cells;
+};
+
 const GardenFooter = ({ heading, children }) => {
     const bandRef = useRef(null);
     const headingRef = useRef(null);
+    const canRef = useRef(null);
+    const hintRef = useRef(null);
     const [measured, setMeasured] = useState({ width: 0, height: 0 });
 
     const isTouch = useMediaQuery('(pointer: coarse)');
@@ -84,9 +124,45 @@ const GardenFooter = ({ heading, children }) => {
         };
     }, [reducedMotion]);
 
+    // The can replaces the native cursor, so it is desktop-only: a touch device
+    // has no hover state to reveal it with, and it would just be a sprite stuck
+    // to the screen.
+    const showCan = !isTouch;
+
+    const handlePointerEnter = () => {
+        if (!showCan) return;
+        bandRef.current?.classList.add('is-live');
+        canRef.current?.classList.add('is-on');
+    };
+
+    const handlePointerLeave = () => {
+        bandRef.current?.classList.remove('is-live');
+        canRef.current?.classList.remove('is-on');
+        hintRef.current?.classList.remove('is-on');
+    };
+
+    const handlePointerMove = (event) => {
+        if (canRef.current) {
+            canRef.current.style.transform =
+                `translate(${event.clientX - CAN_TIP_X}px, ${event.clientY - CAN_TIP_Y}px)`;
+        }
+        if (hintRef.current) {
+            // Sits to the pointer's lower right: the can's art hangs up and to
+            // the left of the tip, so that is the one side always left clear.
+            hintRef.current.style.transform =
+                `translate(${event.clientX + 16}px, ${event.clientY + 4}px)`;
+        }
+    };
+
     return (
         <div className="gf-footer">
-            <div className="gf-band" ref={bandRef}>
+            <div
+                className="gf-band"
+                ref={bandRef}
+                onPointerEnter={handlePointerEnter}
+                onPointerLeave={handlePointerLeave}
+                onPointerMove={handlePointerMove}
+            >
                 <svg
                     className="gf-soil"
                     aria-hidden="true"
@@ -164,6 +240,25 @@ const GardenFooter = ({ heading, children }) => {
                     {children}
                 </div>
             </div>
+
+            {showCan && (
+                <>
+                    <svg
+                        className="gf-can"
+                        ref={canRef}
+                        aria-hidden="true"
+                        width={16 * CAN_UNIT}
+                        height={10 * CAN_UNIT}
+                        viewBox="0 0 16 10"
+                        shapeRendering="crispEdges"
+                    >
+                        {canCells().map((c) => (
+                            <rect key={`${c.x}-${c.y}`} x={c.x} y={c.y} width={1} height={1} fill={c.fill} />
+                        ))}
+                    </svg>
+                    <div className="gf-hint" ref={hintRef} aria-hidden="true">click to grow</div>
+                </>
+            )}
         </div>
     );
 };

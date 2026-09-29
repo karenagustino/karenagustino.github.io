@@ -102,3 +102,42 @@
     .gf-head.is-blooming { animation: none; }
     .gf-heading { transform: none; }
 }
+
+/* The native cursor is hidden only over the garden itself — never over the
+   contact link, so a pointer user can't lose track of the one thing here that
+   is actually clickable. */
+.gf-band.is-live { cursor: none; }
+.gf-band.is-live a { cursor: pointer; }
+
+.gf-can,
+.gf-hint {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.gf-can {
+    z-index: 41;
+    filter: drop-shadow(0 3px 4px rgba(40, 60, 40, 0.28));
+}
+
+.gf-hint {
+    z-index: 42;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    color: var(--color-text-primary);
+    /* No plate behind it: the label crosses pale sky and dark soil, so
+       legibility comes from a halo in the page's own ground colour. */
+    text-shadow:
+        0 0 3px var(--color-bg),
+        0 0 7px var(--color-bg),
+        0 0 12px var(--color-bg);
+}
+
+.gf-can.is-on,
+.gf-hint.is-on { opacity: 1; }
