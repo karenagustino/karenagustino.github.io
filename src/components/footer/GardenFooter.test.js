@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import GardenFooter, { FALLBACK_WIDTH, FALLBACK_HEIGHT } from './GardenFooter';
 import { buildBed } from './pixelPlants';
 import { ridgeY } from './gardenMath';
@@ -241,4 +241,23 @@ test('does not show the grow hint while over the contact link', () => {
         clientX: 0, clientY: 0, bubbles: true,
     });
     expect(container.querySelector('.gf-hint')).not.toHaveClass('is-on');
+});
+
+// Two fingers landing near-simultaneously on a phone can dispatch two
+// pointerdown events in the same React batch, with no render in between.
+// Growth must compound rather than the second event overwriting the first's
+// result with a stale base.
+test('compounds growth from two pointerDown events fired without a render between them', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    const before = scaleOf(container.querySelectorAll('.gf-plant')[0]);
+    act(() => {
+        fireEvent.pointerDown(band, pointerAtPlant());
+        fireEvent.pointerDown(band, pointerAtPlant());
+    });
+    const after = scaleOf(container.querySelectorAll('.gf-plant')[0]);
+    // Each step grows by at most 0.24 (GROWTH_DELTA_MAX) and at least 0.14
+    // (GROWTH_DELTA_MIN); two compounded steps are always > 0.24, while a
+    // clobbered second write would leave the total at a single step's size.
+    expect(after - before).toBeGreaterThan(0.24);
 });

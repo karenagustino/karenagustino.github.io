@@ -86,6 +86,13 @@ const GardenFooter = ({ heading, children }) => {
     const [bloomTicks, setBloomTicks] = useState(() => plants.map(() => 0));
     const contentRef = useRef(null);
 
+    // Mirrors `scales` for handlePointerDown to read and write synchronously.
+    // A plain assignment during render — the same established pattern
+    // `tickRef.current` already uses below — keeps it current on every
+    // render without an effect.
+    const scalesRef = useRef(scales);
+    scalesRef.current = scales;
+
     useEffect(() => {
         setScales(plants.map((p) => p.startScale));
         setBloomTicks(plants.map(() => 0));
@@ -288,15 +295,19 @@ const GardenFooter = ({ heading, children }) => {
             ? contentRect.bottom - bandRect.top + CEILING_PADDING
             : -Infinity;
 
-        // Computed synchronously from the closed-over `scales`, not via the
-        // setState-updater form: a functional updater's callback runs later,
-        // during React's render phase, so a `bloomed` array only populated in
-        // there would still read empty at the check below. This handler is
-        // recreated fresh each render and fires once per event, so reading
-        // `scales` directly here is safe and lets bloomed detection happen in
-        // the same tick as the growth it is reporting on.
+        // Computed synchronously into a plain array, not via the setState-
+        // updater form: a functional updater's callback runs later, during
+        // React's render phase, so a `bloomed` array only populated in there
+        // would still read empty at the check below. Read from `scalesRef`
+        // rather than the `scales` closure, and written back to it before
+        // `setScales` is even called: two pointerDown events landing in the
+        // same batch (two fingers on a phone, with no render between them)
+        // would otherwise both read the same stale `scales`, and the second
+        // event's write would silently clobber the first's growth. The ref is
+        // mutated synchronously here regardless of whether React has
+        // re-rendered yet, so the second event picks up the first's result.
         const bloomed = [];
-        const nextScales = scales.map((scale, index) => {
+        const nextScales = scalesRef.current.map((scale, index) => {
             const plant = plants[index];
             if (!plant) return scale;
             const geometry = { ...plantGeometry(plant, index), scale };
@@ -306,6 +317,7 @@ const GardenFooter = ({ heading, children }) => {
             if (grown === scale) bloomed.push(index);
             return grown;
         });
+        scalesRef.current = nextScales;
         setScales(nextScales);
         if (bloomed.length) {
             setBloomTicks((current) =>
