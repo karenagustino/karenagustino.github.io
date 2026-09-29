@@ -78,9 +78,29 @@ test('drives the heading scale from scroll position', () => {
 test('keeps updating the heading as the page scrolls', () => {
     renderGarden();
     const heading = screen.getByText("let's grow something");
-    heading.style.setProperty('--gf-grow', '0');
-    fireEvent.scroll(window);
-    expect(heading.style.getPropertyValue('--gf-grow')).toBe('1.0000');
+    // jsdom's getBoundingClientRect is always zero, so the scroll handler's
+    // own self-correcting compare-before-write would recompute the exact same
+    // '1.0000' it wrote at mount — manually setting --gf-grow to '0' first
+    // and then asserting '1.0000' after a scroll event passes whether or not
+    // the listener is even attached, since the mount-time `update()` already
+    // wrote '1.0000' before this test touched the property at all. Stub a
+    // rect that differs between reads so a genuine recompute is
+    // distinguishable from a value the scroll listener never touched.
+    let calls = 0;
+    const rectSpy = jest.spyOn(heading, 'getBoundingClientRect').mockImplementation(() => {
+        calls += 1;
+        const y = calls * 900; // pushes the centre well past the scrub's end
+        return { top: y, bottom: y, left: 0, right: 0, width: 0, height: 0, x: 0, y, toJSON: () => {} };
+    });
+    try {
+        const before = heading.style.getPropertyValue('--gf-grow');
+        fireEvent.scroll(window);
+        expect(rectSpy).toHaveBeenCalled();
+        expect(heading.style.getPropertyValue('--gf-grow')).not.toBe(before);
+        expect(heading.style.getPropertyValue('--gf-grow')).toBe('0.0000');
+    } finally {
+        rectSpy.mockRestore();
+    }
 });
 
 test('stops listening to scroll once unmounted', () => {

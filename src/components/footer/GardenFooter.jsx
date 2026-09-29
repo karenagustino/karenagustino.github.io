@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { buildBed, CELL } from './pixelPlants';
 import {
@@ -58,7 +58,7 @@ const CAN_UNIT = 3;
 const CAN_TIP_X = 13.5 * CAN_UNIT;
 const CAN_TIP_Y = 9 * CAN_UNIT;
 
-const canCells = () => {
+const buildCanCells = () => {
     const cells = [];
     CAN_ROWS.forEach((row, y) => {
         row.split('').forEach((ch, x) => {
@@ -67,6 +67,10 @@ const canCells = () => {
     });
     return cells;
 };
+
+// The can's cells never change — computed once at module scope instead of
+// rebuilt on every render (it was previously called from inside the JSX).
+const CAN_CELLS = buildCanCells();
 
 const GardenFooter = ({ heading, children }) => {
     const bandRef = useRef(null);
@@ -97,6 +101,10 @@ const GardenFooter = ({ heading, children }) => {
         [isTouch]
     );
 
+    // Rebuilds hundreds of dither-cell objects; only actually needs to when
+    // the band's own dimensions change, not on every render (a click included).
+    const ditherCells = useMemo(() => ridgeDither(width, height, CELL), [width, height]);
+
     const [scales, setScales] = useState(() => plants.map((p) => p.startScale * bedScale));
     const [bloomTicks, setBloomTicks] = useState(() => plants.map(() => 0));
     const contentRef = useRef(null);
@@ -123,8 +131,11 @@ const GardenFooter = ({ heading, children }) => {
     }, [plants]);
 
     // Measure the band so plants can be rooted against the ridge at whatever
-    // width the viewport happens to be.
-    useEffect(() => {
+    // width the viewport happens to be. A layout effect, not a plain one: it
+    // runs before the browser paints, so the first painted frame already has
+    // the real size instead of drawing the ridge against FALLBACK_HEIGHT and
+    // then jumping once the true measurement lands a frame later.
+    useLayoutEffect(() => {
         const band = bandRef.current;
         if (!band) return undefined;
         const measure = () =>
@@ -306,6 +317,10 @@ const GardenFooter = ({ heading, children }) => {
     };
 
     const handlePointerMove = (event) => {
+        // Hoisted out of the two branches below that each used to call this —
+        // getBoundingClientRect is a layout read, and there is no reason to
+        // pay for it twice per pointermove.
+        const point = toBand(event);
         if (canRef.current) {
             canRef.current.style.transform =
                 `translate(${event.clientX - CAN_TIP_X}px, ${event.clientY - CAN_TIP_Y}px)`;
@@ -317,7 +332,6 @@ const GardenFooter = ({ heading, children }) => {
                 `translate(${event.clientX + 16}px, ${event.clientY + 4}px)`;
             // Shown only where a click would actually do something, so the
             // label never promises growth over empty sky or over the link.
-            const point = toBand(event);
             const inReach =
                 !onControl(event.target) &&
                 plants.some((plant, index) => withinReach(point, plantGeometry(plant, index)));
@@ -327,7 +341,6 @@ const GardenFooter = ({ heading, children }) => {
         const now = performance.now();
         if (now - lastMistRef.current > MIST_INTERVAL_MS) {
             lastMistRef.current = now;
-            const point = toBand(event);
             emit(point.x, point.y + 6, 1, 0.5, 0.4);
         }
     };
@@ -394,7 +407,7 @@ const GardenFooter = ({ heading, children }) => {
                     {/* Dithered rim, drawn over the fill so the soil's top edge
                         reads as pixel art instead of a smooth vector curve. */}
                     <g shapeRendering="crispEdges">
-                        {ridgeDither(width, height, CELL).map((c) => (
+                        {ditherCells.map((c) => (
                             <rect
                                 key={`${c.x}-${c.y}`}
                                 x={c.x}
@@ -409,7 +422,11 @@ const GardenFooter = ({ heading, children }) => {
 
                 <div className="gf-bed" aria-hidden="true">
                     {plants.map((plant, index) => {
-                        const baseY = ridgeY(plant.xPct / 100, height) + plant.sink;
+                        // Read from plantGeometry rather than recomputing the
+                        // rooting formula here — two copies of it agreeing
+                        // today is exactly the drift a single ridge function
+                        // exists to prevent.
+                        const { baseY } = plantGeometry(plant, index);
                         return (
                             <div
                                 key={plant.id}
@@ -480,7 +497,7 @@ const GardenFooter = ({ heading, children }) => {
                         viewBox="0 0 16 10"
                         shapeRendering="crispEdges"
                     >
-                        {canCells().map((c) => (
+                        {CAN_CELLS.map((c) => (
                             <rect key={`${c.x}-${c.y}`} x={c.x} y={c.y} width={1} height={1} fill={c.fill} />
                         ))}
                     </svg>
