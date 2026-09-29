@@ -7,7 +7,7 @@ import Footer from './Footer';
 
 test('keeps the existing thank-you line', () => {
     render(<Footer />);
-    expect(screen.getByText(/thank you for making it this far/i)).toBeInTheDocument();
+    expect(screen.getByText('thank you for making it this far ♡')).toBeInTheDocument();
 });
 
 test('keeps the contact link pointing at the same mailbox', () => {
@@ -17,8 +17,8 @@ test('keeps the contact link pointing at the same mailbox', () => {
 });
 
 test('keeps the invitation to chat', () => {
-    render(<Footer />);
-    expect(screen.getByText(/i'm always happy to chat/i)).toBeInTheDocument();
+    const { container } = render(<Footer />);
+    expect(container.querySelector('footer').textContent).toContain('contact me here! i\'m always happy to chat ~');
 });
 
 test('shows the garden heading', () => {
