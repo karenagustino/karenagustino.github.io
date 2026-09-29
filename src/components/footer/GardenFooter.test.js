@@ -130,3 +130,42 @@ test('keeps the can outside the heading so its fixed position tracks the viewpor
     expect(container.querySelector('.gf-heading .gf-can')).toBeNull();
     expect(container.querySelector('.gf-footer > .gf-can')).toBeInTheDocument();
 });
+
+const bandOf = (container) => container.querySelector('.gf-band');
+
+test('mists droplets as the pointer moves across the garden', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    fireEvent.pointerEnter(band);
+    fireEvent.pointerMove(band, { clientX: 200, clientY: 200 });
+    expect(container.querySelectorAll('.gf-drop').length).toBeGreaterThan(0);
+});
+
+test('bursts a spray of droplets on click', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    fireEvent.pointerDown(band, { clientX: 200, clientY: 200 });
+    expect(container.querySelectorAll('.gf-drop').length).toBeGreaterThanOrEqual(16);
+});
+
+// Review Focus 5 — a held or fast-dragged pointer must not grow the array
+// without bound.
+test('never exceeds the droplet cap however many bursts are fired', () => {
+    const { container } = renderGarden();
+    const band = bandOf(container);
+    for (let i = 0; i < 40; i++) {
+        fireEvent.pointerDown(band, { clientX: 100 + i, clientY: 150 });
+    }
+    expect(container.querySelectorAll('.gf-drop').length).toBeLessThanOrEqual(90);
+});
+
+// Review Focus 4 — the rAF loop holds a ref to the band; unmounting mid-flight
+// must stop it rather than leave it spinning against a dead node.
+test('cancels the droplet loop and clears droplets on unmount', () => {
+    const cancel = jest.spyOn(window, 'cancelAnimationFrame');
+    const { container, unmount } = renderGarden();
+    fireEvent.pointerDown(bandOf(container), { clientX: 200, clientY: 200 });
+    unmount();
+    expect(cancel).toHaveBeenCalled();
+    cancel.mockRestore();
+});

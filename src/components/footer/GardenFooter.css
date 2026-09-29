@@ -141,3 +141,13 @@
 
 .gf-can.is-on,
 .gf-hint.is-on { opacity: 1; }
+
+.gf-drop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    background: var(--gf-drop);
+    box-shadow: 0 0 4px rgba(80, 180, 230, 0.5);
+    will-change: transform, opacity;
+}

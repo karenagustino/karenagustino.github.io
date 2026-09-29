@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { buildBed, CELL } from './pixelPlants';
-import { ridgePath, ridgeDither, ridgeY } from './gardenMath';
+import { ridgePath, ridgeDither, ridgeY, stepDroplet, DROPLET_GRAVITY } from './gardenMath';
 import './GardenFooter.css';
 
 const DESKTOP_PLANT_COUNT = 20;
 const TOUCH_PLANT_COUNT = 12;
+const DROPLET_CAP = 90;
+const MIST_INTERVAL_MS = 120;
+const CLICK_BURST = 16;
+const REDUCED_CLICK_BURST = 5;
 
 // jsdom, a hidden footer and the first paint before layout all report 0x0.
 // Falling back to a plausible band keeps the ridge maths finite and the markup
@@ -129,6 +133,81 @@ const GardenFooter = ({ heading, children }) => {
     // to the screen.
     const showCan = !isTouch;
 
+    const fxRef = useRef(null);
+    const dropsRef = useRef([]);
+    const rafRef = useRef(0);
+    const lastMistRef = useRef(0);
+
+    // Droplets are written straight to the DOM and never enter React state.
+    // Up to 90 of them move every frame; reconciling that through the component
+    // tree would re-render the whole bed 60 times a second for decoration
+    // nothing else reads.
+    const tickRef = useRef(null);
+    tickRef.current = () => {
+        const band = bandRef.current;
+        const drops = dropsRef.current;
+        if (!band) {
+            rafRef.current = 0;
+            return;
+        }
+        const bandWidth = band.clientWidth || FALLBACK_WIDTH;
+        const bandHeight = band.clientHeight || FALLBACK_HEIGHT;
+        const groundAt = (x) => ridgeY(x / bandWidth, bandHeight);
+        for (let i = drops.length - 1; i >= 0; i--) {
+            const drop = stepDroplet(drops[i], DROPLET_GRAVITY, groundAt);
+            if (drop.dead) {
+                drop.el.remove();
+                drops.splice(i, 1);
+                continue;
+            }
+            drop.el.style.transform = `translate(${drop.x.toFixed(1)}px, ${drop.y.toFixed(1)}px)`;
+            drop.el.style.opacity = drop.alpha.toFixed(2);
+        }
+        rafRef.current = drops.length
+            ? requestAnimationFrame(() => tickRef.current())
+            : 0;
+    };
+
+    const emit = (x, y, count, spread, vy0) => {
+        const layer = fxRef.current;
+        if (!layer) return;
+        const drops = dropsRef.current;
+        for (let i = 0; i < count && drops.length < DROPLET_CAP; i++) {
+            const radius = 2.4 + Math.random() * 2.2;
+            const el = document.createElement('div');
+            el.className = 'gf-drop';
+            el.style.width = `${radius.toFixed(1)}px`;
+            el.style.height = `${radius.toFixed(1)}px`;
+            layer.appendChild(el);
+            drops.push({
+                el,
+                x: x + (Math.random() * 8 - 4),
+                y: y + (Math.random() * 6 - 3),
+                vx: (Math.random() * 2 - 1) * spread,
+                vy: vy0 + Math.random() * 1.6,
+                alpha: 1,
+                dead: false,
+            });
+        }
+        if (!rafRef.current && drops.length) {
+            rafRef.current = requestAnimationFrame(() => tickRef.current());
+        }
+    };
+
+    // Band-local coordinates. getBoundingClientRect is zero in jsdom, which
+    // simply puts every droplet at the pointer's raw position — harmless.
+    const toBand = (event) => {
+        const rect = bandRef.current?.getBoundingClientRect();
+        return { x: event.clientX - (rect?.left ?? 0), y: event.clientY - (rect?.top ?? 0) };
+    };
+
+    useEffect(() => () => {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+        dropsRef.current.forEach((drop) => drop.el.remove());
+        dropsRef.current = [];
+    }, []);
+
     const handlePointerEnter = () => {
         if (!showCan) return;
         bandRef.current?.classList.add('is-live');
@@ -152,6 +231,18 @@ const GardenFooter = ({ heading, children }) => {
             hintRef.current.style.transform =
                 `translate(${event.clientX + 16}px, ${event.clientY + 4}px)`;
         }
+        if (reducedMotion) return;
+        const now = performance.now();
+        if (now - lastMistRef.current > MIST_INTERVAL_MS) {
+            lastMistRef.current = now;
+            const point = toBand(event);
+            emit(point.x, point.y + 6, 1, 0.5, 0.4);
+        }
+    };
+
+    const handlePointerDown = (event) => {
+        const point = toBand(event);
+        emit(point.x, point.y + 6, reducedMotion ? REDUCED_CLICK_BURST : CLICK_BURST, 2.6, 0.6);
     };
 
     return (
@@ -162,6 +253,7 @@ const GardenFooter = ({ heading, children }) => {
                 onPointerEnter={handlePointerEnter}
                 onPointerLeave={handlePointerLeave}
                 onPointerMove={handlePointerMove}
+                onPointerDown={handlePointerDown}
             >
                 <svg
                     className="gf-soil"
@@ -233,7 +325,7 @@ const GardenFooter = ({ heading, children }) => {
                     })}
                 </div>
 
-                <div className="gf-fx" aria-hidden="true" />
+                <div className="gf-fx" ref={fxRef} aria-hidden="true" />
 
                 <div className="gf-content">
                     <h2 className="gf-heading" ref={headingRef}>{heading}</h2>
