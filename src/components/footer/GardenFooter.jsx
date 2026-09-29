@@ -240,10 +240,16 @@ const GardenFooter = ({ heading, children }) => {
             el.style.width = `${radius.toFixed(1)}px`;
             el.style.height = `${radius.toFixed(1)}px`;
             layer.appendChild(el);
+            const spawnY = y + (Math.random() * 6 - 3);
             drops.push({
                 el,
                 x: x + (Math.random() * 8 - 4),
-                y: y + (Math.random() * 6 - 3),
+                y: spawnY,
+                // Its own birth height: a droplet spawned below the ridge (any
+                // click in the soil itself) has already landed, and stepDroplet
+                // floors the ground here so it doesn't get pulled back up to
+                // the ridge line before it splashes.
+                y0: spawnY,
                 vx: (Math.random() * 2 - 1) * spread,
                 vy: vy0 + Math.random() * 1.6,
                 alpha: 1,

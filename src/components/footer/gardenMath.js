@@ -139,13 +139,17 @@ export function cappedGrowth(plant, delta, ceilingY) {
  * per frame is churn the GC doesn't need.
  *
  * `ridgeYAtX` maps a band-local x to the soil height there, so droplets splash
- * on the actual terrain rather than at a flat line.
+ * on the actual terrain rather than at a flat line. A droplet born BELOW the
+ * ridge — every click in the soil itself, roughly the bottom 22% of the band —
+ * has already landed at spawn: `drop.y0` (set by the caller at emit time)
+ * floors the ground at the droplet's own birth height, so it splashes and
+ * fades where it was born instead of snapping up to the ridge line.
  */
 export function stepDroplet(drop, gravity, ridgeYAtX) {
     drop.vy += gravity;
     drop.x += drop.vx;
     drop.y += drop.vy;
-    const ground = ridgeYAtX(drop.x);
+    const ground = Math.max(ridgeYAtX(drop.x), drop.y0);
     if (drop.y >= ground) {
         drop.y = ground;
         drop.alpha -= 0.16;

@@ -151,7 +151,7 @@ test('cappedGrowth never shrinks a plant that is already past a tight ceiling', 
 });
 
 test('stepDroplet accelerates downward while it is in the air', () => {
-    const drop = { x: 10, y: 0, vx: 1, vy: 0, alpha: 1, dead: false };
+    const drop = { x: 10, y: 0, y0: 0, vx: 1, vy: 0, alpha: 1, dead: false };
     stepDroplet(drop, 0.42, () => 1000);
     expect(drop.vy).toBeCloseTo(0.42);
     expect(drop.y).toBeCloseTo(0.42);
@@ -160,14 +160,25 @@ test('stepDroplet accelerates downward while it is in the air', () => {
 });
 
 test('stepDroplet settles a droplet onto the ridge and fades it there', () => {
-    const drop = { x: 10, y: 99, vx: 1, vy: 5, alpha: 1, dead: false };
+    const drop = { x: 10, y: 99, y0: 99, vx: 1, vy: 5, alpha: 1, dead: false };
     stepDroplet(drop, 0.42, () => 100);
     expect(drop.y).toBe(100);
     expect(drop.alpha).toBeLessThan(1);
 });
 
 test('stepDroplet reports dead once it has fully faded', () => {
-    const drop = { x: 10, y: 200, vx: 0, vy: 0, alpha: 0.1, dead: false };
+    const drop = { x: 10, y: 200, y0: 200, vx: 0, vy: 0, alpha: 0.1, dead: false };
     stepDroplet(drop, 0.42, () => 100);
     expect(drop.dead).toBe(true);
+});
+
+// Review Focus — a click in the soil itself (roughly the bottom 22% of the
+// band) spawns a droplet BELOW the ridge. Treating `ridgeYAtX` as the only
+// floor would snap it up to the ridge line, rendering the burst well above
+// where the cursor actually was.
+test('stepDroplet born below the ridge splashes at its own position, not the ridge', () => {
+    const drop = { x: 10, y: 400, y0: 400, vx: 1, vy: 0, alpha: 1, dead: false };
+    stepDroplet(drop, 0.42, () => 359);
+    expect(drop.y).toBe(400);
+    expect(drop.alpha).toBeLessThan(1);
 });
