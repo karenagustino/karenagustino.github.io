@@ -289,7 +289,7 @@ const GardenFooter = ({ heading, children }) => {
                 plants.some((plant, index) => withinReach(point, plantGeometry(plant, index)));
             hintRef.current.classList.toggle('is-on', inReach);
         }
-        if (reducedMotion) return;
+        if (reducedMotion || onControl(event.target)) return;
         const now = performance.now();
         if (now - lastMistRef.current > MIST_INTERVAL_MS) {
             lastMistRef.current = now;

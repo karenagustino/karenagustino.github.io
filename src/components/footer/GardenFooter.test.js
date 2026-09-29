@@ -229,6 +229,20 @@ test('does not water or grow when the contact link is clicked', () => {
     expect(container.querySelectorAll('.gf-drop')).toHaveLength(0);
 });
 
+test('does not water when the pointer moves over the contact link', () => {
+    const { container } = render(
+        <GardenFooter heading="let's grow something">
+            <a href="mailto:someone@example.com">here</a>
+        </GardenFooter>
+    );
+    const band = bandOf(container);
+    fireEvent.pointerEnter(band);
+    fireEvent.pointerMove(screen.getByRole('link', { name: 'here' }), {
+        clientX: 0, clientY: 0, bubbles: true,
+    });
+    expect(container.querySelectorAll('.gf-drop')).toHaveLength(0);
+});
+
 test('does not show the grow hint while over the contact link', () => {
     const { container } = render(
         <GardenFooter heading="let's grow something">
