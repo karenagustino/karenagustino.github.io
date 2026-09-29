@@ -2202,19 +2202,24 @@ Replace `handlePointerDown` with:
             ? contentRect.bottom - bandRect.top + CEILING_PADDING
             : -Infinity;
 
+        // Computed synchronously from the closed-over `scales`, not via the
+        // setState-updater form: a functional updater's callback runs later,
+        // during React's render phase, so a `bloomed` array only populated in
+        // there would still read empty at the check below — the bloom pulse
+        // would never fire. Populating it from an updater would also make that
+        // updater impure, and so double-fire under StrictMode.
         const bloomed = [];
-        setScales((current) =>
-            current.map((scale, index) => {
-                const plant = plants[index];
-                if (!plant) return scale;
-                const geometry = { ...plantGeometry(plant, index), scale };
-                if (!withinReach(point, geometry)) return scale;
-                const delta = GROWTH_DELTA_MIN + Math.random() * (GROWTH_DELTA_MAX - GROWTH_DELTA_MIN);
-                const grown = cappedGrowth(geometry, delta, ceilingY);
-                if (grown === scale) bloomed.push(index);
-                return grown;
-            })
-        );
+        const nextScales = scales.map((scale, index) => {
+            const plant = plants[index];
+            if (!plant) return scale;
+            const geometry = { ...plantGeometry(plant, index), scale };
+            if (!withinReach(point, geometry)) return scale;
+            const delta = GROWTH_DELTA_MIN + Math.random() * (GROWTH_DELTA_MAX - GROWTH_DELTA_MIN);
+            const grown = cappedGrowth(geometry, delta, ceilingY);
+            if (grown === scale) bloomed.push(index);
+            return grown;
+        });
+        setScales(nextScales);
         if (bloomed.length) {
             setBloomTicks((current) =>
                 current.map((tick, index) => (bloomed.includes(index) ? tick + 1 : tick))
