@@ -326,6 +326,61 @@ test('still grows plants when tapped on a touch device', () => {
     }
 });
 
+// A shorter band cannot fit a full-size bed without plants colliding with the
+// growth ceiling almost immediately — the whole-branch review's headline
+// finding. jsdom never reports a real layout, so the band's true height is
+// stubbed directly on Element.prototype (clientHeight/getBoundingClientRect
+// are spec'd on Element, not HTMLElement — spying on HTMLElement.prototype
+// silently spies on nothing).
+test('scales the bed down to fit a short band, and growth still works', () => {
+    const restoreMedia = withMediaQuery((q) => q.includes('coarse'));
+    const SHORT_BAND = 240; // the phone band height from the spec's degradation clamp
+    const heightSpy = jest
+        .spyOn(Element.prototype, 'clientHeight', 'get')
+        .mockReturnValue(SHORT_BAND);
+    // getBoundingClientRect is otherwise all-zero in jsdom for every element,
+    // which would give the growth ceiling artificially generous headroom no
+    // matter what the band's height is — exactly what would hide this bug.
+    // Stand in a content block occupying the band's upper portion (per the
+    // spec's layout), sized the way it would be once the contact line wraps
+    // to two lines on a narrow phone: tight enough that an unscaled bed's
+    // startScale would already sit above the ceiling for at least one plant.
+    const rectSpy = jest
+        .spyOn(Element.prototype, 'getBoundingClientRect')
+        .mockImplementation(function stubRect() {
+            const isContent = this.classList && this.classList.contains('gf-content');
+            const bottom = isContent ? SHORT_BAND * 0.55 : SHORT_BAND;
+            return { top: 0, bottom, left: 0, right: 0, width: 0, height: bottom, x: 0, y: 0, toJSON: () => {} };
+        });
+    try {
+        const { container } = renderGarden();
+        const bedScale = SHORT_BAND / 460;
+        const rawPlants = buildBed(12);
+        const plantEls = [...container.querySelectorAll('.gf-plant')];
+
+        // The starting scale actually shrank in proportion to the band,
+        // rather than staying at the full-size bed's startScale.
+        plantEls.forEach((el, i) => {
+            expect(scaleOf(el)).toBeCloseTo(rawPlants[i].startScale * bedScale, 3);
+        });
+
+        // Growth still works, even with the tight, realistic ceiling above.
+        const plant = rawPlants[0];
+        const point = {
+            clientX: (plant.xPct / 100) * FALLBACK_WIDTH,
+            clientY: ridgeY(plant.xPct / 100, SHORT_BAND) + plant.sink - 10,
+        };
+        const before = scaleOf(plantEls[0]);
+        fireEvent.pointerDown(bandOf(container), point);
+        const after = scaleOf(container.querySelectorAll('.gf-plant')[0]);
+        expect(after).toBeGreaterThan(before);
+    } finally {
+        heightSpy.mockRestore();
+        rectSpy.mockRestore();
+        restoreMedia();
+    }
+});
+
 test('pins the heading open and skips the mist under reduced motion', () => {
     const restore = withMediaQuery((q) => q.includes('reduced-motion'));
     try {

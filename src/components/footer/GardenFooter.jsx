@@ -17,6 +17,10 @@ const GROWTH_DELTA_MIN = 0.14;
 const GROWTH_DELTA_MAX = 0.24;
 // Plants stop this far below the text block rather than climbing over it.
 const CEILING_PADDING = 18;
+// The band's max height (see GardenFooter.css) — a bed built for this height
+// needs no shrinking. Shorter bands scale their starting plants down so the
+// bed stays proportionate instead of the plants eating the ceiling headroom.
+const BED_REFERENCE_HEIGHT = 460;
 
 // jsdom, a hidden footer and the first paint before layout all report 0x0.
 // Falling back to a plausible band keeps the ridge maths finite and the markup
@@ -77,12 +81,23 @@ const GardenFooter = ({ heading, children }) => {
     const width = measured.width || FALLBACK_WIDTH;
     const height = measured.height || FALLBACK_HEIGHT;
 
+    // A shorter band (phones, or just a narrower desktop window — see below)
+    // cannot fit a full-size bed without plants colliding with the growth
+    // ceiling almost immediately. Keyed off the MEASURED band height rather
+    // than `(pointer: coarse)`, a deliberate deviation from the spec's literal
+    // wording: plant count is keyed off pointer type, but band height is a
+    // separate `max-width: 640px` query, so a touch iPad in landscape gets a
+    // full-height band while a narrow desktop window gets a short one — height
+    // is what actually drives the headroom problem, in both cases. Capped at 1
+    // so a band taller than the reference never scales plants up.
+    const bedScale = Math.min(1, height / BED_REFERENCE_HEIGHT);
+
     const plants = useMemo(
         () => buildBed(isTouch ? TOUCH_PLANT_COUNT : DESKTOP_PLANT_COUNT),
         [isTouch]
     );
 
-    const [scales, setScales] = useState(() => plants.map((p) => p.startScale));
+    const [scales, setScales] = useState(() => plants.map((p) => p.startScale * bedScale));
     const [bloomTicks, setBloomTicks] = useState(() => plants.map(() => 0));
     const contentRef = useRef(null);
 
@@ -94,7 +109,16 @@ const GardenFooter = ({ heading, children }) => {
     scalesRef.current = scales;
 
     useEffect(() => {
-        setScales(plants.map((p) => p.startScale));
+        // Read the band's real height straight off the node rather than off
+        // `height` above: on the render that first mounts this effect, the
+        // band has never been measured yet (that measurement is itself an
+        // effect, and `measured` state hasn't caught up), so `height` here
+        // would still be FALLBACK_HEIGHT even on a genuinely short band. The
+        // ref is already attached by the time any effect runs, so this reads
+        // the true value one commit sooner than waiting on `measured` would.
+        const realHeight = bandRef.current?.clientHeight || FALLBACK_HEIGHT;
+        const realBedScale = Math.min(1, realHeight / BED_REFERENCE_HEIGHT);
+        setScales(plants.map((p) => p.startScale * realBedScale));
         setBloomTicks(plants.map(() => 0));
     }, [plants]);
 
@@ -251,7 +275,11 @@ const GardenFooter = ({ heading, children }) => {
         xPx: (plant.xPct / 100) * width,
         baseY: ridgeY(plant.xPct / 100, height) + plant.sink,
         fullHeight: plant.height,
-        scale: scales[index] ?? plant.startScale,
+        // The `??` side is only ever reached the instant a bed grows (touch
+        // flip) faster than its `scales` array catches up — kept scaled by
+        // the same `bedScale` factor for consistency with everywhere else a
+        // plant's starting size is read.
+        scale: scales[index] ?? plant.startScale * bedScale,
         maxScale: MAX_PLANT_SCALE,
     });
 
@@ -384,7 +412,7 @@ const GardenFooter = ({ heading, children }) => {
                                     left: `${plant.xPct}%`,
                                     bottom: `${(height - baseY).toFixed(1)}px`,
                                     zIndex: 1 + (index % 3),
-                                    '--gf-scale': (scales[index] ?? plant.startScale).toFixed(3),
+                                    '--gf-scale': (scales[index] ?? plant.startScale * bedScale).toFixed(3),
                                 }}
                             >
                                 <div
