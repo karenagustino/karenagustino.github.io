@@ -39,7 +39,7 @@ export const FALLBACK_HEIGHT = 360;
 // clusters its values near the middle, a typical edge moves a good deal less
 // than that. Sizing these as though `throw` were the displacement is what made
 // the first attempt at this invisible: 1.6 moved the plants by under a pixel.
-export const PAINT_COARSE = { frequency: '0.03 0.04', throw: 14 };
+export const PAINT_COARSE = { frequency: '0.03 0.04', throw: 7 };
 // Plants are drawn from 4px cells, so their peak excursion has to stay under
 // one cell — past that the sprite stops looking painted and starts coming
 // apart. Rendered comparisons put the usable band at roughly 6-8.

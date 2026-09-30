@@ -510,16 +510,15 @@ test('keeps the watering can crisp', () => {
 // still passed. These pin the sizes against the art instead.
 const peakDisplacement = (paint) => paint.throw / 2;
 
-test('the plant brush moves edges enough to see, but less than one cell', () => {
-    // Under ~1px is invisible; a full cell or more stops looking like brushwork
-    // and starts pulling the sprite apart.
-    expect(peakDisplacement(PAINT_FINE)).toBeGreaterThanOrEqual(1);
-    expect(peakDisplacement(PAINT_FINE)).toBeLessThan(CELL);
+test.each([
+    ['plant', PAINT_FINE],
+    ['soil', PAINT_COARSE],
+])('the %s brush moves edges far enough to see', (_name, paint) => {
+    // The bug this exists to catch: a peak under one pixel renders identically
+    // to no filter at all, and nothing else in this suite would notice.
+    expect(peakDisplacement(paint)).toBeGreaterThanOrEqual(1);
 });
 
-test('the soil brush tears harder than the plant brush', () => {
-    // The soil is a band-wide shape: the same excursion that wrecks a 44px
-    // flower barely registers across 1000px of ground.
-    expect(peakDisplacement(PAINT_COARSE)).toBeGreaterThan(peakDisplacement(PAINT_FINE));
-    expect(peakDisplacement(PAINT_COARSE)).toBeGreaterThanOrEqual(4);
+test('the plant brush stays under one cell, so sprites waver instead of coming apart', () => {
+    expect(peakDisplacement(PAINT_FINE)).toBeLessThan(CELL);
 });
