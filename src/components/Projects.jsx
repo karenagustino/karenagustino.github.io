@@ -1,10 +1,10 @@
 import React from 'react';
 import leafPixel from '../assets/leaf-pixel.png';
 import pmcIcon from '../assets/pmc.png';
-import eyedropperIcon from '../assets/eyedropper.png';
-import shirtIcon from '../assets/shirt.png';
+import eyedropperIcon from '../assets/dropper.png';
+import shirtIcon from '../assets/dress.png';
 import vendingIcon from '../assets/vending.png';
-import mapIcon from '../assets/map.png';
+import mapIcon from '../assets/address.png';
 import checkIcon from '../assets/check.png';
 import vrIcon from '../assets/vr.png';
 import snapIcon from '../assets/snap.png';
@@ -33,7 +33,7 @@ const LEAF_SIZE = 'clamp(82px, 26vw, 118px)';
 // Expressed as a share of the leaf rather than a fixed pixel drop, so the patch
 // edge cuts through the same point of the leaf at every size: roughly a third
 // of it below the line, the rest resting on the soil.
-const LEAF_DIP = `calc(${LEAF_SIZE} * -0.32)`;
+const LEAF_DIP = `calc(${LEAF_SIZE} * -0.4)`;
 const LEAF_INSET = -4;
 const LEAF_Z = 0;
 // Keeps the title and tech line painted above the leaves.
@@ -84,7 +84,7 @@ const projects = [
     },
     {
         title: "LingoSnap",
-        tech: "GLSL, JavaScript, TypeScript, Lens Studio",
+        tech: "JavaScript, TypeScript, Lens Studio",
         icon: snapIcon,
     },
 ];
