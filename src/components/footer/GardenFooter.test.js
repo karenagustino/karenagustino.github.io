@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import GardenFooter, { FALLBACK_WIDTH, FALLBACK_HEIGHT } from './GardenFooter';
-import { buildBed } from './pixelPlants';
+import GardenFooter, { FALLBACK_WIDTH, FALLBACK_HEIGHT, PAINT_COARSE, PAINT_FINE } from './GardenFooter';
+import { buildBed, CELL } from './pixelPlants';
 import { ridgeY } from './gardenMath';
 
 const renderGarden = () =>
@@ -501,4 +501,25 @@ test('stops forcing crisp pixel edges on the soil and the bed', () => {
 test('keeps the watering can crisp', () => {
     const { container } = renderGarden();
     expect(container.querySelector('.gf-can').getAttribute('shape-rendering')).toBe('crispEdges');
+});
+
+// feDisplacementMap moves a pixel by `scale * (channel - 0.5)` and the channel
+// runs 0..1, so the peak excursion is HALF the configured scale. The first
+// attempt at this styling set the plant scale to 1.6 — a peak of 0.8px, under
+// one pixel — and was invisible on screen while every structural test above
+// still passed. These pin the sizes against the art instead.
+const peakDisplacement = (paint) => paint.throw / 2;
+
+test('the plant brush moves edges enough to see, but less than one cell', () => {
+    // Under ~1px is invisible; a full cell or more stops looking like brushwork
+    // and starts pulling the sprite apart.
+    expect(peakDisplacement(PAINT_FINE)).toBeGreaterThanOrEqual(1);
+    expect(peakDisplacement(PAINT_FINE)).toBeLessThan(CELL);
+});
+
+test('the soil brush tears harder than the plant brush', () => {
+    // The soil is a band-wide shape: the same excursion that wrecks a 44px
+    // flower barely registers across 1000px of ground.
+    expect(peakDisplacement(PAINT_COARSE)).toBeGreaterThan(peakDisplacement(PAINT_FINE));
+    expect(peakDisplacement(PAINT_COARSE)).toBeGreaterThanOrEqual(4);
 });

@@ -31,13 +31,19 @@ export const FALLBACK_WIDTH = 1024;
 export const FALLBACK_HEIGHT = 360;
 
 // Brush strength, as the two knobs worth turning. `frequency` is the noise
-// wavelength (lower = longer, lazier tears) and `throw` is how far an edge
-// pixel can travel, in px. Turn `throw` up for a rougher, more gestural edge;
-// turn it down toward 0 to go back to clean vector shapes.
-const PAINT_COARSE = { frequency: '0.018 0.03', throw: 4 };
-// A plant's whole sprite is ~44px wide on a 4px grid, so its throw has to stay
-// well under one cell or the flower comes apart instead of looking painted.
-const PAINT_FINE = { frequency: '0.07 0.09', throw: 1.6 };
+// wavelength (lower = longer, lazier tears); `throw` is the filter's `scale`.
+//
+// `throw` is NOT the distance an edge moves. feDisplacementMap shifts a pixel
+// by `scale * (channel - 0.5)`, and the channel runs 0..1, so the peak
+// excursion is only half the number written here — and because fractalNoise
+// clusters its values near the middle, a typical edge moves a good deal less
+// than that. Sizing these as though `throw` were the displacement is what made
+// the first attempt at this invisible: 1.6 moved the plants by under a pixel.
+export const PAINT_COARSE = { frequency: '0.03 0.04', throw: 14 };
+// Plants are drawn from 4px cells, so their peak excursion has to stay under
+// one cell — past that the sprite stops looking painted and starts coming
+// apart. Rendered comparisons put the usable band at roughly 6-8.
+export const PAINT_FINE = { frequency: '0.05 0.06', throw: 7 };
 
 // Pixel watering can, tilted to pour down-right. Rows are written out as a
 // legible little picture rather than a list of coordinates:
@@ -464,22 +470,22 @@ const GardenFooter = ({ heading, children }) => {
                     preserveAspectRatio="none"
                 >
                     <g filter="url(#gf-paint-coarse)">
-                    <path d={ridgePath(width, height)} fill="var(--gf-soil)" />
-                    {/* Rim along the ridge. Displaced along with the fill, it
+                        <path d={ridgePath(width, height)} fill="var(--gf-soil)" />
+                        {/* Rim along the ridge. Displaced along with the fill, it
                         reads as paint stipple rather than as the pixel dither
                         it started life as. */}
-                    <g>
-                        {ditherCells.map((c) => (
-                            <rect
-                                key={`${c.x}-${c.y}`}
-                                x={c.x}
-                                y={c.y}
-                                width={c.w}
-                                height={c.h}
-                                fill="var(--gf-soil-edge)"
-                            />
-                        ))}
-                    </g>
+                        <g>
+                            {ditherCells.map((c) => (
+                                <rect
+                                    key={`${c.x}-${c.y}`}
+                                    x={c.x}
+                                    y={c.y}
+                                    width={c.w}
+                                    height={c.h}
+                                    fill="var(--gf-soil-edge)"
+                                />
+                            ))}
+                        </g>
                     </g>
                 </svg>
 
