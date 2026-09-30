@@ -450,3 +450,55 @@ test('parks the sway animations while the footer is off screen', () => {
         }
     }
 });
+
+// ── brush styling ──
+// The garden is drawn in code, so its "hand-painted" quality comes from an SVG
+// displacement filter rather than from artwork. jsdom does not rasterise
+// filters, so these tests can only pin the wiring — that the filters exist and
+// that both surfaces reference them. Whether it actually reads as brushwork is
+// a browser check.
+
+test('defines both paint filters exactly once', () => {
+    const { container } = renderGarden();
+    expect(container.querySelectorAll('#gf-paint-coarse')).toHaveLength(1);
+    expect(container.querySelectorAll('#gf-paint-fine')).toHaveLength(1);
+});
+
+test('paints the soil with the coarse filter', () => {
+    const { container } = renderGarden();
+    const painted = container.querySelector('.gf-soil [filter]');
+    expect(painted).toBeInTheDocument();
+    expect(painted.getAttribute('filter')).toBe('url(#gf-paint-coarse)');
+});
+
+test('paints every plant with the fine filter', () => {
+    const { container } = renderGarden();
+    const plants = [...container.querySelectorAll('.gf-plant')];
+    expect(plants).toHaveLength(20);
+    for (const plant of plants) {
+        expect(
+            plant.querySelectorAll('[filter="url(#gf-paint-fine)"]').length
+        ).toBeGreaterThan(0);
+    }
+});
+
+// The head carries the bloom animation, so it is the group most easily left
+// unfiltered — a crisp flower on a brushed stem would be obvious.
+test('paints the flower head as well as the stem', () => {
+    const { container } = renderGarden();
+    const head = container.querySelector('.gf-plant .gf-head');
+    expect(head.getAttribute('filter')).toBe('url(#gf-paint-fine)');
+});
+
+test('stops forcing crisp pixel edges on the soil and the bed', () => {
+    const { container } = renderGarden();
+    expect(container.querySelectorAll('.gf-soil [shape-rendering="crispEdges"]')).toHaveLength(0);
+    expect(container.querySelectorAll('.gf-bed [shape-rendering="crispEdges"]')).toHaveLength(0);
+});
+
+// Deliberate: pixel decor resting on brushed ground is exactly how the project
+// cards compose leaf-pixel.png over patch.png.
+test('keeps the watering can crisp', () => {
+    const { container } = renderGarden();
+    expect(container.querySelector('.gf-can').getAttribute('shape-rendering')).toBe('crispEdges');
+});

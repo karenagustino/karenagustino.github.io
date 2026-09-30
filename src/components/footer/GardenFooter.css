@@ -154,3 +154,12 @@
     box-shadow: 0 0 4px rgba(80, 180, 230, 0.5);
     will-change: transform, opacity;
 }
+
+/* The paint filters live in a zero-size SVG that exists only to carry <defs>;
+   without this it would reserve a default 300x150 box in the layout. */
+.gf-paint-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}

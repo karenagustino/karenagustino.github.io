@@ -30,6 +30,15 @@ const BED_REFERENCE_HEIGHT = 460;
 export const FALLBACK_WIDTH = 1024;
 export const FALLBACK_HEIGHT = 360;
 
+// Brush strength, as the two knobs worth turning. `frequency` is the noise
+// wavelength (lower = longer, lazier tears) and `throw` is how far an edge
+// pixel can travel, in px. Turn `throw` up for a rougher, more gestural edge;
+// turn it down toward 0 to go back to clean vector shapes.
+const PAINT_COARSE = { frequency: '0.018 0.03', throw: 4 };
+// A plant's whole sprite is ~44px wide on a 4px grid, so its throw has to stay
+// well under one cell or the flower comes apart instead of looking painted.
+const PAINT_FINE = { frequency: '0.07 0.09', throw: 1.6 };
+
 // Pixel watering can, tilted to pour down-right. Rows are written out as a
 // legible little picture rather than a list of coordinates:
 //   h = handle, d = rim/shadow, b = body, s = spout, r = spout rose
@@ -389,6 +398,57 @@ const GardenFooter = ({ heading, children }) => {
 
     return (
         <div className="gf-footer">
+            {/* Paint filters. The garden is drawn in code rather than from
+                artwork, so its hand-painted quality has to be generated: a
+                noise field displaces each edge sideways, which is what gives
+                the project cards' patch.png its torn, brushed edge.
+
+                Two strengths, because one cannot serve both. The soil is a
+                band-wide shape that wants long, coarse tears; a daisy is 44px
+                across and built from 4px cells, and displacing THAT by four
+                pixels would dissolve the flower. Coarse gets a low frequency
+                (long wavelength) and a big throw; fine gets the opposite.
+
+                The region is widened past the default -10%/120% because
+                displacement pushes pixels outside the source bounding box and
+                would otherwise clip them flat. */}
+            <svg className="gf-paint-defs" aria-hidden="true" focusable="false">
+                <defs>
+                    <filter id="gf-paint-coarse" x="-20%" y="-20%" width="140%" height="140%">
+                        <feTurbulence
+                            type="fractalNoise"
+                            baseFrequency={PAINT_COARSE.frequency}
+                            numOctaves="2"
+                            seed="6"
+                            result="noise"
+                        />
+                        <feDisplacementMap
+                            in="SourceGraphic"
+                            in2="noise"
+                            scale={PAINT_COARSE.throw}
+                            xChannelSelector="R"
+                            yChannelSelector="G"
+                        />
+                    </filter>
+                    <filter id="gf-paint-fine" x="-25%" y="-25%" width="150%" height="150%">
+                        <feTurbulence
+                            type="fractalNoise"
+                            baseFrequency={PAINT_FINE.frequency}
+                            numOctaves="2"
+                            seed="11"
+                            result="noise"
+                        />
+                        <feDisplacementMap
+                            in="SourceGraphic"
+                            in2="noise"
+                            scale={PAINT_FINE.throw}
+                            xChannelSelector="R"
+                            yChannelSelector="G"
+                        />
+                    </filter>
+                </defs>
+            </svg>
+
             <div
                 className="gf-band"
                 ref={bandRef}
@@ -403,10 +463,12 @@ const GardenFooter = ({ heading, children }) => {
                     viewBox={`0 0 ${width} ${height}`}
                     preserveAspectRatio="none"
                 >
+                    <g filter="url(#gf-paint-coarse)">
                     <path d={ridgePath(width, height)} fill="var(--gf-soil)" />
-                    {/* Dithered rim, drawn over the fill so the soil's top edge
-                        reads as pixel art instead of a smooth vector curve. */}
-                    <g shapeRendering="crispEdges">
+                    {/* Rim along the ridge. Displaced along with the fill, it
+                        reads as paint stipple rather than as the pixel dither
+                        it started life as. */}
+                    <g>
                         {ditherCells.map((c) => (
                             <rect
                                 key={`${c.x}-${c.y}`}
@@ -417,6 +479,7 @@ const GardenFooter = ({ heading, children }) => {
                                 fill="var(--gf-soil-edge)"
                             />
                         ))}
+                    </g>
                     </g>
                 </svg>
 
@@ -450,19 +513,26 @@ const GardenFooter = ({ heading, children }) => {
                                         width={plant.width}
                                         height={plant.height}
                                         viewBox={`0 0 ${plant.width} ${plant.height}`}
-                                        shapeRendering="crispEdges"
                                     >
-                                        {plant.cells
-                                            .filter((c) => c.part === 'stem')
-                                            .map((c, i) => (
-                                                <rect key={`s${i}`} x={c.x} y={c.y} width={c.w} height={c.h} fill={c.fill} />
-                                            ))}
+                                        <g filter="url(#gf-paint-fine)">
+                                            {plant.cells
+                                                .filter((c) => c.part === 'stem')
+                                                .map((c, i) => (
+                                                    <rect key={`s${i}`} x={c.x} y={c.y} width={c.w} height={c.h} fill={c.fill} />
+                                                ))}
+                                        </g>
                                         {/* Remounting the group on each tick is
                                             what restarts the CSS animation — a
                                             plant at full height pulses again
                                             every time it is watered. */}
+                                        {/* Filtered here rather than inside, so
+                                            the bloom's transform scales an
+                                            already-rendered raster instead of
+                                            re-running the noise every frame of
+                                            the pulse. */}
                                         <g
                                             key={bloomTicks[index]}
+                                            filter="url(#gf-paint-fine)"
                                             className={bloomTicks[index] > 0 ? 'gf-head is-blooming' : 'gf-head'}
                                         >
                                             {plant.cells
