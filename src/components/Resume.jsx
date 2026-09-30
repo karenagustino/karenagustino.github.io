@@ -24,14 +24,24 @@ const education = [
 
 const experiences = [
     {
-        title: 'HR Information Systems Analyst Co-op',
+        title: 'Business Analyst Co-op',
+        company: 'RBCx (Royal Bank of Canada)',
+        dates: 'Sep 2026 - Present',
+    },
+    {
+        title: 'Product Analyst Co-op',
+        company: 'Simplii Financial (CIBC)',
+        dates: 'Jan 2026 - Aug 2026',
+    },
+    {
+        title: 'HR Information Systems Data Analyst Co-op',
         company: 'Elk Valley Resources Ltd. (Glencore)',
-        dates: 'Sept 2024 – present',
+        dates: 'Sep 2024 – Aug 2025',
     },
     {
         title: 'Hackathon Organizer',
         company: 'nwPlus',
-        dates: 'May 2023 – present',
+        dates: 'May 2025 – Apr 2026',
     },
     {
         title: 'Community Operations Intern',

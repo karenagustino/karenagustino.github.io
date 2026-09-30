@@ -115,7 +115,7 @@ const Hero = () => {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    const descriptions = ["product", "software", "matcha", "muay thai"]
+    const descriptions = ["product", "software", "matcha", "muay thai", "jasmine tea"]
 
 
     return (
