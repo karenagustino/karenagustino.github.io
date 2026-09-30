@@ -68,34 +68,25 @@
     color: var(--color-panel-muted);
 }
 
-/* An unwritten study. The card keeps its shape and place in the coverflow —
-   pulling it out would misrepresent how much work is on the shelf — but it
-   reads as dimmed, and the native cursor is handed over to the padlock sprite
-   that follows the pointer (see ComingSoonCursor). */
+/* An unwritten study. The card keeps its shape and place in the coverflow,
+   since pulling it out would misrepresent how much work is on the shelf, but
+   it carries only its title, centred on both axes, and hands the native cursor
+   over to the padlock sprite that follows the pointer (see ComingSoonCursor).
+
+   The two centring declarations override the base rule's `justify-content:
+   flex-end`, which bottom aligns a written card's stack of title, tagline and
+   tech. With a single line of content there is nothing to align against the
+   card's foot, and a lone title sitting down there reads as a caption for the
+   empty space above it. */
 .case-study-card--coming-soon {
     cursor: none;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-.case-study-card--coming-soon .case-study-card-title,
-.case-study-card--coming-soon .case-study-card-tagline,
-.case-study-card--coming-soon .case-study-card-tech {
-    opacity: 0.55;
-}
-
-.case-study-card-lock {
-    /* No `margin-top: auto` here. The card is `justify-content: flex-end`, so
-       its content already sits at the bottom, clear of the absolutely
-       positioned eyebrow at the top. Pushing the badge down with auto margin
-       drags the title up into that eyebrow instead, and puts a locked card's
-       title somewhere no written card's title ever appears. */
-    margin-top: 0.75rem;
-    align-self: flex-start;
-    font-family: var(--font-pixel);
-    font-size: 0.5rem;
-    letter-spacing: 0.14em;
-    padding: 0.35em 0.6em;
-    border: 2px solid var(--color-panel-frame);
-    border-radius: 4px;
-    background: var(--color-panel-alt);
+.case-study-card--coming-soon .case-study-card-title {
+    margin-bottom: 0;
+    font-size: 1.25rem;
     color: var(--color-panel-muted);
 }

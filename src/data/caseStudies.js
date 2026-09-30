@@ -105,32 +105,45 @@ const caseStudies = [
         ],
     },
     {
-        id: 'placeholder-2',
-        title: 'Case study 02',
+        id: 'case-study-02',
+        title: 'Case Study 02',
         comingSoon: true,
     },
-    // To publish this one: fill the template in, uncomment it, delete the
-    //    stub above, and drop `comingSoon`. Its card becomes clickable.
+    // ========================================================================
+    // TODO: Case Study 02. Fill this in, uncomment it, delete the stub above,
+    // and drop `comingSoon`. The card then becomes clickable and opens this.
+    //
+    // Every `#TODO` below is a gap to fill. Keep the section ids and block
+    // shapes; they are what the overlay's sidebar and renderer read. Blocks
+    // come in three kinds:
+    //   { type: 'prose',   text: '...' }
+    //   { type: 'rows',    items: [{ label, text }] }
+    //   { type: 'metrics', items: [{ value, label, caption }] }
+    // Sections and blocks can be added, removed or reordered freely.
+    //
+    // One house rule: no dashes of any width in the copy. Write "student led" rather than
+    // the hyphenated form. A test enforces it.
+    // ========================================================================
     // {
-    //     id: 'placeholder-2',
-    //     title: 'Case Study Placeholder 2',
-    //     tagline: 'Real narrative content coming soon',
-    //     tech: ['Placeholder Tech'],
-    //     role: 'Placeholder Role',
-    //     timeframe: 'Placeholder Timeframe',
-    //     tags: ['PLACEHOLDER'],
+    //     id: '#TODO slug, lowercase with hyphens, e.g. ubc-pm-club',
+    //     title: '#TODO the real title',
+    //     tagline: '#TODO one line hook, the question this work answered',
+    //     tech: ['#TODO tool', '#TODO tool'],
+    //     role: '#TODO your role',
+    //     timeframe: '#TODO e.g. 2025',
+    //     tags: ['#TODO TAG', '#TODO TAG'],
     //     stats: [
-    //         { value: '00', label: 'placeholder' },
-    //         { value: '00', label: 'placeholder' },
+    //         { value: '#TODO', label: '#TODO' },   // shown in the overlay header
+    //         { value: '#TODO', label: '#TODO' },
     //     ],
-    //     note: 'Placeholder closing note.',
+    //     note: '#TODO closing note, or delete this line',
     //     sections: [
     //         {
     //             id: 'overview',
     //             icon: '📖',
     //             title: 'Overview',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
+    //                 { type: 'prose', text: '#TODO what the project was, what was going wrong, what you set out to change' },
     //             ],
     //         },
     //         {
@@ -138,16 +151,14 @@ const caseStudies = [
     //             icon: '🔍',
     //             title: 'Research',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
+    //                 { type: 'prose', text: '#TODO how you found out what was actually true' },
     //                 {
     //                     type: 'rows',
     //                     items: [
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: '#TODO', text: '#TODO' },
+    //                         { label: '#TODO', text: '#TODO' },
     //                     ],
     //                 },
-    //                 { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
     //             ],
     //         },
     //         {
@@ -155,7 +166,7 @@ const caseStudies = [
     //             icon: '🧭',
     //             title: 'Recommendation',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
+    //                 { type: 'prose', text: '#TODO what you proposed and why that over the alternatives' },
     //             ],
     //         },
     //         {
@@ -166,53 +177,62 @@ const caseStudies = [
     //                 {
     //                     type: 'metrics',
     //                     items: [
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '#TODO', label: '#TODO', caption: '#TODO' },
+    //                         { value: '#TODO', label: '#TODO', caption: '#TODO' },
     //                     ],
     //                 },
-    //                 { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
     //             ],
     //         },
     //         {
     //             id: 'learnings',
-    //             icon: '🎓',
+    //             icon: '🌱',
     //             title: 'Learnings',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder learning about the work itself.' },
-    //                 { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
+    //                 { type: 'prose', text: '#TODO what you would do differently' },
     //             ],
     //         },
     //     ],
     // },
     {
-        id: 'placeholder-3',
-        title: 'Case study 03',
+        id: 'case-study-03',
+        title: 'Case Study 03',
         comingSoon: true,
     },
-    // To publish this one: fill the template in, uncomment it, delete the
-    //    stub above, and drop `comingSoon`. Its card becomes clickable.
+    // ========================================================================
+    // TODO: Case Study 03. Fill this in, uncomment it, delete the stub above,
+    // and drop `comingSoon`. The card then becomes clickable and opens this.
+    //
+    // Every `#TODO` below is a gap to fill. Keep the section ids and block
+    // shapes; they are what the overlay's sidebar and renderer read. Blocks
+    // come in three kinds:
+    //   { type: 'prose',   text: '...' }
+    //   { type: 'rows',    items: [{ label, text }] }
+    //   { type: 'metrics', items: [{ value, label, caption }] }
+    // Sections and blocks can be added, removed or reordered freely.
+    //
+    // One house rule: no dashes of any width in the copy. Write "student led" rather than
+    // the hyphenated form. A test enforces it.
+    // ========================================================================
     // {
-    //     id: 'placeholder-3',
-    //     title: 'Case Study Placeholder 3',
-    //     tagline: 'Real narrative content coming soon',
-    //     tech: ['Placeholder Tech'],
-    //     role: 'Placeholder Role',
-    //     timeframe: 'Placeholder Timeframe',
-    //     tags: ['PLACEHOLDER'],
+    //     id: '#TODO slug, lowercase with hyphens, e.g. ubc-pm-club',
+    //     title: '#TODO the real title',
+    //     tagline: '#TODO one line hook, the question this work answered',
+    //     tech: ['#TODO tool', '#TODO tool'],
+    //     role: '#TODO your role',
+    //     timeframe: '#TODO e.g. 2025',
+    //     tags: ['#TODO TAG', '#TODO TAG'],
     //     stats: [
-    //         { value: '00', label: 'placeholder' },
-    //         { value: '00', label: 'placeholder' },
+    //         { value: '#TODO', label: '#TODO' },   // shown in the overlay header
+    //         { value: '#TODO', label: '#TODO' },
     //     ],
-    //     note: 'Placeholder closing note.',
+    //     note: '#TODO closing note, or delete this line',
     //     sections: [
     //         {
     //             id: 'overview',
     //             icon: '📖',
     //             title: 'Overview',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
+    //                 { type: 'prose', text: '#TODO what the project was, what was going wrong, what you set out to change' },
     //             ],
     //         },
     //         {
@@ -220,16 +240,14 @@ const caseStudies = [
     //             icon: '🔍',
     //             title: 'Research',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
+    //                 { type: 'prose', text: '#TODO how you found out what was actually true' },
     //                 {
     //                     type: 'rows',
     //                     items: [
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: '#TODO', text: '#TODO' },
+    //                         { label: '#TODO', text: '#TODO' },
     //                     ],
     //                 },
-    //                 { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
     //             ],
     //         },
     //         {
@@ -237,7 +255,7 @@ const caseStudies = [
     //             icon: '🧭',
     //             title: 'Recommendation',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
+    //                 { type: 'prose', text: '#TODO what you proposed and why that over the alternatives' },
     //             ],
     //         },
     //         {
@@ -248,53 +266,62 @@ const caseStudies = [
     //                 {
     //                     type: 'metrics',
     //                     items: [
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '#TODO', label: '#TODO', caption: '#TODO' },
+    //                         { value: '#TODO', label: '#TODO', caption: '#TODO' },
     //                     ],
     //                 },
-    //                 { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
     //             ],
     //         },
     //         {
     //             id: 'learnings',
-    //             icon: '🎓',
+    //             icon: '🌱',
     //             title: 'Learnings',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder learning about the work itself.' },
-    //                 { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
+    //                 { type: 'prose', text: '#TODO what you would do differently' },
     //             ],
     //         },
     //     ],
     // },
     {
-        id: 'placeholder-4',
-        title: 'Case study 04',
+        id: 'case-study-04',
+        title: 'Case Study 04',
         comingSoon: true,
     },
-    // To publish this one: fill the template in, uncomment it, delete the
-    //    stub above, and drop `comingSoon`. Its card becomes clickable.
+    // ========================================================================
+    // TODO: Case Study 04. Fill this in, uncomment it, delete the stub above,
+    // and drop `comingSoon`. The card then becomes clickable and opens this.
+    //
+    // Every `#TODO` below is a gap to fill. Keep the section ids and block
+    // shapes; they are what the overlay's sidebar and renderer read. Blocks
+    // come in three kinds:
+    //   { type: 'prose',   text: '...' }
+    //   { type: 'rows',    items: [{ label, text }] }
+    //   { type: 'metrics', items: [{ value, label, caption }] }
+    // Sections and blocks can be added, removed or reordered freely.
+    //
+    // One house rule: no dashes of any width in the copy. Write "student led" rather than
+    // the hyphenated form. A test enforces it.
+    // ========================================================================
     // {
-    //     id: 'placeholder-4',
-    //     title: 'Case Study Placeholder 4',
-    //     tagline: 'Real narrative content coming soon',
-    //     tech: ['Placeholder Tech'],
-    //     role: 'Placeholder Role',
-    //     timeframe: 'Placeholder Timeframe',
-    //     tags: ['PLACEHOLDER'],
+    //     id: '#TODO slug, lowercase with hyphens, e.g. ubc-pm-club',
+    //     title: '#TODO the real title',
+    //     tagline: '#TODO one line hook, the question this work answered',
+    //     tech: ['#TODO tool', '#TODO tool'],
+    //     role: '#TODO your role',
+    //     timeframe: '#TODO e.g. 2025',
+    //     tags: ['#TODO TAG', '#TODO TAG'],
     //     stats: [
-    //         { value: '00', label: 'placeholder' },
-    //         { value: '00', label: 'placeholder' },
+    //         { value: '#TODO', label: '#TODO' },   // shown in the overlay header
+    //         { value: '#TODO', label: '#TODO' },
     //     ],
-    //     note: 'Placeholder closing note.',
+    //     note: '#TODO closing note, or delete this line',
     //     sections: [
     //         {
     //             id: 'overview',
     //             icon: '📖',
     //             title: 'Overview',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
+    //                 { type: 'prose', text: '#TODO what the project was, what was going wrong, what you set out to change' },
     //             ],
     //         },
     //         {
@@ -302,16 +329,14 @@ const caseStudies = [
     //             icon: '🔍',
     //             title: 'Research',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
+    //                 { type: 'prose', text: '#TODO how you found out what was actually true' },
     //                 {
     //                     type: 'rows',
     //                     items: [
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: '#TODO', text: '#TODO' },
+    //                         { label: '#TODO', text: '#TODO' },
     //                     ],
     //                 },
-    //                 { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
     //             ],
     //         },
     //         {
@@ -319,7 +344,7 @@ const caseStudies = [
     //             icon: '🧭',
     //             title: 'Recommendation',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
+    //                 { type: 'prose', text: '#TODO what you proposed and why that over the alternatives' },
     //             ],
     //         },
     //         {
@@ -330,22 +355,18 @@ const caseStudies = [
     //                 {
     //                     type: 'metrics',
     //                     items: [
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '#TODO', label: '#TODO', caption: '#TODO' },
+    //                         { value: '#TODO', label: '#TODO', caption: '#TODO' },
     //                     ],
     //                 },
-    //                 { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
     //             ],
     //         },
     //         {
     //             id: 'learnings',
-    //             icon: '🎓',
+    //             icon: '🌱',
     //             title: 'Learnings',
     //             blocks: [
-    //                 { type: 'prose', text: 'Placeholder learning about the work itself.' },
-    //                 { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
+    //                 { type: 'prose', text: '#TODO what you would do differently' },
     //             ],
     //         },
     //     ],

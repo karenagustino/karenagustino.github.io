@@ -85,7 +85,7 @@ test('calls onClick when Enter is pressed', () => {
 // A real unwritten entry: a title, a flag, and nothing else.
 const comingSoonStudy = {
     id: 'not-written-yet',
-    title: 'Case study 02',
+    title: 'Case Study 02',
     comingSoon: true,
 };
 
@@ -124,11 +124,21 @@ test('pressing Enter on a coming soon card does nothing', () => {
     expect(onClick).not.toHaveBeenCalled();
 });
 
-// Touch has no hover, so the cursor alone would leave a locked card silently
-// inert. The badge is the part everyone gets.
-test('a coming soon card says so on its face', () => {
-    renderComingSoon();
-    expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+// The card's face carries the title alone. Assistive technology still learns
+// the card is inert from aria-disabled, which is the affordance that survives
+// stripping the visible badge.
+test('a coming soon card is marked disabled for assistive technology', () => {
+    const { container } = renderComingSoon();
+    expect(container.querySelector('.case-study-card')).toHaveAttribute('aria-disabled', 'true');
+});
+
+test('a coming soon card carries nothing on its face but the title', () => {
+    const { container } = renderComingSoon();
+    expect(screen.getByText('Case Study 02')).toBeInTheDocument();
+    expect(container.querySelector('.case-study-card-lock')).toBeNull();
+    expect(container.querySelector('.case-study-card-tagline')).toBeNull();
+    expect(container.querySelector('.case-study-card-tech')).toBeNull();
+    expect(container.querySelector('.case-study-card-eyebrow')).toBeNull();
 });
 
 test('a written card is still a button and still opens', () => {
@@ -146,9 +156,3 @@ test('a written card is still a button and still opens', () => {
     expect(onClick).toHaveBeenCalled();
 });
 
-test('a coming soon card renders from a title alone, with no tagline or tech line', () => {
-    const { container } = renderComingSoon();
-    expect(screen.getByText('Case study 02')).toBeInTheDocument();
-    expect(container.querySelector('.case-study-card-tagline')).toBeNull();
-    expect(container.querySelector('.case-study-card-tech')).toBeNull();
-});

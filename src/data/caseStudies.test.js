@@ -43,9 +43,17 @@ test('no coming soon study carries placeholder copy', () => {
     });
 });
 
-test('no coming soon title says placeholder', () => {
+// Nothing the reader can meet should say "placeholder" — including the id,
+// which shows up in React keys and in any future deep link.
+test('the word placeholder appears nowhere in a coming soon entry', () => {
     comingSoon.forEach((entry) => {
-        expect(entry.title.toLowerCase()).not.toContain('placeholder');
+        expect(JSON.stringify(entry).toLowerCase()).not.toContain('placeholder');
+    });
+});
+
+test('every coming soon title is just Case Study and its number', () => {
+    comingSoon.forEach((entry) => {
+        expect(entry.title).toMatch(/^Case Study \d{2}$/);
     });
 });
 
