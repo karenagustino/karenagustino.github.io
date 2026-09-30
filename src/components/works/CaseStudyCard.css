@@ -83,7 +83,12 @@
 }
 
 .case-study-card-lock {
-    margin-top: auto;
+    /* No `margin-top: auto` here. The card is `justify-content: flex-end`, so
+       its content already sits at the bottom, clear of the absolutely
+       positioned eyebrow at the top. Pushing the badge down with auto margin
+       drags the title up into that eyebrow instead, and puts a locked card's
+       title somewhere no written card's title ever appears. */
+    margin-top: 0.75rem;
     align-self: flex-start;
     font-family: var(--font-pixel);
     font-size: 0.5rem;

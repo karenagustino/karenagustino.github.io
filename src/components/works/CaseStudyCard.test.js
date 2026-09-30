@@ -82,11 +82,10 @@ test('calls onClick when Enter is pressed', () => {
 });
 
 // ── coming soon cards ──
+// A real unwritten entry: a title, a flag, and nothing else.
 const comingSoonStudy = {
     id: 'not-written-yet',
-    title: 'Unwritten Study',
-    tagline: 'Content still to come',
-    tech: ['Placeholder Tech'],
+    title: 'Case study 02',
     comingSoon: true,
 };
 
@@ -145,4 +144,11 @@ test('a written card is still a button and still opens', () => {
     expect(container.querySelector('[role="button"]')).toBeInTheDocument();
     fireEvent.click(container.querySelector('.case-study-card'));
     expect(onClick).toHaveBeenCalled();
+});
+
+test('a coming soon card renders from a title alone, with no tagline or tech line', () => {
+    const { container } = renderComingSoon();
+    expect(screen.getByText('Case study 02')).toBeInTheDocument();
+    expect(container.querySelector('.case-study-card-tagline')).toBeNull();
+    expect(container.querySelector('.case-study-card-tech')).toBeNull();
 });

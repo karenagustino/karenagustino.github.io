@@ -50,8 +50,11 @@ const CaseStudyCard = ({
         >
             <span className="case-study-card-eyebrow" aria-hidden="true">CASE FILE {pad(index + 1)}</span>
             <div className="case-study-card-title">{caseStudy.title}</div>
-            <div className="case-study-card-tagline">{caseStudy.tagline}</div>
-            <div className="case-study-card-tech">{caseStudy.tech.join(' · ')}</div>
+            {/* An unwritten study has no tagline or tech list at all, rather
+                than stand in copy: these rows are simply absent from its card
+                instead of rendering an empty frame where text should be. */}
+            {caseStudy.tagline && <div className="case-study-card-tagline">{caseStudy.tagline}</div>}
+            {caseStudy.tech && <div className="case-study-card-tech">{caseStudy.tech.join(' · ')}</div>}
             {/* Stated on the card itself, not only in the hover cursor: a touch
                 visitor gets no hover, and would otherwise meet a card that
                 simply does nothing when tapped. */}

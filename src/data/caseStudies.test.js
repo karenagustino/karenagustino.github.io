@@ -12,8 +12,9 @@ const REQUIRED_KEYS = [
 const published = caseStudies.filter((entry) => !entry.comingSoon);
 const comingSoon = caseStudies.filter((entry) => entry.comingSoon);
 
-// Only the card face reads these, so they are all an unwritten study owes.
-const CARD_FACE_KEYS = ['id', 'title', 'tagline', 'tech'];
+// An unwritten study shows a title and nothing else: no invented tagline, no
+// invented tech line. These are all it owes.
+const CARD_FACE_KEYS = ['id', 'title'];
 
 const BLOCK_TYPES = ['prose', 'rows', 'metrics'];
 
@@ -29,7 +30,22 @@ test('there is at least one of each kind, so neither group is vacuous', () => {
 test('every coming soon study carries what the card face reads', () => {
     comingSoon.forEach((entry) => {
         CARD_FACE_KEYS.forEach((key) => expect(entry).toHaveProperty(key));
-        expect(Array.isArray(entry.tech)).toBe(true);
+        expect(entry.title.length).toBeGreaterThan(0);
+    });
+});
+
+// Nothing invented sits on an unwritten card: no stand in tagline, no stand in
+// tech list. A title and the badge are the whole face.
+test('no coming soon study carries placeholder copy', () => {
+    comingSoon.forEach((entry) => {
+        expect(entry.tagline).toBeUndefined();
+        expect(entry.tech).toBeUndefined();
+    });
+});
+
+test('no coming soon title says placeholder', () => {
+    comingSoon.forEach((entry) => {
+        expect(entry.title.toLowerCase()).not.toContain('placeholder');
     });
 });
 

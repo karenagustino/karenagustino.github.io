@@ -2,9 +2,11 @@
 // content is a data edit rather than a component change.
 //
 // An entry marked `comingSoon: true` is a card on the shelf whose content is
-// not written yet: it carries only what the card face shows, its full template
-// sits commented out beneath it, and it deliberately has no `sections` so the
-// overlay can never open onto invented content. A section is an icon,
+// not written yet. It carries a title and nothing else: no stand in tagline or
+// tech list, since inventing copy only to label it as invented reads worse than
+// an honest blank. Its full template sits commented out beneath it, and it
+// deliberately has no `sections`, so the overlay can never open onto content
+// that was never meant to be read. A section is an icon,
 // a title, and an ordered list of blocks. Three block types exist:
 //
 //   { type: 'prose',   text: '...' }
@@ -104,9 +106,7 @@ const caseStudies = [
     },
     {
         id: 'placeholder-2',
-        title: 'Case Study Placeholder 2',
-        tagline: 'Real narrative content coming soon',
-        tech: ['Placeholder Tech'],
+        title: 'Case study 02',
         comingSoon: true,
     },
     // To publish this one: fill the template in, uncomment it, delete the
@@ -188,9 +188,7 @@ const caseStudies = [
     // },
     {
         id: 'placeholder-3',
-        title: 'Case Study Placeholder 3',
-        tagline: 'Real narrative content coming soon',
-        tech: ['Placeholder Tech'],
+        title: 'Case study 03',
         comingSoon: true,
     },
     // To publish this one: fill the template in, uncomment it, delete the
@@ -272,9 +270,7 @@ const caseStudies = [
     // },
     {
         id: 'placeholder-4',
-        title: 'Case Study Placeholder 4',
-        tagline: 'Real narrative content coming soon',
-        tech: ['Placeholder Tech'],
+        title: 'Case study 04',
         comingSoon: true,
     },
     // To publish this one: fill the template in, uncomment it, delete the
