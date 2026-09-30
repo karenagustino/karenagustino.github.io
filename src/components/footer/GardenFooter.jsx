@@ -474,7 +474,7 @@ const GardenFooter = ({ heading, children }) => {
                         {/* Rim along the ridge. Displaced along with the fill, it
                         reads as paint stipple rather than as the pixel dither
                         it started life as. */}
-                        <g>
+                        <g className="gf-soil-rim">
                             {ditherCells.map((c) => (
                                 <rect
                                     key={`${c.x}-${c.y}`}

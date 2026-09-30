@@ -52,7 +52,7 @@
 .gf-heading {
     font-family: var(--font-pixel);
     font-weight: 400;
-    font-size: clamp(0.95rem, 2.4vw, 1.4rem);
+    font-size: clamp(1.4rem, 3.6vw, 2.3rem);
     letter-spacing: 0.04em;
     color: var(--color-text-primary);
     margin: 0 0 1.1rem 0;
@@ -162,4 +162,12 @@
     width: 0;
     height: 0;
     overflow: hidden;
+}
+
+/* The rim started life as a pixel dither, drawn at full strength so the soil's
+   edge would read as pixel art. Against a brushed edge that same contrast
+   reads as a dotted rule laid over the ground rather than as part of it —
+   dropping it to a wash keeps the texture and loses the line. */
+.gf-soil-rim {
+    opacity: 0.35;
 }
