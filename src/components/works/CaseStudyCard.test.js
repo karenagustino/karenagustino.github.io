@@ -80,3 +80,69 @@ test('calls onClick when Enter is pressed', () => {
     fireEvent.keyDown(screen.getByText('Sample Project'), { key: 'Enter' });
     expect(handleClick).toHaveBeenCalledTimes(1);
 });
+
+// ── coming soon cards ──
+const comingSoonStudy = {
+    id: 'not-written-yet',
+    title: 'Unwritten Study',
+    tagline: 'Content still to come',
+    tech: ['Placeholder Tech'],
+    comingSoon: true,
+};
+
+const renderComingSoon = (onClick = () => {}) =>
+    render(
+        <CaseStudyCard
+            caseStudy={comingSoonStudy}
+            positionStyle={samplePositionStyle}
+            isActive
+            onClick={onClick}
+        />
+    );
+
+test('a coming soon card is not offered as a button', () => {
+    const { container } = renderComingSoon();
+    expect(container.querySelector('[role="button"]')).toBeNull();
+});
+
+test('a coming soon card is not keyboard focusable, even when active', () => {
+    const { container } = renderComingSoon();
+    const card = container.querySelector('.case-study-card');
+    expect(card).not.toHaveAttribute('tabindex', '0');
+});
+
+test('clicking a coming soon card does nothing', () => {
+    const onClick = jest.fn();
+    const { container } = renderComingSoon(onClick);
+    fireEvent.click(container.querySelector('.case-study-card'));
+    expect(onClick).not.toHaveBeenCalled();
+});
+
+test('pressing Enter on a coming soon card does nothing', () => {
+    const onClick = jest.fn();
+    const { container } = renderComingSoon(onClick);
+    fireEvent.keyDown(container.querySelector('.case-study-card'), { key: 'Enter' });
+    expect(onClick).not.toHaveBeenCalled();
+});
+
+// Touch has no hover, so the cursor alone would leave a locked card silently
+// inert. The badge is the part everyone gets.
+test('a coming soon card says so on its face', () => {
+    renderComingSoon();
+    expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+});
+
+test('a written card is still a button and still opens', () => {
+    const onClick = jest.fn();
+    const { container } = render(
+        <CaseStudyCard
+            caseStudy={sampleCaseStudy}
+            positionStyle={samplePositionStyle}
+            isActive
+            onClick={onClick}
+        />
+    );
+    expect(container.querySelector('[role="button"]')).toBeInTheDocument();
+    fireEvent.click(container.querySelector('.case-study-card'));
+    expect(onClick).toHaveBeenCalled();
+});

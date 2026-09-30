@@ -234,3 +234,40 @@ test('clicking a side card while the overlay is open only closes it, without swi
     expect(screen.queryByText('Problem A')).not.toBeInTheDocument();
     expect(screen.getByLabelText('A — open full screen')).toHaveAttribute('tabindex', '0');
 });
+
+// ── coming soon studies ──
+const lockedStudies = [
+    sampleCaseStudy('A'),
+    { id: 'locked', title: 'Locked', tagline: 'Not written yet', tech: ['TBD'], comingSoon: true },
+];
+
+test('clicking a coming soon card never opens the overlay', () => {
+    render(<PlotStage caseStudies={lockedStudies} />);
+    // Make it the active card first, so the only thing left between the click
+    // and the overlay is the guard under test.
+    fireEvent.click(screen.getByRole('button', { name: 'Next case study' }));
+    fireEvent.click(screen.getByText('Locked'));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+test('a written card still opens when it is active', () => {
+    render(<PlotStage caseStudies={lockedStudies} />);
+    fireEvent.click(screen.getByText('A'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+});
+
+test('shows the coming soon cursor while the pointer is over a locked card', () => {
+    const { container } = render(<PlotStage caseStudies={lockedStudies} />);
+    const locked = screen.getByText('Locked').closest('.case-study-card');
+    expect(container.querySelector('.coming-soon-cursor')).toBeNull();
+    fireEvent.pointerEnter(locked);
+    expect(container.querySelector('.coming-soon-cursor')).toBeInTheDocument();
+    fireEvent.pointerLeave(locked);
+    expect(container.querySelector('.coming-soon-cursor')).toBeNull();
+});
+
+test('does not show the coming soon cursor over a written card', () => {
+    const { container } = render(<PlotStage caseStudies={lockedStudies} />);
+    fireEvent.pointerEnter(screen.getByText('A').closest('.case-study-card'));
+    expect(container.querySelector('.coming-soon-cursor')).toBeNull();
+});

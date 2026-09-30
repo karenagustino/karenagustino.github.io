@@ -1,5 +1,10 @@
 // Each case study renders itself from `sections`, so adding or reordering
-// content is a data edit rather than a component change. A section is an icon,
+// content is a data edit rather than a component change.
+//
+// An entry marked `comingSoon: true` is a card on the shelf whose content is
+// not written yet: it carries only what the card face shows, its full template
+// sits commented out beneath it, and it deliberately has no `sections` so the
+// overlay can never open onto invented content. A section is an icon,
 // a title, and an ordered list of blocks. Three block types exist:
 //
 //   { type: 'prose',   text: '...' }
@@ -102,226 +107,253 @@ const caseStudies = [
         title: 'Case Study Placeholder 2',
         tagline: 'Real narrative content coming soon',
         tech: ['Placeholder Tech'],
-        role: 'Placeholder Role',
-        timeframe: 'Placeholder Timeframe',
-        tags: ['PLACEHOLDER'],
-        stats: [
-            { value: '00', label: 'placeholder' },
-            { value: '00', label: 'placeholder' },
-        ],
-        note: 'Placeholder closing note.',
-        sections: [
-            {
-                id: 'overview',
-                icon: '📖',
-                title: 'Overview',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
-                ],
-            },
-            {
-                id: 'research',
-                icon: '🔍',
-                title: 'Research',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
-                    {
-                        type: 'rows',
-                        items: [
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                        ],
-                    },
-                    { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
-                ],
-            },
-            {
-                id: 'recommendation',
-                icon: '🧭',
-                title: 'Recommendation',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
-                ],
-            },
-            {
-                id: 'impact',
-                icon: '💥',
-                title: 'Impact',
-                blocks: [
-                    {
-                        type: 'metrics',
-                        items: [
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                        ],
-                    },
-                    { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
-                ],
-            },
-            {
-                id: 'learnings',
-                icon: '🎓',
-                title: 'Learnings',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder learning about the work itself.' },
-                    { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
-                ],
-            },
-        ],
+        comingSoon: true,
     },
+    // To publish this one: fill the template in, uncomment it, delete the
+    //    stub above, and drop `comingSoon`. Its card becomes clickable.
+    // {
+    //     id: 'placeholder-2',
+    //     title: 'Case Study Placeholder 2',
+    //     tagline: 'Real narrative content coming soon',
+    //     tech: ['Placeholder Tech'],
+    //     role: 'Placeholder Role',
+    //     timeframe: 'Placeholder Timeframe',
+    //     tags: ['PLACEHOLDER'],
+    //     stats: [
+    //         { value: '00', label: 'placeholder' },
+    //         { value: '00', label: 'placeholder' },
+    //     ],
+    //     note: 'Placeholder closing note.',
+    //     sections: [
+    //         {
+    //             id: 'overview',
+    //             icon: '📖',
+    //             title: 'Overview',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'research',
+    //             icon: '🔍',
+    //             title: 'Research',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
+    //                 {
+    //                     type: 'rows',
+    //                     items: [
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                     ],
+    //                 },
+    //                 { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'recommendation',
+    //             icon: '🧭',
+    //             title: 'Recommendation',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'impact',
+    //             icon: '💥',
+    //             title: 'Impact',
+    //             blocks: [
+    //                 {
+    //                     type: 'metrics',
+    //                     items: [
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                     ],
+    //                 },
+    //                 { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'learnings',
+    //             icon: '🎓',
+    //             title: 'Learnings',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder learning about the work itself.' },
+    //                 { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
+    //             ],
+    //         },
+    //     ],
+    // },
     {
         id: 'placeholder-3',
         title: 'Case Study Placeholder 3',
         tagline: 'Real narrative content coming soon',
         tech: ['Placeholder Tech'],
-        role: 'Placeholder Role',
-        timeframe: 'Placeholder Timeframe',
-        tags: ['PLACEHOLDER'],
-        stats: [
-            { value: '00', label: 'placeholder' },
-            { value: '00', label: 'placeholder' },
-        ],
-        note: 'Placeholder closing note.',
-        sections: [
-            {
-                id: 'overview',
-                icon: '📖',
-                title: 'Overview',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
-                ],
-            },
-            {
-                id: 'research',
-                icon: '🔍',
-                title: 'Research',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
-                    {
-                        type: 'rows',
-                        items: [
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                        ],
-                    },
-                    { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
-                ],
-            },
-            {
-                id: 'recommendation',
-                icon: '🧭',
-                title: 'Recommendation',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
-                ],
-            },
-            {
-                id: 'impact',
-                icon: '💥',
-                title: 'Impact',
-                blocks: [
-                    {
-                        type: 'metrics',
-                        items: [
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                        ],
-                    },
-                    { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
-                ],
-            },
-            {
-                id: 'learnings',
-                icon: '🎓',
-                title: 'Learnings',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder learning about the work itself.' },
-                    { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
-                ],
-            },
-        ],
+        comingSoon: true,
     },
+    // To publish this one: fill the template in, uncomment it, delete the
+    //    stub above, and drop `comingSoon`. Its card becomes clickable.
+    // {
+    //     id: 'placeholder-3',
+    //     title: 'Case Study Placeholder 3',
+    //     tagline: 'Real narrative content coming soon',
+    //     tech: ['Placeholder Tech'],
+    //     role: 'Placeholder Role',
+    //     timeframe: 'Placeholder Timeframe',
+    //     tags: ['PLACEHOLDER'],
+    //     stats: [
+    //         { value: '00', label: 'placeholder' },
+    //         { value: '00', label: 'placeholder' },
+    //     ],
+    //     note: 'Placeholder closing note.',
+    //     sections: [
+    //         {
+    //             id: 'overview',
+    //             icon: '📖',
+    //             title: 'Overview',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'research',
+    //             icon: '🔍',
+    //             title: 'Research',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
+    //                 {
+    //                     type: 'rows',
+    //                     items: [
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                     ],
+    //                 },
+    //                 { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'recommendation',
+    //             icon: '🧭',
+    //             title: 'Recommendation',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'impact',
+    //             icon: '💥',
+    //             title: 'Impact',
+    //             blocks: [
+    //                 {
+    //                     type: 'metrics',
+    //                     items: [
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                     ],
+    //                 },
+    //                 { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'learnings',
+    //             icon: '🎓',
+    //             title: 'Learnings',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder learning about the work itself.' },
+    //                 { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
+    //             ],
+    //         },
+    //     ],
+    // },
     {
         id: 'placeholder-4',
         title: 'Case Study Placeholder 4',
         tagline: 'Real narrative content coming soon',
         tech: ['Placeholder Tech'],
-        role: 'Placeholder Role',
-        timeframe: 'Placeholder Timeframe',
-        tags: ['PLACEHOLDER'],
-        stats: [
-            { value: '00', label: 'placeholder' },
-            { value: '00', label: 'placeholder' },
-        ],
-        note: 'Placeholder closing note.',
-        sections: [
-            {
-                id: 'overview',
-                icon: '📖',
-                title: 'Overview',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
-                ],
-            },
-            {
-                id: 'research',
-                icon: '🔍',
-                title: 'Research',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
-                    {
-                        type: 'rows',
-                        items: [
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                            { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
-                        ],
-                    },
-                    { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
-                ],
-            },
-            {
-                id: 'recommendation',
-                icon: '🧭',
-                title: 'Recommendation',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
-                ],
-            },
-            {
-                id: 'impact',
-                icon: '💥',
-                title: 'Impact',
-                blocks: [
-                    {
-                        type: 'metrics',
-                        items: [
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                            { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
-                        ],
-                    },
-                    { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
-                ],
-            },
-            {
-                id: 'learnings',
-                icon: '🎓',
-                title: 'Learnings',
-                blocks: [
-                    { type: 'prose', text: 'Placeholder learning about the work itself.' },
-                    { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
-                ],
-            },
-        ],
+        comingSoon: true,
     },
+    // To publish this one: fill the template in, uncomment it, delete the
+    //    stub above, and drop `comingSoon`. Its card becomes clickable.
+    // {
+    //     id: 'placeholder-4',
+    //     title: 'Case Study Placeholder 4',
+    //     tagline: 'Real narrative content coming soon',
+    //     tech: ['Placeholder Tech'],
+    //     role: 'Placeholder Role',
+    //     timeframe: 'Placeholder Timeframe',
+    //     tags: ['PLACEHOLDER'],
+    //     stats: [
+    //         { value: '00', label: 'placeholder' },
+    //         { value: '00', label: 'placeholder' },
+    //     ],
+    //     note: 'Placeholder closing note.',
+    //     sections: [
+    //         {
+    //             id: 'overview',
+    //             icon: '📖',
+    //             title: 'Overview',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder overview. What the project was, what was going wrong, and what you set out to change.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'research',
+    //             icon: '🔍',
+    //             title: 'Research',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder lead in to how you learned what was actually true.' },
+    //                 {
+    //                     type: 'rows',
+    //                     items: [
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                         { label: 'Placeholder method', text: 'Placeholder description of what this method surfaced.' },
+    //                     ],
+    //                 },
+    //                 { type: 'prose', text: 'Placeholder closing line. The one finding that changed your thinking.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'recommendation',
+    //             icon: '🧭',
+    //             title: 'Recommendation',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder description of what you designed, built, or recommended, and how you got it agreed.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'impact',
+    //             icon: '💥',
+    //             title: 'Impact',
+    //             blocks: [
+    //                 {
+    //                     type: 'metrics',
+    //                     items: [
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                         { value: '00', label: 'Placeholder metric', caption: 'placeholder caption' },
+    //                     ],
+    //                 },
+    //                 { type: 'prose', text: 'Placeholder line for the outcome a number cannot carry.' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'learnings',
+    //             icon: '🎓',
+    //             title: 'Learnings',
+    //             blocks: [
+    //                 { type: 'prose', text: 'Placeholder learning about the work itself.' },
+    //                 { type: 'prose', text: 'Placeholder learning about how you want to work next time.' },
+    //             ],
+    //         },
+    //     ],
+    // },
 ];
 
 export default caseStudies;

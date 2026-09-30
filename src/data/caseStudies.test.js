@@ -6,14 +6,43 @@ const REQUIRED_KEYS = [
     'tags', 'stats', 'note', 'sections',
 ];
 
+// A study that is written and openable, versus one whose card is on the shelf
+// with its content still to be filled in. The two carry different obligations,
+// so every structural test below picks the group it applies to.
+const published = caseStudies.filter((entry) => !entry.comingSoon);
+const comingSoon = caseStudies.filter((entry) => entry.comingSoon);
+
+// Only the card face reads these, so they are all an unwritten study owes.
+const CARD_FACE_KEYS = ['id', 'title', 'tagline', 'tech'];
+
 const BLOCK_TYPES = ['prose', 'rows', 'metrics'];
 
 test('exports exactly 4 case studies', () => {
     expect(caseStudies).toHaveLength(4);
 });
 
-test('every case study has the full required shape', () => {
-    caseStudies.forEach((entry) => {
+test('there is at least one of each kind, so neither group is vacuous', () => {
+    expect(published.length).toBeGreaterThan(0);
+    expect(comingSoon.length).toBeGreaterThan(0);
+});
+
+test('every coming soon study carries what the card face reads', () => {
+    comingSoon.forEach((entry) => {
+        CARD_FACE_KEYS.forEach((key) => expect(entry).toHaveProperty(key));
+        expect(Array.isArray(entry.tech)).toBe(true);
+    });
+});
+
+// The guard that matters: the overlay renders from `sections`, so an unwritten
+// study that still carried them could be opened onto invented content.
+test('no coming soon study carries sections', () => {
+    comingSoon.forEach((entry) => {
+        expect(entry.sections).toBeUndefined();
+    });
+});
+
+test('every published case study has the full required shape', () => {
+    published.forEach((entry) => {
         REQUIRED_KEYS.forEach((key) => {
             expect(entry).toHaveProperty(key);
         });
@@ -33,7 +62,7 @@ test('every case study has a unique id', () => {
 // The overlay's sidebar is built from the section list and scrolls to a section
 // by id, so a duplicate id inside one case study would break navigation.
 test('sections carry an icon, a title, and an id unique within their case study', () => {
-    caseStudies.forEach((entry) => {
+    published.forEach((entry) => {
         const sectionIds = entry.sections.map((section) => section.id);
         expect(new Set(sectionIds).size).toBe(sectionIds.length);
         entry.sections.forEach((section) => {
@@ -47,7 +76,7 @@ test('sections carry an icon, a title, and an id unique within their case study'
 });
 
 test('every block is one of the renderable types, with the fields that type needs', () => {
-    caseStudies.forEach((entry) => {
+    published.forEach((entry) => {
         entry.sections.forEach((section) => {
             section.blocks.forEach((block) => {
                 expect(BLOCK_TYPES).toContain(block.type);
@@ -93,8 +122,10 @@ test('no case study copy contains a dash', () => {
     });
 });
 
-test('the placeholders follow the same section structure as the first case study', () => {
-    const [first, ...rest] = caseStudies;
+// Scoped to published studies. With only one published today this passes
+// vacuously; it re-arms the moment a second study is filled in and published.
+test('every published study follows the same section structure as the first', () => {
+    const [first, ...rest] = published;
     const shapeOf = (entry) => entry.sections.map((section) => ({
         id: section.id,
         blockTypes: section.blocks.map((block) => block.type),

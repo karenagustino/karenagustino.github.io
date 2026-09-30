@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import CaseStudyCard from './CaseStudyCard';
 import CaseStudyOverlay from './CaseStudyOverlay';
+import ComingSoonCursor from './ComingSoonCursor';
 import { cardTransformStyle } from './coverflowMath';
 import './PlotStage.css';
 
@@ -18,6 +19,10 @@ const PlotStage = ({ caseStudies }) => {
     // when it has finished so it can actually be unmounted.
     const [overlayClosing, setOverlayClosing] = useState(false);
     const dragStateRef = useRef({ startX: 0, wasDrag: false, offset: 0 });
+    // Whether the pointer is currently over a card whose study is not
+    // written yet. Changes on hover, not per frame, so state is fine here;
+    // the cursor's own position is written through a ref.
+    const [hoveringLocked, setHoveringLocked] = useState(false);
 
     const requestCloseOverlay = () => setOverlayClosing(true);
 
@@ -38,6 +43,10 @@ const PlotStage = ({ caseStudies }) => {
 
     const handleCardClick = (index) => {
         if (overlayOpen) return;
+        // The card for an unwritten study wires no click handler, so this is a
+        // second lock rather than the only one. It is here because the guard
+        // belongs with the thing it guards: opening.
+        if (caseStudies[index]?.comingSoon) return;
         if (index === activeIndex) {
             setOverlayOpen(true);
         } else {
@@ -186,6 +195,8 @@ const PlotStage = ({ caseStudies }) => {
                                 isActive={isActive}
                                 index={index}
                                 onClick={() => handleCardClick(index)}
+                                onLockedEnter={() => setHoveringLocked(true)}
+                                onLockedLeave={() => setHoveringLocked(false)}
                             />
                         </li>
                     );
@@ -200,6 +211,7 @@ const PlotStage = ({ caseStudies }) => {
             >
                 &#8250;
             </button>
+            <ComingSoonCursor active={hoveringLocked && !overlayOpen} />
             {overlayOpen && (
                 <CaseStudyOverlay
                     caseStudy={caseStudies[activeIndex]}

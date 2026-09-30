@@ -67,3 +67,30 @@
     line-height: 1.7;
     color: var(--color-panel-muted);
 }
+
+/* An unwritten study. The card keeps its shape and place in the coverflow —
+   pulling it out would misrepresent how much work is on the shelf — but it
+   reads as dimmed, and the native cursor is handed over to the padlock sprite
+   that follows the pointer (see ComingSoonCursor). */
+.case-study-card--coming-soon {
+    cursor: none;
+}
+
+.case-study-card--coming-soon .case-study-card-title,
+.case-study-card--coming-soon .case-study-card-tagline,
+.case-study-card--coming-soon .case-study-card-tech {
+    opacity: 0.55;
+}
+
+.case-study-card-lock {
+    margin-top: auto;
+    align-self: flex-start;
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    letter-spacing: 0.14em;
+    padding: 0.35em 0.6em;
+    border: 2px solid var(--color-panel-frame);
+    border-radius: 4px;
+    background: var(--color-panel-alt);
+    color: var(--color-panel-muted);
+}
