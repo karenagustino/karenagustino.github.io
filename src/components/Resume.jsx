@@ -26,12 +26,12 @@ const experiences = [
     {
         title: 'Business Analyst Co-op',
         company: 'RBCx (Royal Bank of Canada)',
-        dates: 'Sep 2026 - Present',
+        dates: 'Sep 2026 – Present',
     },
     {
         title: 'Product Analyst Co-op',
         company: 'Simplii Financial (CIBC)',
-        dates: 'Jan 2026 - Aug 2026',
+        dates: 'Jan 2026 – Aug 2026',
     },
     {
         title: 'HR Information Systems Data Analyst Co-op',

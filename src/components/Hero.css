@@ -50,6 +50,10 @@
     background-color: #D9741E;
 }
 
+/* One stop per word in Hero's `descriptions` array, which this is coupled to:
+   the list scrolls by its own 2.5rem line height, so N words need N stops
+   ending at -(N-1) * 2.5rem. Add a word without adding a stop and it sits
+   below the window forever, invisible with nothing failing. */
 @keyframes animation {
 
     0%,
@@ -57,31 +61,39 @@
         top: 0;
     }
 
-    20% {
+    16% {
         top: 0;
     }
 
-    25% {
+    20% {
         top: -2.5rem;
     }
 
-    45% {
+    36% {
         top: -2.5rem;
     }
 
-    50% {
+    40% {
         top: -5rem;
     }
 
-    70% {
+    56% {
         top: -5rem;
     }
 
-    75% {
+    60% {
         top: -7.5rem;
     }
 
-    95% {
+    76% {
         top: -7.5rem;
+    }
+
+    80% {
+        top: -10rem;
+    }
+
+    96% {
+        top: -10rem;
     }
 }
