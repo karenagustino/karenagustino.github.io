@@ -16,7 +16,7 @@ const comingSoon = caseStudies.filter((entry) => entry.comingSoon);
 // invented tech line. These are all it owes.
 const CARD_FACE_KEYS = ['id', 'title'];
 
-const BLOCK_TYPES = ['prose', 'rows', 'metrics'];
+const BLOCK_TYPES = ['prose', 'rows', 'steps', 'metrics'];
 
 test('exports exactly 4 case studies', () => {
     expect(caseStudies).toHaveLength(4);
@@ -112,7 +112,7 @@ test('every block is one of the renderable types, with the fields that type need
                     expect(block.items.length).toBeGreaterThan(0);
                     block.items.forEach((item) => {
                         expect(item.label).toBeTruthy();
-                        expect(block.type === 'rows' ? item.text : item.value).toBeTruthy();
+                        expect(block.type === 'metrics' ? item.value : item.text).toBeTruthy();
                     });
                 }
             });

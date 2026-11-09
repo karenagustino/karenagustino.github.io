@@ -54,7 +54,10 @@ const CaseStudyCard = ({
                 one. `aria-disabled` above is what tells assistive technology
                 the card is inert. */}
             {!comingSoon && (
-                <span className="case-study-card-eyebrow" aria-hidden="true">CASE FILE {pad(index + 1)}</span>
+                <span className="case-study-card-eyebrow" aria-hidden="true">CASE STUDY {pad(index + 1)}</span>
+            )}
+            {!comingSoon && caseStudy.preview && (
+                <img className="case-study-card-preview" src={caseStudy.preview} alt="" draggable="false" />
             )}
             <div className="case-study-card-title">{caseStudy.title}</div>
             {caseStudy.tagline && <div className="case-study-card-tagline">{caseStudy.tagline}</div>}

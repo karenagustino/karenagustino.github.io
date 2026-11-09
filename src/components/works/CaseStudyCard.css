@@ -90,3 +90,19 @@
     font-size: 1.25rem;
     color: var(--color-panel-muted);
 }
+
+/* A study's preview image fills whatever height the text leaves free, starting
+   below the eyebrow. `min-height: 0` lets it shrink inside the flex column, and
+   `object-fit: cover` crops rather than squashes it as the card resizes. The
+   alt is empty because the title right beneath it already names the study. */
+.case-study-card-preview {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    margin: 1.2rem 0 0.8rem;
+    object-fit: cover;
+    object-position: center;
+    border: 2px solid var(--color-panel-line);
+    border-radius: 4px;
+    user-select: none;
+}

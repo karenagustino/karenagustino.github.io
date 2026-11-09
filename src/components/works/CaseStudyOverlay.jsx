@@ -16,16 +16,29 @@ const pad = (value) => String(value).padStart(2, '0');
 // and placeholder entries legitimately repeat the same label and value, which
 // would collide if the content were used as the key.
 const renderBlock = (block, index) => {
-    if (block.type === 'rows') {
+    // Rows and steps share one shape: an icon tile in front, then the label over
+    // its text. Steps add their number to the label, in an `<ol>` so the order
+    // is real to assistive technology and not only drawn. An item without an
+    // icon gets a plain square, so a list never loses its markers halfway down.
+    if (block.type === 'rows' || block.type === 'steps') {
+        const List = block.type === 'steps' ? 'ol' : 'ul';
         return (
-            <ul className="case-study-rows" key={index}>
+            <List className={`case-study-rows case-study-${block.type}`} key={index}>
                 {block.items.map((item, itemIndex) => (
                     <li className="case-study-row" key={itemIndex}>
-                        <span className="case-study-row-label">{item.label}</span>
-                        <span className="case-study-row-text">{item.text}</span>
+                        <span className="case-study-row-icon" aria-hidden="true">{item.icon || '\u25AA'}</span>
+                        <span className="case-study-row-body">
+                            <span className="case-study-row-label">
+                                {block.type === 'steps' && (
+                                    <span className="case-study-step-number" aria-hidden="true">{pad(itemIndex + 1)}</span>
+                                )}
+                                {item.label}
+                            </span>
+                            <span className="case-study-row-text">{item.text}</span>
+                        </span>
                     </li>
                 ))}
-            </ul>
+            </List>
         );
     }
 
