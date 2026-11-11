@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import CaseStudyOverlay, { toFigmaEmbedUrl } from './CaseStudyOverlay';
 
 const sampleCaseStudy = {
@@ -168,7 +168,7 @@ test('turns a prototype share link into an embed without Figma chrome', () => {
     expect(embed.searchParams.get('node-id')).toBe('1-2');
     expect(embed.searchParams.get('scaling')).toBe('min-zoom');
     expect(embed.searchParams.get('hide-ui')).toBe('1');
-    expect(embed.searchParams.get('embed-host')).toBe('share');
+    expect(embed.searchParams.get('embed-host')).toBe('karenagustino-portfolio');
     expect(embed.searchParams.has('show-proto-sidebar')).toBe(false);
     expect(embed.searchParams.has('t')).toBe(false);
 });
@@ -188,4 +188,84 @@ test('plays a prototype block in a phone frame with a link out to Figma', () => 
     expect(frame.tagName).toBe('IFRAME');
     expect(frame.getAttribute('src')).toBe(toFigmaEmbedUrl(PROTO_URL));
     expect(screen.getByRole('link', { name: /open in figma/i })).toHaveAttribute('href', PROTO_URL);
+});
+
+const renderPrototype = (extra = {}) => render(
+    <CaseStudyOverlay
+        caseStudy={{
+            ...sampleCaseStudy,
+            sections: [{
+                id: 'prototype',
+                icon: '📱',
+                title: 'Prototype',
+                blocks: [{ type: 'prototype', url: PROTO_URL, label: 'Try the flow', ...extra }],
+            }],
+        }}
+        onClose={() => {}}
+    />,
+);
+
+const postFromFigma = (iframe, data) => act(() => {
+    window.dispatchEvent(new MessageEvent('message', {
+        data, origin: 'https://www.figma.com', source: iframe.contentWindow,
+    }));
+});
+
+test('covers the screen with a loader until the embed has loaded', () => {
+    jest.useFakeTimers();
+    try {
+        renderPrototype();
+        expect(screen.getByRole('status')).toHaveTextContent(/loading prototype/i);
+        fireEvent.load(screen.getByTitle('Try the flow'));
+        act(() => { jest.advanceTimersByTime(1200); });
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    } finally {
+        jest.useRealTimers();
+    }
+});
+
+test('start over reloads the embed and shows the loader again', () => {
+    jest.useFakeTimers();
+    try {
+        renderPrototype();
+        const first = screen.getByTitle('Try the flow');
+        fireEvent.load(first);
+        act(() => { jest.advanceTimersByTime(1200); });
+        fireEvent.click(screen.getByRole('button', { name: /start over/i }));
+        expect(screen.getByRole('status')).toBeInTheDocument();
+        expect(screen.getByTitle('Try the flow')).not.toBe(first);
+    } finally {
+        jest.useRealTimers();
+    }
+});
+
+test('offers a replay on the last screen once Figma reports reaching it', () => {
+    renderPrototype({ endNodeId: '9:9' });
+    const iframe = screen.getByTitle('Try the flow');
+    postFromFigma(iframe, { type: 'INITIAL_LOAD', data: {} });
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+    postFromFigma(iframe, { type: 'PRESENTED_NODE_CHANGED', data: { presentedNodeId: '1:2' } });
+    expect(screen.queryByRole('button', { name: /replay/i })).not.toBeInTheDocument();
+
+    postFromFigma(iframe, { type: 'PRESENTED_NODE_CHANGED', data: { presentedNodeId: '9:9' } });
+    const post = jest.spyOn(iframe.contentWindow, 'postMessage').mockImplementation(() => {});
+    fireEvent.click(screen.getByRole('button', { name: /replay/i }));
+    expect(post).toHaveBeenCalledWith({ type: 'RESTART' }, 'https://www.figma.com');
+    expect(screen.queryByRole('button', { name: /replay/i })).not.toBeInTheDocument();
+});
+
+test('ignores messages that do not come from Figma', () => {
+    renderPrototype({ endNodeId: '9:9' });
+    act(() => {
+        window.dispatchEvent(new MessageEvent('message', {
+            data: { type: 'INITIAL_LOAD', data: {} }, origin: 'https://evil.example',
+        }));
+    });
+    expect(screen.getByRole('status')).toBeInTheDocument();
+});
+
+test('adds the client id to the embed only when one is set', () => {
+    expect(new URL(toFigmaEmbedUrl(PROTO_URL, '')).searchParams.has('client-id')).toBe(false);
+    expect(new URL(toFigmaEmbedUrl(PROTO_URL, 'abc')).searchParams.get('client-id')).toBe('abc');
 });

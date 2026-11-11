@@ -110,6 +110,11 @@ test('every block is one of the renderable types, with the fields that type need
                 } else if (block.type === 'prototype') {
                     expect(block.url).toMatch(/^https:\/\/www\.figma\.com\/proto\//);
                     expect(block.label).toBeTruthy();
+                    // Node ids as the Embed API reports them: a colon, not the
+                    // dash that share links use.
+                    if (block.endNodeId !== undefined) {
+                        expect(block.endNodeId).toMatch(/^\d+:\d+$/);
+                    }
                 } else {
                     expect(Array.isArray(block.items)).toBe(true);
                     expect(block.items.length).toBeGreaterThan(0);

@@ -18,7 +18,10 @@
 //   { type: 'metrics', items: [{ value, label, caption }] }
 //   { type: 'prototype', url, label, caption }   a Figma prototype share link,
 //                                                played inside a phone frame.
-//       Add `frame: { width, height }` if the screens are not 375 by 812.
+//       Add `frame: { width, height }` if the screens are not 375 by 812, and
+//       `endNodeId: '123:456'` (the last screen's node id, colon not dash) to
+//       offer a replay there. That prompt needs FIGMA_CLIENT_ID, in
+//       CaseStudyOverlay.jsx; without it a Start over button still works.
 //
 // A written study can also carry a `preview` image, shown on its card above
 // the title.
@@ -97,6 +100,7 @@ const caseStudies = [
                         type: 'prototype',
                         url: 'https://www.figma.com/proto/inDoas65kctyHR8F3T9U1z/Onboarding-Prototype?node-id=332-6612&p=f&t=HqRktiYgi6tKvLun-9&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=332%3A6612&show-proto-sidebar=1',
                         label: 'Explore banking',
+                        endNodeId: '341:3912',
                         caption: 'Tap Explore the app to look around the preview dashboard, or Open an account to try the new username sign in. Click anywhere on the screen to see what you can press.',
                     },
                 ],

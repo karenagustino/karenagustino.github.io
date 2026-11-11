@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './CaseStudyOverlay.css';
 
 // How far below the content's top edge a heading has to sit before the section
@@ -12,11 +12,26 @@ const PROGRESS_CELLS = 12;
 
 const pad = (value) => String(value).padStart(2, '0');
 
+// Figma's Embed API, which reports when a prototype has drawn and which
+// screen it is on, only talks to embeds that carry a registered client id.
+// Leave this empty and the prototype still plays: the loader falls back to the
+// iframe's own load event, and replay reloads the embed. Fill it in (and add
+// the site's origin to the app's allowed embed origins) and the loader waits
+// for the prototype itself, and the replay prompt appears on the last screen.
+// The id is public by design; it travels in every embed URL.
+export const FIGMA_CLIENT_ID = '';
+
+const FIGMA_ORIGIN = 'https://www.figma.com';
+
+// Without the Embed API the iframe's load event is the only signal, and it
+// fires when Figma's page arrives, a moment before the prototype has drawn.
+const LOAD_GRACE_MS = 1200;
+
 // Turns a Figma prototype share link into its embeddable form. The share link
 // is what Figma's Share button hands out, so that is what the data holds; the
 // embed host serves the same prototype without Figma's own toolbar and
 // sidebar, which would crowd a phone sized frame.
-export const toFigmaEmbedUrl = (shareUrl) => {
+export const toFigmaEmbedUrl = (shareUrl, clientId = FIGMA_CLIENT_ID) => {
     const url = new URL(shareUrl);
     url.hostname = 'embed.figma.com';
     url.searchParams.delete('show-proto-sidebar');
@@ -26,7 +41,8 @@ export const toFigmaEmbedUrl = (shareUrl) => {
     // around the frame, so the frame is played at 100% and PrototypeScreen
     // below does the fitting instead, where the edges can be controlled.
     url.searchParams.set('scaling', 'min-zoom');
-    url.searchParams.set('embed-host', 'share');
+    url.searchParams.set('embed-host', 'karenagustino-portfolio');
+    if (clientId) url.searchParams.set('client-id', clientId);
     return url.toString();
 };
 
@@ -37,12 +53,17 @@ const DEFAULT_FRAME = { width: 375, height: 812 };
 // margin and never shrinks the frame to make it fit. All of it is cropped off.
 const EMBED_MARGIN = 120;
 
+// Cells in the loader's bar, echoing the reading progress meter.
+const LOADER_CELLS = 5;
+
 // The phone's screen. The embed is drawn larger than the screen, with the
 // frame at 100% in its centre, then shrunk so the frame exactly covers the
 // screen and the margin around it falls outside, where overflow hides it.
 // Clicks still land in the right place: a transformed iframe maps pointer
 // positions through its transform.
-const PrototypeScreen = ({ url, label, frame = DEFAULT_FRAME }) => {
+const PrototypeScreen = ({
+    url, label, frame = DEFAULT_FRAME, iframeRef, run, loaded, atEnd, onLoad, onReplay,
+}) => {
     const screenRef = useRef(null);
     const [scale, setScale] = useState(null);
 
@@ -65,12 +86,17 @@ const PrototypeScreen = ({ url, label, frame = DEFAULT_FRAME }) => {
             ref={screenRef}
             style={{ aspectRatio: `${frame.width} / ${frame.height}` }}
         >
+            {/* Keyed by run, so a replay without the Embed API mounts a fresh
+                embed, which starts again from the first screen. */}
             <iframe
+                key={run}
+                ref={iframeRef}
                 className="case-study-phone-embed"
                 title={label}
                 src={toFigmaEmbedUrl(url)}
                 loading="lazy"
                 allowFullScreen
+                onLoad={onLoad}
                 style={{
                     width: frame.width + EMBED_MARGIN * 2,
                     height: frame.height + EMBED_MARGIN * 2,
@@ -80,7 +106,117 @@ const PrototypeScreen = ({ url, label, frame = DEFAULT_FRAME }) => {
                     transform: `translate(-50%, -50%) scale(${scale || 1})`,
                 }}
             />
+            {!loaded && (
+                <div className="case-study-phone-loader" role="status">
+                    <span className="case-study-phone-loader-bar" aria-hidden="true">
+                        {Array.from({ length: LOADER_CELLS }, (unused, cell) => (
+                            <span
+                                key={cell}
+                                className="case-study-phone-loader-cell"
+                                style={{ animationDelay: `${cell * 0.15}s` }}
+                            />
+                        ))}
+                    </span>
+                    <span className="case-study-phone-loader-label">Loading prototype</span>
+                </div>
+            )}
+            {atEnd && (
+                <div className="case-study-phone-end">
+                    <button type="button" className="case-study-phone-replay" onClick={onReplay}>
+                        ↺ Replay
+                    </button>
+                </div>
+            )}
         </div>
+    );
+};
+
+// A live prototype, played as the screen of a drawn phone, with a caption and
+// the way out to Figma beside it. Holds the playback state the phone and the
+// caption share: whether it has loaded, whether it has reached its last
+// screen, and the replay both of them can trigger.
+const PrototypeBlock = ({ block }) => {
+    const iframeRef = useRef(null);
+    const graceTimer = useRef(null);
+    const [run, setRun] = useState(0);
+    const [loaded, setLoaded] = useState(false);
+    const [atEnd, setAtEnd] = useState(false);
+    // True once the embed has spoken through the Embed API, which only happens
+    // with a client id. Until then nothing can be sent to it either.
+    const [apiReady, setApiReady] = useState(false);
+
+    useEffect(() => {
+        const handleMessage = (event) => {
+            // The embed lives on embed.figma.com but posts from www.figma.com.
+            // The source check keeps two prototypes on one page apart.
+            const frameWindow = iframeRef.current && iframeRef.current.contentWindow;
+            if (event.origin !== FIGMA_ORIGIN || !frameWindow || event.source !== frameWindow) return;
+            const { type, data } = event.data || {};
+            if (type === 'INITIAL_LOAD') {
+                setApiReady(true);
+                setLoaded(true);
+            } else if (type === 'PRESENTED_NODE_CHANGED' && data) {
+                setAtEnd(Boolean(block.endNodeId) && data.presentedNodeId === block.endNodeId);
+            }
+        };
+        window.addEventListener('message', handleMessage);
+        return () => {
+            window.removeEventListener('message', handleMessage);
+            clearTimeout(graceTimer.current);
+        };
+    }, [block.endNodeId]);
+
+    const handleLoad = () => {
+        if (apiReady) return;
+        clearTimeout(graceTimer.current);
+        graceTimer.current = setTimeout(() => setLoaded(true), LOAD_GRACE_MS);
+    };
+
+    const replay = () => {
+        setAtEnd(false);
+        const frameWindow = iframeRef.current && iframeRef.current.contentWindow;
+        if (apiReady && frameWindow) {
+            frameWindow.postMessage({ type: 'RESTART' }, FIGMA_ORIGIN);
+            return;
+        }
+        clearTimeout(graceTimer.current);
+        setLoaded(false);
+        setRun((current) => current + 1);
+    };
+
+    return (
+        <figure className="case-study-prototype">
+            <div className="case-study-phone">
+                <PrototypeScreen
+                    url={block.url}
+                    label={block.label}
+                    frame={block.frame}
+                    iframeRef={iframeRef}
+                    run={run}
+                    loaded={loaded}
+                    atEnd={atEnd}
+                    onLoad={handleLoad}
+                    onReplay={replay}
+                />
+            </div>
+            <figcaption className="case-study-prototype-caption">
+                <span className="case-study-row-label">{block.label}</span>
+                {block.caption && <span className="case-study-row-text">{block.caption}</span>}
+                <span className="case-study-prototype-actions">
+                    <button type="button" className="case-study-prototype-link" onClick={replay}>
+                        ↺ Start over
+                    </button>
+                    <a
+                        className="case-study-prototype-link"
+                        href={block.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Open in Figma ↗
+                    </a>
+                </span>
+            </figcaption>
+        </figure>
     );
 };
 
@@ -128,33 +264,11 @@ const renderBlock = (block, index) => {
         );
     }
 
-    // A live prototype, played as the screen of a drawn phone. The Figma
-    // file's prototype device must be set to None, or Figma draws a second
-    // phone inside this one. `frame` is only needed for a prototype not drawn
-    // at 375 by 812.
-    // Lazy so the overlay opens without waiting on Figma; the link underneath
-    // is the way out for anyone who wants it full size, or whose browser
-    // blocks the embed.
+    // The Figma file's prototype device must be set to None, or Figma draws a
+    // second phone inside this one. `frame` is only needed for a prototype not
+    // drawn at 375 by 812. Lazy so the overlay opens without waiting on Figma.
     if (block.type === 'prototype') {
-        return (
-            <figure className="case-study-prototype" key={index}>
-                <div className="case-study-phone">
-                    <PrototypeScreen url={block.url} label={block.label} frame={block.frame} />
-                </div>
-                <figcaption className="case-study-prototype-caption">
-                    <span className="case-study-row-label">{block.label}</span>
-                    {block.caption && <span className="case-study-row-text">{block.caption}</span>}
-                    <a
-                        className="case-study-prototype-link"
-                        href={block.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Open in Figma ↗
-                    </a>
-                </figcaption>
-            </figure>
-        );
+        return <PrototypeBlock block={block} key={index} />;
     }
 
     return (
