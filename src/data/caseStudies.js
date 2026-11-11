@@ -7,7 +7,7 @@
 // an honest blank. Its full template sits commented out beneath it, and it
 // deliberately has no `sections`, so the overlay can never open onto content
 // that was never meant to be read. A section is an icon,
-// a title, and an ordered list of blocks. Four block types exist:
+// a title, and an ordered list of blocks. Five block types exist:
 //
 //   { type: 'prose',   text: '...' }
 //   { type: 'rows',    items: [{ icon, label, text }] }
@@ -16,6 +16,9 @@
 // `icon` is an emoji shown in a tile in front of the item. It is optional; an
 // item without one gets a plain square.
 //   { type: 'metrics', items: [{ value, label, caption }] }
+//   { type: 'prototype', url, label, caption }   a Figma prototype share link,
+//                                                played inside a phone frame.
+//       Add `frame: { width, height }` if the screens are not 375 by 812.
 //
 // A written study can also carry a `preview` image, shown on its card above
 // the title.
@@ -86,6 +89,19 @@ const caseStudies = [
                 ],
             },
             {
+                id: 'prototype',
+                icon: '📱',
+                title: 'Prototype',
+                blocks: [
+                    {
+                        type: 'prototype',
+                        url: 'https://www.figma.com/proto/inDoas65kctyHR8F3T9U1z/Onboarding-Prototype?node-id=332-6612&p=f&t=HqRktiYgi6tKvLun-9&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=332%3A6612&show-proto-sidebar=1',
+                        label: 'Explore banking',
+                        caption: 'Tap Explore the app to look around the preview dashboard, or Open an account to try the new username sign in. Click anywhere on the screen to see what you can press.',
+                    },
+                ],
+            },
+            {
                 id: 'impact',
                 icon: '💥',
                 title: 'Impact',
@@ -134,10 +150,12 @@ const caseStudies = [
     //
     // Every `#TODO` below is a gap to fill. Keep the section ids and block
     // shapes; they are what the overlay's sidebar and renderer read. Blocks
-    // come in three kinds:
-    //   { type: 'prose',   text: '...' }
-    //   { type: 'rows',    items: [{ label, text }] }
-    //   { type: 'metrics', items: [{ value, label, caption }] }
+    // come in four kinds:
+    //   { type: 'prose',     text: '...' }
+    //   { type: 'rows',      items: [{ label, text }] }
+    //   { type: 'metrics',   items: [{ value, label, caption }] }
+    //   { type: 'prototype', url, label, caption }   paste the link from
+    //       Figma's Share button, and set the file's prototype device to None
     // Sections and blocks can be added, removed or reordered freely.
     //
     // One house rule: no dashes of any width in the copy. Write "student led" rather than
@@ -186,6 +204,19 @@ const caseStudies = [
     //             title: 'Recommendation',
     //             blocks: [
     //                 { type: 'prose', text: '#TODO what you proposed and why that over the alternatives' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'prototype',
+    //             icon: '📱',
+    //             title: 'Prototype',
+    //             blocks: [
+    //                 {
+    //                     type: 'prototype',
+    //                     url: '#TODO Figma prototype share link',
+    //                     label: '#TODO short, obvious action, e.g. Explore banking',
+    //                     caption: '#TODO what to tap first and what they will see',
+    //                 },
     //             ],
     //         },
     //         {
@@ -223,10 +254,12 @@ const caseStudies = [
     //
     // Every `#TODO` below is a gap to fill. Keep the section ids and block
     // shapes; they are what the overlay's sidebar and renderer read. Blocks
-    // come in three kinds:
-    //   { type: 'prose',   text: '...' }
-    //   { type: 'rows',    items: [{ label, text }] }
-    //   { type: 'metrics', items: [{ value, label, caption }] }
+    // come in four kinds:
+    //   { type: 'prose',     text: '...' }
+    //   { type: 'rows',      items: [{ label, text }] }
+    //   { type: 'metrics',   items: [{ value, label, caption }] }
+    //   { type: 'prototype', url, label, caption }   paste the link from
+    //       Figma's Share button, and set the file's prototype device to None
     // Sections and blocks can be added, removed or reordered freely.
     //
     // One house rule: no dashes of any width in the copy. Write "student led" rather than
@@ -275,6 +308,19 @@ const caseStudies = [
     //             title: 'Recommendation',
     //             blocks: [
     //                 { type: 'prose', text: '#TODO what you proposed and why that over the alternatives' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'prototype',
+    //             icon: '📱',
+    //             title: 'Prototype',
+    //             blocks: [
+    //                 {
+    //                     type: 'prototype',
+    //                     url: '#TODO Figma prototype share link',
+    //                     label: '#TODO short, obvious action, e.g. Explore banking',
+    //                     caption: '#TODO what to tap first and what they will see',
+    //                 },
     //             ],
     //         },
     //         {
@@ -312,10 +358,12 @@ const caseStudies = [
     //
     // Every `#TODO` below is a gap to fill. Keep the section ids and block
     // shapes; they are what the overlay's sidebar and renderer read. Blocks
-    // come in three kinds:
-    //   { type: 'prose',   text: '...' }
-    //   { type: 'rows',    items: [{ label, text }] }
-    //   { type: 'metrics', items: [{ value, label, caption }] }
+    // come in four kinds:
+    //   { type: 'prose',     text: '...' }
+    //   { type: 'rows',      items: [{ label, text }] }
+    //   { type: 'metrics',   items: [{ value, label, caption }] }
+    //   { type: 'prototype', url, label, caption }   paste the link from
+    //       Figma's Share button, and set the file's prototype device to None
     // Sections and blocks can be added, removed or reordered freely.
     //
     // One house rule: no dashes of any width in the copy. Write "student led" rather than
@@ -364,6 +412,19 @@ const caseStudies = [
     //             title: 'Recommendation',
     //             blocks: [
     //                 { type: 'prose', text: '#TODO what you proposed and why that over the alternatives' },
+    //             ],
+    //         },
+    //         {
+    //             id: 'prototype',
+    //             icon: '📱',
+    //             title: 'Prototype',
+    //             blocks: [
+    //                 {
+    //                     type: 'prototype',
+    //                     url: '#TODO Figma prototype share link',
+    //                     label: '#TODO short, obvious action, e.g. Explore banking',
+    //                     caption: '#TODO what to tap first and what they will see',
+    //                 },
     //             ],
     //         },
     //         {

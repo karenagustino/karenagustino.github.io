@@ -16,7 +16,7 @@ const comingSoon = caseStudies.filter((entry) => entry.comingSoon);
 // invented tech line. These are all it owes.
 const CARD_FACE_KEYS = ['id', 'title'];
 
-const BLOCK_TYPES = ['prose', 'rows', 'steps', 'metrics'];
+const BLOCK_TYPES = ['prose', 'rows', 'steps', 'metrics', 'prototype'];
 
 test('exports exactly 4 case studies', () => {
     expect(caseStudies).toHaveLength(4);
@@ -107,6 +107,9 @@ test('every block is one of the renderable types, with the fields that type need
                 if (block.type === 'prose') {
                     expect(typeof block.text).toBe('string');
                     expect(block.text.length).toBeGreaterThan(0);
+                } else if (block.type === 'prototype') {
+                    expect(block.url).toMatch(/^https:\/\/www\.figma\.com\/proto\//);
+                    expect(block.label).toBeTruthy();
                 } else {
                     expect(Array.isArray(block.items)).toBe(true);
                     expect(block.items.length).toBeGreaterThan(0);

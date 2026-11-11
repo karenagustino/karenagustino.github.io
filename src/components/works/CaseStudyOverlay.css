@@ -506,6 +506,75 @@
     color: var(--color-panel-muted);
 }
 
+/* ---------- clickable prototype in a phone ---------- */
+
+/* Phone on the left, its caption beside it; they stack on narrow screens. */
+.case-study-prototype {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 1.75rem;
+    margin: 0 0 1rem 0;
+}
+
+/* The bezel is a thick ring of ink with rounded corners: the one soft shape on
+   the panel, because a square phone stops reading as a phone. Sized to stand
+   as tall as the plain stage it replaced (about 585px at full width). */
+.case-study-phone {
+    flex: 0 0 auto;
+    width: min(270px, 100%);
+    box-sizing: border-box;
+    padding: 9px;
+    border-radius: 2.4rem;
+    background: var(--color-panel-ink);
+    box-shadow: 6px 6px 0 var(--color-panel-line);
+}
+
+/* The screen is cut to the frame's proportions (set inline from the data) and
+   crops the oversized embed inside it down to just the frame. */
+.case-study-phone-screen {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 1.8rem;
+    background: var(--color-panel-alt);
+    /* Keeps the rounded corners clipping the iframe in Safari. */
+    isolation: isolate;
+}
+
+.case-study-phone-embed {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border: 0;
+    transform-origin: center;
+}
+
+.case-study-prototype-caption {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.case-study-prototype-link {
+    align-self: flex-start;
+    margin-top: 0.4rem;
+    padding: 0.45rem 0.7rem;
+    border: 2px solid var(--color-panel-line);
+    background: var(--color-panel-alt);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-panel-accent);
+    text-decoration: none;
+}
+
+.case-study-prototype-link:hover,
+.case-study-prototype-link:focus-visible {
+    border-color: var(--color-panel-accent);
+}
+
 .case-study-note {
     margin: 2rem 0 0 0;
     padding: 0.7rem 0.85rem;
