@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import './CaseStudyOverlay.css';
 
 // How far below the content's top edge a heading has to sit before the section
@@ -11,6 +11,78 @@ const SPY_OFFSET = 96;
 const PROGRESS_CELLS = 12;
 
 const pad = (value) => String(value).padStart(2, '0');
+
+// Turns a Figma prototype share link into its embeddable form. The share link
+// is what Figma's Share button hands out, so that is what the data holds; the
+// embed host serves the same prototype without Figma's own toolbar and
+// sidebar, which would crowd a phone sized frame.
+export const toFigmaEmbedUrl = (shareUrl) => {
+    const url = new URL(shareUrl);
+    url.hostname = 'embed.figma.com';
+    url.searchParams.delete('show-proto-sidebar');
+    url.searchParams.delete('t');
+    url.searchParams.set('hide-ui', '1');
+    // Actual size. Figma's fit modes leave a margin of its own background
+    // around the frame, so the frame is played at 100% and PrototypeScreen
+    // below does the fitting instead, where the edges can be controlled.
+    url.searchParams.set('scaling', 'min-zoom');
+    url.searchParams.set('embed-host', 'share');
+    return url.toString();
+};
+
+// Mobile frames are drawn at this size unless a block says otherwise.
+const DEFAULT_FRAME = { width: 375, height: 812 };
+
+// Room left around the frame inside the embed, so Figma has space for its own
+// margin and never shrinks the frame to make it fit. All of it is cropped off.
+const EMBED_MARGIN = 120;
+
+// The phone's screen. The embed is drawn larger than the screen, with the
+// frame at 100% in its centre, then shrunk so the frame exactly covers the
+// screen and the margin around it falls outside, where overflow hides it.
+// Clicks still land in the right place: a transformed iframe maps pointer
+// positions through its transform.
+const PrototypeScreen = ({ url, label, frame = DEFAULT_FRAME }) => {
+    const screenRef = useRef(null);
+    const [scale, setScale] = useState(null);
+
+    useLayoutEffect(() => {
+        const screen = screenRef.current;
+        if (!screen) return undefined;
+        const measure = () => {
+            if (screen.clientWidth > 0) setScale(screen.clientWidth / frame.width);
+        };
+        measure();
+        if (typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(measure);
+        observer.observe(screen);
+        return () => observer.disconnect();
+    }, [frame.width]);
+
+    return (
+        <div
+            className="case-study-phone-screen"
+            ref={screenRef}
+            style={{ aspectRatio: `${frame.width} / ${frame.height}` }}
+        >
+            <iframe
+                className="case-study-phone-embed"
+                title={label}
+                src={toFigmaEmbedUrl(url)}
+                loading="lazy"
+                allowFullScreen
+                style={{
+                    width: frame.width + EMBED_MARGIN * 2,
+                    height: frame.height + EMBED_MARGIN * 2,
+                    // Hidden until measured, so the first paint never shows
+                    // the full size embed spilling out of the phone.
+                    visibility: scale ? 'visible' : 'hidden',
+                    transform: `translate(-50%, -50%) scale(${scale || 1})`,
+                }}
+            />
+        </div>
+    );
+};
 
 // Blocks are keyed by index on purpose: the data is static and never reordered,
 // and placeholder entries legitimately repeat the same label and value, which
@@ -53,6 +125,35 @@ const renderBlock = (block, index) => {
                     </div>
                 ))}
             </div>
+        );
+    }
+
+    // A live prototype, played as the screen of a drawn phone. The Figma
+    // file's prototype device must be set to None, or Figma draws a second
+    // phone inside this one. `frame` is only needed for a prototype not drawn
+    // at 375 by 812.
+    // Lazy so the overlay opens without waiting on Figma; the link underneath
+    // is the way out for anyone who wants it full size, or whose browser
+    // blocks the embed.
+    if (block.type === 'prototype') {
+        return (
+            <figure className="case-study-prototype" key={index}>
+                <div className="case-study-phone">
+                    <PrototypeScreen url={block.url} label={block.label} frame={block.frame} />
+                </div>
+                <figcaption className="case-study-prototype-caption">
+                    <span className="case-study-row-label">{block.label}</span>
+                    {block.caption && <span className="case-study-row-text">{block.caption}</span>}
+                    <a
+                        className="case-study-prototype-link"
+                        href={block.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Open in Figma ↗
+                    </a>
+                </figcaption>
+            </figure>
         );
     }
 

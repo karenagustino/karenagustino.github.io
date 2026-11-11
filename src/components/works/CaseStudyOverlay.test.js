@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import CaseStudyOverlay from './CaseStudyOverlay';
+import CaseStudyOverlay, { toFigmaEmbedUrl } from './CaseStudyOverlay';
 
 const sampleCaseStudy = {
     id: 'sample-1',
@@ -157,4 +157,35 @@ test('exposes reading progress as a progressbar starting at zero', () => {
     const meter = screen.getByRole('progressbar', { name: 'Reading progress' });
     expect(meter).toHaveAttribute('aria-valuenow', '0');
     expect(screen.getByText('00%')).toBeInTheDocument();
+});
+
+const PROTO_URL = 'https://www.figma.com/proto/abc123/Flow?node-id=1-2&t=tok&scaling=scale-down&show-proto-sidebar=1';
+
+test('turns a prototype share link into an embed without Figma chrome', () => {
+    const embed = new URL(toFigmaEmbedUrl(PROTO_URL));
+    expect(embed.hostname).toBe('embed.figma.com');
+    expect(embed.pathname).toBe('/proto/abc123/Flow');
+    expect(embed.searchParams.get('node-id')).toBe('1-2');
+    expect(embed.searchParams.get('scaling')).toBe('min-zoom');
+    expect(embed.searchParams.get('hide-ui')).toBe('1');
+    expect(embed.searchParams.get('embed-host')).toBe('share');
+    expect(embed.searchParams.has('show-proto-sidebar')).toBe(false);
+    expect(embed.searchParams.has('t')).toBe(false);
+});
+
+test('plays a prototype block in a phone frame with a link out to Figma', () => {
+    const withPrototype = {
+        ...sampleCaseStudy,
+        sections: [{
+            id: 'prototype',
+            icon: '📱',
+            title: 'Prototype',
+            blocks: [{ type: 'prototype', url: PROTO_URL, label: 'Try the flow', caption: 'Tap through it.' }],
+        }],
+    };
+    render(<CaseStudyOverlay caseStudy={withPrototype} onClose={() => {}} />);
+    const frame = screen.getByTitle('Try the flow');
+    expect(frame.tagName).toBe('IFRAME');
+    expect(frame.getAttribute('src')).toBe(toFigmaEmbedUrl(PROTO_URL));
+    expect(screen.getByRole('link', { name: /open in figma/i })).toHaveAttribute('href', PROTO_URL);
 });
