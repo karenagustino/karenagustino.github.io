@@ -473,7 +473,7 @@
 
 .case-study-metrics {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(125px, 100%), 1fr));
     gap: 0.5rem;
     margin: 0 0 1rem 0;
 }
