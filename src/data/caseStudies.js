@@ -25,8 +25,10 @@
 //       CaseStudyOverlay.jsx; without it a Start over button still works.
 //
 // A written study can also carry a `preview` image, shown on its card above
-// the title, and a `process: { url, label }` link to the working notes behind
-// it, shown as a button after the last section.
+// the title. Give it a `previewBackground` colour (the image's own edge colour)
+// to show the whole image instead of cropping it to fill the card. A study can
+// also carry a `process: { url, label }` link to the working notes behind it,
+// shown as a button after the last section.
 //
 // Mix them in any order. The sidebar in the overlay is built from the section
 // list, so every section needs a unique `id` within its case study.
@@ -154,6 +156,7 @@ const caseStudies = [
         id: 'payment-checker',
         title: 'Marketplace payment checker',
         preview: paymentCheckerPreview,
+        previewBackground: '#f4f4f5',
         tagline: 'Is the payment real, or just a convincing screenshot?',
         tech: ['Supabase', 'Claude Code', 'Vercel', 'Notion'],
         role: 'Product Management',
@@ -166,7 +169,7 @@ const caseStudies = [
         note: 'Usability study in progress. More learnings to come.',
         process: {
             url: 'https://equable-phalange-f6d.notion.site/Design-a-payment-checker-40b0f56bd0d180e58a3efc13601fb79b',
-            label: 'See how I broke this problem down',
+            label: 'See how I broke this problem down in Notion',
         },
         sections: [
             {
