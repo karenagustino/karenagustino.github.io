@@ -459,6 +459,18 @@ const CaseStudyOverlay = ({ caseStudy, index = 0, total = 0, closing, onClose, o
                                 </section>
                             );
                         })}
+                        {caseStudy.process && (
+                            <p className="case-study-process">
+                                <a
+                                    className="case-study-prototype-link"
+                                    href={caseStudy.process.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {caseStudy.process.label} ↗
+                                </a>
+                            </p>
+                        )}
                         {caseStudy.note && <p className="case-study-note">{caseStudy.note}</p>}
                     </div>
                 </div>

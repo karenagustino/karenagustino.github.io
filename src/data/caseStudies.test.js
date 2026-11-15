@@ -132,6 +132,15 @@ test('every block is one of the renderable types, with the fields that type need
     });
 });
 
+// The process link is optional, but when present it must be a real public
+// link with a label to show.
+test('every process link is public https with a label', () => {
+    published.filter((entry) => entry.process).forEach((entry) => {
+        expect(entry.process.url).toMatch(/^https:\/\//);
+        expect(entry.process.label).toBeTruthy();
+    });
+});
+
 // A standing instruction on this content: the copy must not contain dashes, of
 // any width. Ids are excluded because they are slugs rather than prose.
 const COPY_FIELDS = ['title', 'tagline', 'role', 'timeframe', 'note', 'text', 'label', 'value', 'caption'];

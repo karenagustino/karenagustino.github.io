@@ -661,6 +661,14 @@
     border-color: var(--color-panel-accent);
 }
 
+.case-study-process {
+    margin: 2rem 0 0 0;
+}
+
+.case-study-process + .case-study-note {
+    margin-top: 1rem;
+}
+
 .case-study-note {
     margin: 2rem 0 0 0;
     padding: 0.7rem 0.85rem;

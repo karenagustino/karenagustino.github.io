@@ -25,7 +25,8 @@
 //       CaseStudyOverlay.jsx; without it a Start over button still works.
 //
 // A written study can also carry a `preview` image, shown on its card above
-// the title.
+// the title, and a `process: { url, label }` link to the working notes behind
+// it, shown as a button after the last section.
 //
 // Mix them in any order. The sidebar in the overlay is built from the section
 // list, so every section needs a unique `id` within its case study.
@@ -147,7 +148,8 @@ const caseStudies = [
     {
         // In progress: the usability study is still running, so Impact holds
         // the bars each assumption has to clear rather than results, and
-        // Learnings waits for the study to wrap up. Swap both once it does.
+        // Learnings covers what building the prototype taught so far. Swap
+        // both once the study wraps up.
         id: 'payment-checker',
         title: 'Marketplace payment checker',
         tagline: 'Is the payment real, or just a convincing screenshot?',
@@ -159,7 +161,11 @@ const caseStudies = [
             { value: '8', label: 'scams mapped' },
             { value: '4', label: 'assumptions tested' },
         ],
-        note: 'Usability study in progress. Learnings to come.',
+        note: 'Usability study in progress. More learnings to come.',
+        process: {
+            url: 'https://equable-phalange-f6d.notion.site/Design-a-payment-checker-40b0f56bd0d180e58a3efc13601fb79b',
+            label: 'See how I broke this problem down',
+        },
         sections: [
             {
                 id: 'overview',
@@ -203,7 +209,7 @@ const caseStudies = [
                             { icon: '✅', label: 'Chat shows the real status', text: 'A system card in the chat only confirms payment once the buyer reaches the bank\'s confirmation page. A screenshot can\'t imitate it.' },
                         ],
                     },
-                    { type: 'prose', text: 'In the strongest version, Interac or the banks confirm the money actually landed. That also brings the biggest risk: the partnership may never happen, and a payment from a stolen account can still be reversed after the card says received. In the study, I compare the bank verified card against a chat with no card, to see whether the card itself changes what sellers do.' },
+                    { type: 'prose', text: 'In the strongest version, Interac or the banks confirm the money actually landed. It\'s also the riskiest: the partnership may never happen, and a payment from a stolen account can still be reversed after the card says received. A fallback shows Sent once the buyer reaches the bank\'s confirmation page and lets the seller confirm, but that still leaves sellers checking their own bank. In the study, I compare the bank verified card against a chat with no card, to see whether the card itself changes what sellers do.' },
                 ],
             },
             {
@@ -245,8 +251,8 @@ const caseStudies = [
                 icon: '🎓',
                 title: 'Learnings',
                 blocks: [
-                    { type: 'prose', text: 'Usability testing is still underway. I\'ll share what I learned here once it wraps up.' },
-                    { type: 'prose', text: 'When it does, I\'ll look back at which of my four assumptions held up, and which ones sellers and buyers proved wrong.' },
+                    { type: 'prose', text: 'I expected the scam scenarios to teach me the most. Instead, the one that made me stop was where nobody was lying: the buyer really paid, but the seller\'s bank held the deposit for review while the buyer waited outside. As a seller myself, my first instinct was to hand the item over or cancel. Neither felt right. The fair answer was to reschedule the pickup, and my prototype didn\'t offer it.' },
+                    { type: 'prose', text: 'That became a new hypothesis I\'m saving for its own case study: if sellers can see why their money is on hold and roughly how long it may take, they\'ll feel less pressure to hand over early, and honest buyers won\'t be turned away. I\'m holding my other learnings until the study is done, so they come from real sellers and buyers. In the end, it\'s all about helping both sides feel safe when the money isn\'t in either of their hands.' },
                 ],
             },
         ],

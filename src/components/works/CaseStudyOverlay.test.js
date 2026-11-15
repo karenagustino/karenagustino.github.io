@@ -209,6 +209,22 @@ test('plays a web prototype as it is, with a link out to the live app', () => {
     expect(screen.queryByRole('link', { name: /open in figma/i })).not.toBeInTheDocument();
 });
 
+test('links out to the process write up at the end, when a study has one', () => {
+    const processUrl = 'https://example.notion.site/notes';
+    render(
+        <CaseStudyOverlay
+            caseStudy={{ ...sampleCaseStudy, process: { url: processUrl, label: 'See my process' } }}
+            onClose={() => {}}
+        />,
+    );
+    expect(screen.getByRole('link', { name: /see my process/i })).toHaveAttribute('href', processUrl);
+});
+
+test('shows no process link when a study has none', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
+    expect(screen.queryByRole('link', { name: /process/i })).not.toBeInTheDocument();
+});
+
 const renderPrototype = (extra = {}) => render(
     <CaseStudyOverlay
         caseStudy={{
