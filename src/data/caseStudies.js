@@ -32,6 +32,7 @@
 // list, so every section needs a unique `id` within its case study.
 
 import retailBankPreview from '../assets/retail-bank-onboarding-preview.jpg';
+import paymentCheckerPreview from '../assets/payment-checker-preview.jpg';
 
 const caseStudies = [
     {
@@ -152,6 +153,7 @@ const caseStudies = [
         // both once the study wraps up.
         id: 'payment-checker',
         title: 'Marketplace payment checker',
+        preview: paymentCheckerPreview,
         tagline: 'Is the payment real, or just a convincing screenshot?',
         tech: ['Supabase', 'Claude Code', 'Vercel', 'Notion'],
         role: 'Product Management',
