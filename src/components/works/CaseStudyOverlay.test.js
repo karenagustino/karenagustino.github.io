@@ -190,6 +190,25 @@ test('plays a prototype block in a phone frame with a link out to Figma', () => 
     expect(screen.getByRole('link', { name: /open in figma/i })).toHaveAttribute('href', PROTO_URL);
 });
 
+test('plays a web prototype as it is, with a link out to the live app', () => {
+    const webUrl = 'https://example.vercel.app/';
+    const withPrototype = {
+        ...sampleCaseStudy,
+        sections: [{
+            id: 'prototype',
+            icon: '📱',
+            title: 'Prototype',
+            blocks: [{ type: 'prototype', url: webUrl, label: 'Try the app' }],
+        }],
+    };
+    render(<CaseStudyOverlay caseStudy={withPrototype} onClose={() => {}} />);
+    const frame = screen.getByTitle('Try the app');
+    expect(frame.getAttribute('src')).toBe(webUrl);
+    expect(frame.style.width).toBe('375px');
+    expect(screen.getByRole('link', { name: /open prototype/i })).toHaveAttribute('href', webUrl);
+    expect(screen.queryByRole('link', { name: /open in figma/i })).not.toBeInTheDocument();
+});
+
 const renderPrototype = (extra = {}) => render(
     <CaseStudyOverlay
         caseStudy={{

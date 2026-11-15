@@ -46,6 +46,11 @@ export const toFigmaEmbedUrl = (shareUrl, clientId = FIGMA_CLIENT_ID) => {
     return url.toString();
 };
 
+// A prototype is either a Figma share link or a live web app built for a phone
+// screen. The web app is played as it is: no embed host to swap to, and no
+// margin of Figma's own to crop away.
+export const isFigmaUrl = (url) => new URL(url).hostname.endsWith('figma.com');
+
 // Mobile frames are drawn at this size unless a block says otherwise.
 const DEFAULT_FRAME = { width: 375, height: 812 };
 
@@ -66,6 +71,8 @@ const PrototypeScreen = ({
 }) => {
     const screenRef = useRef(null);
     const [scale, setScale] = useState(null);
+    const figma = isFigmaUrl(url);
+    const margin = figma ? EMBED_MARGIN : 0;
 
     useLayoutEffect(() => {
         const screen = screenRef.current;
@@ -93,13 +100,13 @@ const PrototypeScreen = ({
                 ref={iframeRef}
                 className="case-study-phone-embed"
                 title={label}
-                src={toFigmaEmbedUrl(url)}
+                src={figma ? toFigmaEmbedUrl(url) : url}
                 loading="lazy"
                 allowFullScreen
                 onLoad={onLoad}
                 style={{
-                    width: frame.width + EMBED_MARGIN * 2,
-                    height: frame.height + EMBED_MARGIN * 2,
+                    width: frame.width + margin * 2,
+                    height: frame.height + margin * 2,
                     // Hidden until measured, so the first paint never shows
                     // the full size embed spilling out of the phone.
                     visibility: scale ? 'visible' : 'hidden',
@@ -212,7 +219,7 @@ const PrototypeBlock = ({ block }) => {
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        Open in Figma ↗
+                        {isFigmaUrl(block.url) ? 'Open in Figma ↗' : 'Open prototype ↗'}
                     </a>
                 </span>
             </figcaption>

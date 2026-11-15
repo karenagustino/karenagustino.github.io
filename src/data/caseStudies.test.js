@@ -108,7 +108,11 @@ test('every block is one of the renderable types, with the fields that type need
                     expect(typeof block.text).toBe('string');
                     expect(block.text.length).toBeGreaterThan(0);
                 } else if (block.type === 'prototype') {
-                    expect(block.url).toMatch(/^https:\/\/www\.figma\.com\/proto\//);
+                    // A Figma share link, or a live web prototype over https.
+                    expect(block.url).toMatch(/^https:\/\//);
+                    if (block.url.includes('figma.com')) {
+                        expect(block.url).toMatch(/^https:\/\/www\.figma\.com\/proto\//);
+                    }
                     expect(block.label).toBeTruthy();
                     // Node ids as the Embed API reports them: a colon, not the
                     // dash that share links use.
