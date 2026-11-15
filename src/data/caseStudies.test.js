@@ -108,8 +108,17 @@ test('every block is one of the renderable types, with the fields that type need
                     expect(typeof block.text).toBe('string');
                     expect(block.text.length).toBeGreaterThan(0);
                 } else if (block.type === 'prototype') {
-                    expect(block.url).toMatch(/^https:\/\/www\.figma\.com\/proto\//);
+                    // A Figma share link, or a live web prototype over https.
+                    expect(block.url).toMatch(/^https:\/\//);
+                    if (block.url.includes('figma.com')) {
+                        expect(block.url).toMatch(/^https:\/\/www\.figma\.com\/proto\//);
+                    }
                     expect(block.label).toBeTruthy();
+                    // Node ids as the Embed API reports them: a colon, not the
+                    // dash that share links use.
+                    if (block.endNodeId !== undefined) {
+                        expect(block.endNodeId).toMatch(/^\d+:\d+$/);
+                    }
                 } else {
                     expect(Array.isArray(block.items)).toBe(true);
                     expect(block.items.length).toBeGreaterThan(0);
@@ -120,6 +129,15 @@ test('every block is one of the renderable types, with the fields that type need
                 }
             });
         });
+    });
+});
+
+// The process link is optional, but when present it must be a real public
+// link with a label to show.
+test('every process link is public https with a label', () => {
+    published.filter((entry) => entry.process).forEach((entry) => {
+        expect(entry.process.url).toMatch(/^https:\/\//);
+        expect(entry.process.label).toBeTruthy();
     });
 });
 

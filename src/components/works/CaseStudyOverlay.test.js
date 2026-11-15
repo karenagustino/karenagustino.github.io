@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import CaseStudyOverlay, { toFigmaEmbedUrl } from './CaseStudyOverlay';
 
 const sampleCaseStudy = {
@@ -74,6 +74,32 @@ test('the sidebar lists one entry per section, with the first one current', () =
     expect(items).toHaveLength(3);
     expect(items[0]).toHaveAttribute('aria-current', 'true');
     expect(items[1]).not.toHaveAttribute('aria-current');
+});
+
+// A short last section can't scroll its heading up to the threshold, so the
+// sidebar would stop one short. Reaching the bottom has to count as being in it.
+test('scrolling to the bottom makes the last section current', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
+    const container = document.querySelector('.case-study-content');
+    const sectionNodes = [...container.querySelectorAll('.case-study-section')];
+    // Every heading after the first sits well below the threshold.
+    const rect = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rectOf() {
+        const index = sectionNodes.indexOf(this);
+        return { top: index > 0 ? 1000 : 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 };
+    });
+    Object.defineProperty(container, 'scrollHeight', { configurable: true, value: 2000 });
+    Object.defineProperty(container, 'clientHeight', { configurable: true, value: 800 });
+    const items = screen.getByRole('navigation', { name: 'Case study sections' }).querySelectorAll('button');
+
+    container.scrollTop = 600;
+    fireEvent.scroll(container);
+    expect(items[0]).toHaveAttribute('aria-current', 'true');
+
+    container.scrollTop = 1200;
+    fireEvent.scroll(container);
+    expect(items[items.length - 1]).toHaveAttribute('aria-current', 'true');
+    expect(items[0]).not.toHaveAttribute('aria-current');
+    rect.mockRestore();
 });
 
 test('clicking a sidebar entry makes that section current', () => {
@@ -168,7 +194,7 @@ test('turns a prototype share link into an embed without Figma chrome', () => {
     expect(embed.searchParams.get('node-id')).toBe('1-2');
     expect(embed.searchParams.get('scaling')).toBe('min-zoom');
     expect(embed.searchParams.get('hide-ui')).toBe('1');
-    expect(embed.searchParams.get('embed-host')).toBe('share');
+    expect(embed.searchParams.get('embed-host')).toBe('karenagustino-portfolio');
     expect(embed.searchParams.has('show-proto-sidebar')).toBe(false);
     expect(embed.searchParams.has('t')).toBe(false);
 });
@@ -188,4 +214,119 @@ test('plays a prototype block in a phone frame with a link out to Figma', () => 
     expect(frame.tagName).toBe('IFRAME');
     expect(frame.getAttribute('src')).toBe(toFigmaEmbedUrl(PROTO_URL));
     expect(screen.getByRole('link', { name: /open in figma/i })).toHaveAttribute('href', PROTO_URL);
+});
+
+test('plays a web prototype as it is, with a link out to the live app', () => {
+    const webUrl = 'https://example.vercel.app/';
+    const withPrototype = {
+        ...sampleCaseStudy,
+        sections: [{
+            id: 'prototype',
+            icon: '📱',
+            title: 'Prototype',
+            blocks: [{ type: 'prototype', url: webUrl, label: 'Try the app' }],
+        }],
+    };
+    render(<CaseStudyOverlay caseStudy={withPrototype} onClose={() => {}} />);
+    const frame = screen.getByTitle('Try the app');
+    expect(frame.getAttribute('src')).toBe(webUrl);
+    expect(frame.style.width).toBe('375px');
+    expect(screen.getByRole('link', { name: /open prototype/i })).toHaveAttribute('href', webUrl);
+    expect(screen.queryByRole('link', { name: /open in figma/i })).not.toBeInTheDocument();
+});
+
+test('links out to the process write up at the end, when a study has one', () => {
+    const processUrl = 'https://example.notion.site/notes';
+    render(
+        <CaseStudyOverlay
+            caseStudy={{ ...sampleCaseStudy, process: { url: processUrl, label: 'See my process' } }}
+            onClose={() => {}}
+        />,
+    );
+    expect(screen.getByRole('link', { name: /see my process/i })).toHaveAttribute('href', processUrl);
+});
+
+test('shows no process link when a study has none', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
+    expect(screen.queryByRole('link', { name: /process/i })).not.toBeInTheDocument();
+});
+
+const renderPrototype = (extra = {}) => render(
+    <CaseStudyOverlay
+        caseStudy={{
+            ...sampleCaseStudy,
+            sections: [{
+                id: 'prototype',
+                icon: '📱',
+                title: 'Prototype',
+                blocks: [{ type: 'prototype', url: PROTO_URL, label: 'Try the flow', ...extra }],
+            }],
+        }}
+        onClose={() => {}}
+    />,
+);
+
+const postFromFigma = (iframe, data) => act(() => {
+    window.dispatchEvent(new MessageEvent('message', {
+        data, origin: 'https://www.figma.com', source: iframe.contentWindow,
+    }));
+});
+
+test('covers the screen with a loader until the embed has loaded', () => {
+    jest.useFakeTimers();
+    try {
+        renderPrototype();
+        expect(screen.getByRole('status')).toHaveTextContent(/loading prototype/i);
+        fireEvent.load(screen.getByTitle('Try the flow'));
+        act(() => { jest.advanceTimersByTime(1200); });
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    } finally {
+        jest.useRealTimers();
+    }
+});
+
+test('start over reloads the embed and shows the loader again', () => {
+    jest.useFakeTimers();
+    try {
+        renderPrototype();
+        const first = screen.getByTitle('Try the flow');
+        fireEvent.load(first);
+        act(() => { jest.advanceTimersByTime(1200); });
+        fireEvent.click(screen.getByRole('button', { name: /start over/i }));
+        expect(screen.getByRole('status')).toBeInTheDocument();
+        expect(screen.getByTitle('Try the flow')).not.toBe(first);
+    } finally {
+        jest.useRealTimers();
+    }
+});
+
+test('offers a replay on the last screen once Figma reports reaching it', () => {
+    renderPrototype({ endNodeId: '9:9' });
+    const iframe = screen.getByTitle('Try the flow');
+    postFromFigma(iframe, { type: 'INITIAL_LOAD', data: {} });
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+    postFromFigma(iframe, { type: 'PRESENTED_NODE_CHANGED', data: { presentedNodeId: '1:2' } });
+    expect(screen.queryByRole('button', { name: /replay/i })).not.toBeInTheDocument();
+
+    postFromFigma(iframe, { type: 'PRESENTED_NODE_CHANGED', data: { presentedNodeId: '9:9' } });
+    const post = jest.spyOn(iframe.contentWindow, 'postMessage').mockImplementation(() => {});
+    fireEvent.click(screen.getByRole('button', { name: /replay/i }));
+    expect(post).toHaveBeenCalledWith({ type: 'RESTART' }, 'https://www.figma.com');
+    expect(screen.queryByRole('button', { name: /replay/i })).not.toBeInTheDocument();
+});
+
+test('ignores messages that do not come from Figma', () => {
+    renderPrototype({ endNodeId: '9:9' });
+    act(() => {
+        window.dispatchEvent(new MessageEvent('message', {
+            data: { type: 'INITIAL_LOAD', data: {} }, origin: 'https://evil.example',
+        }));
+    });
+    expect(screen.getByRole('status')).toBeInTheDocument();
+});
+
+test('adds the client id to the embed only when one is set', () => {
+    expect(new URL(toFigmaEmbedUrl(PROTO_URL, '')).searchParams.has('client-id')).toBe(false);
+    expect(new URL(toFigmaEmbedUrl(PROTO_URL, 'abc')).searchParams.get('client-id')).toBe('abc');
 });

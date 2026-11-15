@@ -57,7 +57,18 @@ const CaseStudyCard = ({
                 <span className="case-study-card-eyebrow" aria-hidden="true">CASE STUDY {pad(index + 1)}</span>
             )}
             {!comingSoon && caseStudy.preview && (
-                <img className="case-study-card-preview" src={caseStudy.preview} alt="" draggable="false" />
+                <img
+                    className="case-study-card-preview"
+                    src={caseStudy.preview}
+                    alt=""
+                    draggable="false"
+                    // A preview that must be seen whole is fitted rather than
+                    // cropped, and the gap is filled with the image's own edge
+                    // colour so it reads as part of the picture.
+                    style={caseStudy.previewBackground
+                        ? { objectFit: 'contain', backgroundColor: caseStudy.previewBackground }
+                        : undefined}
+                />
             )}
             <div className="case-study-card-title">{caseStudy.title}</div>
             {caseStudy.tagline && <div className="case-study-card-tagline">{caseStudy.tagline}</div>}
