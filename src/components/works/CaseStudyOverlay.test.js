@@ -76,6 +76,32 @@ test('the sidebar lists one entry per section, with the first one current', () =
     expect(items[1]).not.toHaveAttribute('aria-current');
 });
 
+// A short last section can't scroll its heading up to the threshold, so the
+// sidebar would stop one short. Reaching the bottom has to count as being in it.
+test('scrolling to the bottom makes the last section current', () => {
+    render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
+    const container = document.querySelector('.case-study-content');
+    const sectionNodes = [...container.querySelectorAll('.case-study-section')];
+    // Every heading after the first sits well below the threshold.
+    const rect = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rectOf() {
+        const index = sectionNodes.indexOf(this);
+        return { top: index > 0 ? 1000 : 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 };
+    });
+    Object.defineProperty(container, 'scrollHeight', { configurable: true, value: 2000 });
+    Object.defineProperty(container, 'clientHeight', { configurable: true, value: 800 });
+    const items = screen.getByRole('navigation', { name: 'Case study sections' }).querySelectorAll('button');
+
+    container.scrollTop = 600;
+    fireEvent.scroll(container);
+    expect(items[0]).toHaveAttribute('aria-current', 'true');
+
+    container.scrollTop = 1200;
+    fireEvent.scroll(container);
+    expect(items[items.length - 1]).toHaveAttribute('aria-current', 'true');
+    expect(items[0]).not.toHaveAttribute('aria-current');
+    rect.mockRestore();
+});
+
 test('clicking a sidebar entry makes that section current', () => {
     render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
     const nav = screen.getByRole('navigation', { name: 'Case study sections' });

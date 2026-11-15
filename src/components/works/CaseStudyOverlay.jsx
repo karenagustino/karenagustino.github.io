@@ -316,10 +316,15 @@ const CaseStudyOverlay = ({ caseStudy, index = 0, total = 0, closing, onClose, o
     };
 
     // Keeps the sidebar and the meter in step with the reader: the last heading
-    // to have passed the threshold is the section they're in.
+    // to have passed the threshold is the section they're in. A short last
+    // section can never scroll its heading up to the threshold, so reaching
+    // the bottom counts as being in it.
     const handleScroll = () => {
         const container = contentRef.current;
         if (!container || !sections.length) return;
+
+        const scrollable = container.scrollHeight - container.clientHeight;
+        const atBottom = scrollable > 0 && container.scrollTop >= scrollable - 2;
 
         const containerTop = container.getBoundingClientRect().top;
         let current = sections[0].id;
@@ -329,9 +334,8 @@ const CaseStudyOverlay = ({ caseStudy, index = 0, total = 0, closing, onClose, o
                 current = section.id;
             }
         });
-        setActiveSection(current);
+        setActiveSection(atBottom ? sections[sections.length - 1].id : current);
 
-        const scrollable = container.scrollHeight - container.clientHeight;
         setProgress(scrollable > 0 ? Math.min(1, container.scrollTop / scrollable) : 1);
     };
 
