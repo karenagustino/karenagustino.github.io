@@ -243,7 +243,6 @@ const caseStudies = [
                         type: 'metrics',
                         items: [
                             { value: '80%', label: 'Spot the fake', caption: 'sellers turn down fake payments and phishing links' },
-                            { value: '80%', label: 'Trust the real one', caption: 'sellers hand over to honest buyers once the card says Received' },
                             { value: '75%', label: 'Hold the item', caption: 'sellers wait for Received, even under pressure' },
                             { value: '70%', label: 'Buyers pay in app', caption: 'pay with Marketplace Pay, even after asking about other ways' },
                             { value: '60s', label: 'Tap to sent', caption: 'median time from tapping Pay to sending it in the bank' },
