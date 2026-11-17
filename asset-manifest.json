@@ -1,19 +1,20 @@
 {
   "files": {
-    "main.css": "/static/css/main.86612eb9.css",
-    "main.js": "/static/js/main.b5e6e6ef.js",
+    "main.css": "/static/css/main.cc58611a.css",
+    "main.js": "/static/js/main.93efca2d.js",
     "static/js/453.1407b060.chunk.js": "/static/js/453.1407b060.chunk.js",
     "static/media/cafe-music.mp3": "/static/media/cafe-music.2963df28b36f48906f87.mp3",
     "static/media/payment-checker-preview.jpg": "/static/media/payment-checker-preview.34f797b987fad9873b87.jpg",
     "static/media/retail-bank-onboarding-preview.jpg": "/static/media/retail-bank-onboarding-preview.6730d57c131b03423964.jpg",
     "static/media/patch.png": "/static/media/patch.16a9d62f3704b584931a.png",
     "index.html": "/index.html",
-    "main.86612eb9.css.map": "/static/css/main.86612eb9.css.map",
-    "main.b5e6e6ef.js.map": "/static/js/main.b5e6e6ef.js.map",
+    "static/media/komo.svg": "/static/media/komo.eaa850116ee27747abee5f99019e182b.svg",
+    "main.cc58611a.css.map": "/static/css/main.cc58611a.css.map",
+    "main.93efca2d.js.map": "/static/js/main.93efca2d.js.map",
     "453.1407b060.chunk.js.map": "/static/js/453.1407b060.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.86612eb9.css",
-    "static/js/main.b5e6e6ef.js"
+    "static/css/main.cc58611a.css",
+    "static/js/main.93efca2d.js"
   ]
 }
