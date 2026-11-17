@@ -473,7 +473,7 @@
 
 .case-study-metrics {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(125px, 100%), 1fr));
     gap: 0.5rem;
     margin: 0 0 1rem 0;
 }
@@ -488,9 +488,14 @@
     background: var(--color-panel-alt);
 }
 
+/* The body font, not the pixel one: at this size the pixel font's % and digits
+   blur together, and the number is the one thing in the tile that must read. */
 .case-study-metric-value {
-    font-family: var(--font-pixel);
-    font-size: 1.3rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
     line-height: 1;
     color: var(--color-panel-ink);
 }

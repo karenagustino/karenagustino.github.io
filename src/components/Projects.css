@@ -1,0 +1,156 @@
+/* "New sprout" popup that sits above the garden of projects and points down
+   at the newest card. Drawn from the panel tokens so it follows the theme. */
+.garden-new {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    padding: 0 1rem;
+}
+
+.garden-new__bubble {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem 0.55rem 0.75rem;
+    border: 2px solid var(--color-panel-frame);
+    border-radius: 14px;
+    background: var(--color-panel);
+    color: var(--color-panel-ink);
+    box-shadow: 3px 3px 0 var(--color-panel-shadow);
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+    animation: garden-new-pop 0.5s cubic-bezier(.4, 2, .6, 1) both,
+        garden-new-bob 3.2s ease-in-out 0.6s infinite;
+}
+
+/* Speech-bubble tail pointing down into the garden. */
+.garden-new__bubble::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -9px;
+    width: 14px;
+    height: 14px;
+    background: var(--color-panel);
+    border-right: 2px solid var(--color-panel-frame);
+    border-bottom: 2px solid var(--color-panel-frame);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.garden-new__bubble:hover,
+.garden-new__bubble:focus-visible {
+    background: var(--color-panel-alt);
+}
+
+.garden-new__bubble:hover::after,
+.garden-new__bubble:focus-visible::after {
+    background: var(--color-panel-alt);
+}
+
+.garden-new__bubble:focus-visible {
+    outline: 2px solid var(--color-panel-accent);
+    outline-offset: 3px;
+}
+
+.garden-new__sprout {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.garden-new__tag {
+    padding: 0.1rem 0.45rem;
+    border-radius: 6px;
+    background: var(--color-panel-accent);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.garden-new__text strong {
+    font-weight: 700;
+}
+
+/* Award sash across a patch's top-left corner, like a fair-ribbon on a prize
+   plot. It covers the whole card (see AwardRibbon) so it can be drawn in the
+   artwork's own coordinates. Fixed colours rather than theme tokens: it sits on
+   the patch artwork, which is the same in both themes. Cream on #9A5310 is
+   about 6:1. */
+.garden-award {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    overflow: visible;
+    pointer-events: none;
+    filter: drop-shadow(2px 3px 0 rgba(43, 30, 18, 0.4));
+}
+
+/* Tones. "prize" is a competition win; "evergreen" is a product that is still
+   live and maintained. Both clear 6:1 against the cream label. */
+.garden-award--prize .garden-award__band {
+    fill: #9A5310;
+}
+
+.garden-award--prize .garden-award__star {
+    fill: #F3C969;
+}
+
+.garden-award--evergreen .garden-award__band {
+    fill: #3D5A3B;
+}
+
+.garden-award--evergreen .garden-award__star {
+    fill: #BFDB8F;
+}
+
+.garden-award__stitch {
+    fill: none;
+    stroke: #FFFDF7;
+    stroke-opacity: 0.5;
+    stroke-width: 2;
+    stroke-dasharray: 7 6;
+}
+
+.garden-award__label {
+    fill: #FFFDF7;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+/* The card the popup points at gives a little wiggle when it is reached. */
+.garden-card--wiggle {
+    animation: garden-card-wiggle 0.7s ease-in-out;
+}
+
+@keyframes garden-new-pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.9); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes garden-new-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes garden-card-wiggle {
+    0%, 100% { rotate: 0deg; }
+    25% { rotate: -2deg; }
+    50% { rotate: 2deg; }
+    75% { rotate: -1deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .garden-new__bubble,
+    .garden-card--wiggle {
+        animation: none;
+    }
+}

@@ -242,10 +242,10 @@ const caseStudies = [
                     {
                         type: 'metrics',
                         items: [
-                            { value: '80%', label: 'Spot the fake', caption: 'sellers reject a fake confirmation' },
-                            { value: '75%', label: 'Hold the item', caption: 'sellers wait for received, even under pressure' },
-                            { value: '70%', label: 'Buyers pay in app', caption: 'without asking to pay another way' },
-                            { value: '60s', label: 'Pay to confirmed', caption: 'or less, not counting time in the bank' },
+                            { value: '80%', label: 'Spot the fake', caption: 'sellers turn down fake payments and phishing links' },
+                            { value: '75%', label: 'Hold the item', caption: 'sellers wait for Received, even under pressure' },
+                            { value: '70%', label: 'Buyers pay in app', caption: 'pay with Marketplace Pay, even after asking about other ways' },
+                            { value: '60s', label: 'Tap to sent', caption: 'median time from tapping Pay to sending it in the bank' },
                         ],
                     },
                     { type: 'prose', text: 'The one I\'m most curious about is the buyer. The feature protects the seller, but the buyer does the work. If buyers just say "I\'ll send it to your email," sellers never get the benefit.' },
