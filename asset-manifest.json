@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.33f03484.css",
-    "main.js": "/static/js/main.4ebfbdeb.js",
+    "main.css": "/static/css/main.b2909b36.css",
+    "main.js": "/static/js/main.a2fc8349.js",
     "static/js/453.1407b060.chunk.js": "/static/js/453.1407b060.chunk.js",
     "static/media/cafe-music.mp3": "/static/media/cafe-music.2963df28b36f48906f87.mp3",
     "static/media/community-fridge-design-report.pdf": "/static/media/community-fridge-design-report.523abf8963e67eb2de08.pdf",
@@ -11,12 +11,12 @@
     "static/media/patch.png": "/static/media/patch.16a9d62f3704b584931a.png",
     "index.html": "/index.html",
     "static/media/komo.svg": "/static/media/komo.eaa850116ee27747abee5f99019e182b.svg",
-    "main.33f03484.css.map": "/static/css/main.33f03484.css.map",
-    "main.4ebfbdeb.js.map": "/static/js/main.4ebfbdeb.js.map",
+    "main.b2909b36.css.map": "/static/css/main.b2909b36.css.map",
+    "main.a2fc8349.js.map": "/static/js/main.a2fc8349.js.map",
     "453.1407b060.chunk.js.map": "/static/js/453.1407b060.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.33f03484.css",
-    "static/js/main.4ebfbdeb.js"
+    "static/css/main.b2909b36.css",
+    "static/js/main.a2fc8349.js"
   ]
 }
