@@ -117,8 +117,10 @@ const FEED_SCROLL_SHARE = 0.7;
 const MAX_FEED_SCROLL = 1400;
 // Smallest gap kept between the navbar and the pinned printer on short screens.
 const PIN_GAP = 16;
-// How long the rewind button takes to reel the paper back in.
+// How long the printer's button takes to reel the paper back in, and to
+// print it out.
 const REWIND_MS = 1000;
+const PRINT_MS = 1600;
 
 // Two plants from the footer's garden, grown from a fixed seed so they are the
 // same on every visit, sitting on top of the printer.
@@ -150,6 +152,46 @@ const PrinterFlowers = React.forwardRef((props, ref) => {
     );
 });
 
+// "click to print!" note with a hand-drawn arrow to the printer's button.
+// On wide screens it sits to the right of the printer with the arrow curling
+// left into the button; where there's no room beside it (phones, narrower
+// windows) it sits above the printer's right end with the arrow pointing down.
+//
+// PLACEHOLDER for Karen's handwriting: the text uses the Gaegu font, and both
+// arrows are drawn paths, roughened by the #resume-marker filter to look like
+// felt-tip marker. To use the real thing, export the note and each arrow as
+// transparent PNGs or SVGs, import them here, and swap the span and the two
+// arrow <svg>s for <img>s with the same class names.
+const PrintHint = React.forwardRef(({ visible }, ref) => (
+    <div ref={ref} className={`resume-print-hint${visible ? '' : ' is-hidden'}`} aria-hidden="true">
+        <svg className="resume-print-hint-defs" width="0" height="0">
+            <filter id="resume-marker" x="-10%" y="-10%" width="120%" height="120%">
+                {/* Wobbly marker edges. */}
+                <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="2" seed="4" result="grain" />
+                <feDisplacementMap in="SourceGraphic" in2="grain" scale="1.3" result="rough" />
+                {/* Faint streaks where the ink runs thin, like the hero underline. */}
+                <feTurbulence type="fractalNoise" baseFrequency="0.05 0.9" numOctaves="1" seed="9" result="streaks" />
+                <feColorMatrix
+                    in="streaks"
+                    type="matrix"
+                    values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.45 1.15"
+                    result="ink"
+                />
+                <feComposite in="rough" in2="ink" operator="in" />
+            </filter>
+        </svg>
+        <span className="resume-print-hint-text">click to print!</span>
+        <svg className="resume-print-hint-arrow resume-print-hint-arrow--side" width="84" height="70" viewBox="0 0 84 70" fill="none">
+            <path d="M66 4 C 80 16, 78 38, 60 42 C 48 45, 46 31, 56 32 C 66 33, 60 52, 42 56 C 32 58, 20 57, 8 55" />
+            <path d="M19 46 L 7 55 L 20 63" />
+        </svg>
+        <svg className="resume-print-hint-arrow resume-print-hint-arrow--top" width="44" height="72" viewBox="0 0 44 72" fill="none">
+            <path d="M34 4 C 14 8, 8 26, 20 32 C 30 37, 34 26, 26 25 C 16 24, 14 46, 21 64" />
+            <path d="M12 55 L 21 65 L 29 54" />
+        </svg>
+    </div>
+));
+
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
 // The receipt is tied to scroll position, in three modes:
@@ -162,8 +204,11 @@ const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 // - "printed": the whole receipt is out and stays out, whichever way the page
 //   scrolls, until the visitor is back at the top of the page with the printer
 //   off screen, or presses the printer's button.
-// - "rewinding": the button was pressed; the page glides back up while the
-//   paper reels in, ending exactly where feeding starts.
+// - "rewinding": the button was pressed once printed; the page glides back up
+//   while the paper reels in, ending exactly where feeding starts.
+// - "printing": the button was pressed before the paper was fully out (for
+//   anyone who'd rather click than scroll); the page glides so the printer
+//   settles in the middle while the rest of the paper feeds out.
 const Resume = () => {
     const sectionRef = useRef(null);
     const stageRef = useRef(null);
@@ -171,10 +216,12 @@ const Resume = () => {
     const receiptRef = useRef(null);
     const roomRef = useRef(null);
     const flowersRef = useRef(null);
-    const rewindRef = useRef(() => {});
+    const hintRef = useRef(null);
+    const pressRef = useRef(() => {});
     const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
     const [moving, setMoving] = useState(false);
-    const [printed, setPrinted] = useState(false);
+    const [mode, setMode] = useState('feeding');
+    const printed = mode === 'printed';
 
     useEffect(() => {
         const section = sectionRef.current;
@@ -204,13 +251,13 @@ const Resume = () => {
 
         let mode = 'feeding';
         let frame = 0;
-        let rewindFrame = 0;
+        let glideFrame = 0;
         let idleTimer = 0;
         let lastProgress = -1;
 
         const enterMode = (next) => {
             mode = next;
-            setPrinted(next === 'printed');
+            setMode(next);
         };
 
         const geometry = () => {
@@ -218,13 +265,15 @@ const Resume = () => {
             const nav = document.querySelector('nav');
             const navBottom = nav ? nav.getBoundingClientRect().bottom : 0;
             // Pin the printer in the middle of whatever screen this is, leaving
-            // the flowers on top of it clear of the navbar.
+            // the flowers and the "click to print" note on top of it clear of
+            // the navbar.
             const middle = (window.innerHeight - printer.offsetHeight) / 2;
             const flowers = flowersRef.current ? flowersRef.current.offsetHeight : 0;
+            const hint = hintRef.current ? hintRef.current.offsetHeight : 0;
             return {
                 height,
                 runway: Math.min(height * FEED_SCROLL_SHARE, MAX_FEED_SCROLL),
-                pinTop: Math.max(navBottom + PIN_GAP + flowers, middle),
+                pinTop: Math.max(navBottom + PIN_GAP + Math.max(flowers, hint), middle),
             };
         };
 
@@ -241,7 +290,7 @@ const Resume = () => {
 
         const update = () => {
             frame = 0;
-            if (mode === 'rewinding') return;
+            if (mode === 'rewinding' || mode === 'printing') return;
             const { height, runway, pinTop } = geometry();
             if (!height) {
                 reset();
@@ -285,38 +334,71 @@ const Resume = () => {
             if (!frame) frame = window.requestAnimationFrame(update);
         };
 
-        rewindRef.current = () => {
-            if (mode !== 'printed') return;
-            const { runway, pinTop } = geometry();
+        // Glides the page from where it is to `targetScroll` while the paper
+        // goes from `fromProgress` to `toProgress`, then hands over to `done`.
+        const glide = (duration, targetScroll, fromProgress, toProgress, done) => {
             const startScroll = window.scrollY;
-            // Scroll position where the printer sits in the middle with no paper out.
-            const targetScroll = Math.max(0, section.getBoundingClientRect().top + startScroll - pinTop);
             const started = performance.now();
-            enterMode('rewinding');
             setMoving(true);
             receipt.style.transition = 'none';
-            // Put the pinning room back (below the receipt, so nothing on screen
-            // moves), but don't pin while the page glides back up.
-            pin(runway, null);
 
             const step = (now) => {
-                const t = Math.min(1, (now - started) / REWIND_MS);
+                const t = Math.min(1, (now - started) / duration);
                 const eased = easeInOut(t);
                 window.scrollTo({ top: startScroll + (targetScroll - startScroll) * eased, behavior: 'instant' });
-                // The page glides so the printer lands at the pin point just as
-                // the last of the paper goes in.
-                feed(1 - eased);
+                feed(fromProgress + (toProgress - fromProgress) * eased);
                 if (t < 1) {
-                    rewindFrame = window.requestAnimationFrame(step);
+                    glideFrame = window.requestAnimationFrame(step);
                     return;
                 }
                 receipt.style.transition = '';
                 setMoving(false);
                 lastProgress = -1;
+                done();
+            };
+            glideFrame = window.requestAnimationFrame(step);
+        };
+
+        const rewind = () => {
+            const { runway, pinTop } = geometry();
+            // Scroll position where the printer sits in the middle with no paper out.
+            const targetScroll = Math.max(0, section.getBoundingClientRect().top + window.scrollY - pinTop);
+            enterMode('rewinding');
+            // Put the pinning room back (below the receipt, so nothing on screen
+            // moves), but don't pin while the page glides back up.
+            pin(runway, null);
+            // The page glides so the printer lands at the pin point just as the
+            // last of the paper goes in.
+            glide(REWIND_MS, targetScroll, 1, 0, () => {
                 enterMode('feeding');
                 update();
-            };
-            rewindFrame = window.requestAnimationFrame(step);
+            });
+        };
+
+        const print = () => {
+            const { runway, pinTop } = geometry();
+            const sectionTop = section.getBoundingClientRect().top;
+            const fromProgress = Math.min(runway, Math.max(0, pinTop - sectionTop)) / runway;
+            enterMode('printing');
+            // Swap to the printed layout (no pinning room) without anything on
+            // screen moving: unpinning drops the printer back to its spot in the
+            // page, and the scroll follows it by the same amount.
+            const before = stage.getBoundingClientRect().top;
+            pin(0, null);
+            const after = stage.getBoundingClientRect().top;
+            window.scrollTo({ top: window.scrollY + (after - before), behavior: 'instant' });
+            // Then glide so the printer settles in the middle while the rest of
+            // the paper feeds out.
+            const targetScroll = Math.max(0, window.scrollY + (before - pinTop));
+            glide(PRINT_MS, targetScroll, fromProgress, 1, () => {
+                enterMode('printed');
+                update();
+            });
+        };
+
+        pressRef.current = () => {
+            if (mode === 'printed') rewind();
+            else if (mode === 'feeding') print();
         };
 
         update();
@@ -326,9 +408,9 @@ const Resume = () => {
             window.removeEventListener('scroll', schedule);
             window.removeEventListener('resize', schedule);
             window.cancelAnimationFrame(frame);
-            window.cancelAnimationFrame(rewindFrame);
+            window.cancelAnimationFrame(glideFrame);
             window.clearTimeout(idleTimer);
-            rewindRef.current = () => {};
+            pressRef.current = () => {};
             reset();
         };
     }, [reducedMotion]);
@@ -338,16 +420,17 @@ const Resume = () => {
             <div className="resume-stage" ref={stageRef}>
                 <div ref={printerRef} className={`resume-printer${moving ? ' is-printing' : ''}`}>
                     <PrinterFlowers ref={flowersRef} />
+                    <PrintHint ref={hintRef} visible={mode === 'feeding' && !reducedMotion} />
                     <div className="resume-printer-body">
                         <span className="resume-printer-label">RESUME</span>
                         <span className="resume-printer-led" aria-hidden="true" />
                         <button
                             type="button"
                             className="resume-printer-button"
-                            onClick={() => rewindRef.current()}
-                            disabled={!printed || reducedMotion}
-                            aria-label="Rewind the resume back into the printer"
-                            title={printed ? 'Rewind' : undefined}
+                            onClick={() => pressRef.current()}
+                            disabled={reducedMotion || (mode !== 'feeding' && !printed)}
+                            aria-label={printed ? 'Rewind the resume back into the printer' : 'Print the resume'}
+                            title={printed ? 'Rewind' : 'Print'}
                         />
                     </div>
                     <div className="resume-printer-slot" aria-hidden="true" />

@@ -27,6 +27,8 @@
   --color-printer-highlight: #A9BCD8;
   --color-printer-slot: #2C3646;
   --color-printer-label: #F4F6FA;
+  /* Placeholder for Karen's handwriting. */
+  --font-handwritten: 'Gaegu', 'Comic Sans MS', cursive;
   --font-pixel: 'Silkscreen', 'Courier New', monospace;
 }
 
