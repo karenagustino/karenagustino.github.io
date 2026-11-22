@@ -12,30 +12,216 @@
     width: 100%;
 }
 
-/* Torn-paper zigzag edge, vector-shaped so its peaks stay proportional
-   to the current width instead of tiling/cropping a fixed-size image. */
-.resume-zigzag-edge {
+/* Printer + paper move together; Resume.jsx shifts this down while the
+   printer is pinned under the navbar. */
+.resume-stage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    will-change: transform;
+}
+
+/* ---------- Printer ---------- */
+
+.resume-printer {
+    position: relative;
+    z-index: 2;
+    width: calc(99% + 40px);
+    max-width: 960px;
+    flex-shrink: 0;
+}
+
+.resume-printer-body {
+    position: relative;
+    height: 92px;
+    border-radius: 26px 26px 10px 10px;
+    background: linear-gradient(180deg, var(--color-printer-highlight) 0%, var(--color-printer-body) 38%, var(--color-printer-body-dark) 100%);
+    box-shadow: 0 10px 24px var(--color-panel-shadow), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 14px;
+    transition: background 0.25s ease;
+}
+
+.resume-printer-label {
+    font-family: var(--font-pixel);
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    color: var(--color-printer-label);
+    margin-right: auto;
+}
+
+.resume-printer-led {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #8FD18B;
+    box-shadow: 0 0 8px rgba(143, 209, 139, 0.8);
+}
+
+.resume-printer.is-printing .resume-printer-led {
+    animation: resume-led-blink 0.35s steps(2, jump-none) infinite;
+}
+
+.resume-printer-button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: var(--color-printer-highlight);
+    box-shadow: 0 3px 0 var(--color-printer-slot), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.resume-printer-button:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+.resume-printer-button:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 var(--color-printer-slot);
+}
+
+/* Only pressable once the receipt is fully printed. */
+.resume-printer-button:disabled {
+    cursor: default;
+}
+
+.resume-printer-button:focus-visible {
+    outline: 2px solid var(--color-accent-orange);
+    outline-offset: 3px;
+}
+
+/* The dark mouth the paper comes out of, sitting just under the body. */
+.resume-printer-slot {
+    height: 14px;
+    width: calc(100% - 28px);
+    margin: -7px auto 0;
+    border-radius: 7px;
+    background: var(--color-printer-slot);
+    box-shadow: inset 0 3px 4px rgba(0, 0, 0, 0.45);
+}
+
+.resume-printer.is-printing {
+    animation: resume-printer-shake 0.12s linear infinite;
+}
+
+/* ---------- Receipt ---------- */
+
+/* Clips the receipt to everything below the slot, so the paper looks like it
+   is coming out of the printer. It keeps the receipt's full height, so the
+   page below doesn't jump while it prints. */
+.resume-feed {
     width: 99%;
     max-width: 900px;
-    height: 48px;
-    flex-shrink: 0;
+    margin-top: -7px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+/* Position is set from scroll in Resume.jsx; the short transition smooths out
+   mouse-wheel steps so the paper glides instead of jumping. */
+.resume-receipt {
+    transform: translateY(calc(-100% - 40px));
+    transition: transform 0.12s linear;
+    will-change: transform;
+    filter: drop-shadow(0 6px 10px var(--color-panel-shadow));
+}
+
+.resume-receipt-header,
+.resume-receipt-footer {
+    background-color: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-pixel);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-align: center;
+    transition: background-color 0.25s ease;
+}
+
+.resume-receipt-header {
+    padding: 1.75rem 3rem 0;
+}
+
+.resume-receipt-header span,
+.resume-receipt-footer span {
+    display: block;
+    padding-bottom: 1rem;
+}
+
+.resume-receipt-header span {
+    border-bottom: 2px dashed var(--color-panel-line);
+}
+
+.resume-receipt-footer {
+    padding: 0 3rem 1.5rem;
+}
+
+.resume-receipt-footer span {
+    border-top: 2px dashed var(--color-panel-line);
+    padding-top: 1.25rem;
+}
+
+.resume-barcode {
+    height: 44px;
+    max-width: 260px;
+    margin: 0 auto;
+    background: repeating-linear-gradient(90deg,
+        var(--color-text-primary) 0 2px, transparent 2px 4px,
+        var(--color-text-primary) 4px 7px, transparent 7px 9px,
+        var(--color-text-primary) 9px 10px, transparent 10px 13px);
+    opacity: 0.75;
+}
+
+/* Torn-paper zigzag at the bottom of the receipt, vector-shaped so its teeth
+   stay proportional to the current width. */
+.resume-zigzag-edge {
+    width: 100%;
+    height: 32px;
     background-color: var(--color-surface);
     transition: background-color 0.25s ease;
-    clip-path: polygon(0% 100%, 10% 0%, 20% 100%, 30% 0%, 40% 100%, 50% 0%, 60% 100%, 70% 0%, 80% 100%, 90% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 90% 0%, 85% 100%, 80% 0%, 75% 100%, 70% 0%, 65% 100%, 60% 0%, 55% 100%, 50% 0%, 45% 100%, 40% 0%, 35% 100%, 30% 0%, 25% 100%, 20% 0%, 15% 100%, 10% 0%, 5% 100%, 0% 0%);
 }
 
 .resume-content {
     background-color: var(--color-surface);
     color: var(--color-text-primary);
     transition: background-color 0.25s ease, color 0.25s ease;
-    width: 99%;
-    max-width: 900px;
+    width: 100%;
     padding: 2.5rem 3rem 2.5rem 3rem;
     font-family: 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     box-sizing: border-box;
+}
+
+@keyframes resume-printer-shake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-1px, 0.5px); }
+    50% { transform: translate(1px, 0); }
+    75% { transform: translate(0, -0.5px); }
+}
+
+@keyframes resume-led-blink {
+    0% { opacity: 1; }
+    100% { opacity: 0.25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .resume-receipt {
+        transform: none;
+        transition: none;
+    }
+    .resume-printer.is-printing,
+    .resume-printer.is-printing .resume-printer-led {
+        animation: none;
+    }
 }
 
 .resume-skills-section {
@@ -55,7 +241,29 @@
     }
 
     .resume-zigzag-edge {
-        height: 36px;
+        height: 24px;
+    }
+
+    .resume-printer {
+        width: calc(99% + 20px);
+    }
+
+    .resume-printer-body {
+        height: 72px;
+        padding: 0 20px;
+        border-radius: 20px 20px 8px 8px;
+    }
+
+    .resume-printer-label {
+        font-size: 0.95rem;
+    }
+
+    .resume-receipt-header {
+        padding: 1.5rem 1.25rem 0;
+    }
+
+    .resume-receipt-footer {
+        padding: 0 1.25rem 1.25rem;
     }
 
     .resume-content {
@@ -69,7 +277,7 @@
 
 @media (max-width: 420px) {
     .resume-zigzag-edge {
-        height: 28px;
+        height: 20px;
     }
 
     .resume-content {
