@@ -1,4 +1,4 @@
-# _hi, i'm karen! 🧚🏼‍♀️ _  
+_# hi, i'm karen! 🧚🏼‍♀️_
 
 this repo is the code behind my portfolio, live at **[karenagustino.github.io](https://karenagustino.github.io)**.
 
