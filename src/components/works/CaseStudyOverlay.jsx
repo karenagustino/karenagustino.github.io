@@ -227,10 +227,42 @@ const PrototypeBlock = ({ block }) => {
     );
 };
 
+// A study's source link, the one prose links point back to.
+const sourceLinkId = (studyId) => `${studyId}-source`;
+
+// Brings the source link into view and onto keyboard focus, so a marked phrase
+// works the same whether it is clicked or reached with the keyboard.
+const jumpToSource = (studyId) => {
+    const target = document.getElementById(sourceLinkId(studyId));
+    if (!target) return;
+    if (target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.focus({ preventScroll: true });
+};
+
+// Prose can mark a phrase as `[[affinity diagram]]`. It renders in bold accent
+// colour with an asterisk, and pressing it jumps to the study's source link,
+// which carries the same asterisk.
+const MARK = /\[\[(.+?)\]\]/g;
+const renderMarkedText = (text, studyId) => {
+    const parts = text.split(MARK);
+    if (parts.length === 1) return text;
+    return parts.map((part, partIndex) => (partIndex % 2 === 0 ? part : (
+        <button
+            type="button"
+            className="case-study-mark"
+            key={partIndex}
+            onClick={() => jumpToSource(studyId)}
+        >
+            {part}
+            <span className="case-study-mark-star" aria-hidden="true">*</span>
+        </button>
+    )));
+};
+
 // Blocks are keyed by index on purpose: the data is static and never reordered,
 // and placeholder entries legitimately repeat the same label and value, which
 // would collide if the content were used as the key.
-const renderBlock = (block, index) => {
+const renderBlock = (block, index, studyId) => {
     // Rows and steps share one shape: an icon tile in front, then the label over
     // its text. Steps add their number to the label, in an `<ol>` so the order
     // is real to assistive technology and not only drawn. An item without an
@@ -278,9 +310,33 @@ const renderBlock = (block, index) => {
         return <PrototypeBlock block={block} key={index} />;
     }
 
+    // A paragraph can carry one link to the source behind it, shown beneath it
+    // in the same style as the prototype's Open in Figma link. It is marked with
+    // an asterisk, and `[[phrase]]` markers anywhere in the study's prose point
+    // back to it.
+    if (block.link) {
+        return (
+            <React.Fragment key={index}>
+                <p className="case-study-prose">{renderMarkedText(block.text, studyId)}</p>
+                <p className="case-study-prose-link">
+                    <a
+                        id={sourceLinkId(studyId)}
+                        className="case-study-prototype-link"
+                        href={block.link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <span className="case-study-mark-star" aria-hidden="true">*</span>
+                        {block.link.label} ↗
+                    </a>
+                </p>
+            </React.Fragment>
+        );
+    }
+
     return (
         <p className="case-study-prose" key={index}>
-            {block.text}
+            {renderMarkedText(block.text, studyId)}
         </p>
     );
 };
@@ -458,7 +514,7 @@ const CaseStudyOverlay = ({ caseStudy, index = 0, total = 0, closing, onClose, o
                                         {section.title}
                                     </h3>
                                     <div className="case-study-section-body">
-                                        {(section.blocks || []).map(renderBlock)}
+                                        {(section.blocks || []).map((block, blockIndex) => renderBlock(block, blockIndex, caseStudy.id))}
                                     </div>
                                 </section>
                             );
