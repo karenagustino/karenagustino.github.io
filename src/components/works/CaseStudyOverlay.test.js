@@ -67,6 +67,53 @@ test('renders prose, row and metric blocks', () => {
     expect(screen.getByText('phase two')).toBeInTheDocument();
 });
 
+test('a prose block with a link shows it beneath the paragraph, opening in a new tab', () => {
+    const withLink = {
+        ...sampleCaseStudy,
+        sections: [{
+            id: 'impact',
+            icon: '💥',
+            title: 'Impact',
+            blocks: [{
+                type: 'prose',
+                text: 'We sorted feedback into themes.',
+                link: { url: 'https://www.figma.com/board/abc', label: 'See the diagram' },
+            }],
+        }],
+    };
+    render(<CaseStudyOverlay caseStudy={withLink} onClose={() => {}} />);
+    expect(screen.getByText('We sorted feedback into themes.')).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /See the diagram/ });
+    expect(link).toHaveAttribute('href', 'https://www.figma.com/board/abc');
+    expect(link).toHaveAttribute('target', '_blank');
+});
+
+test('a marked phrase renders as a button that jumps to the source link', () => {
+    const marked = {
+        ...sampleCaseStudy,
+        sections: [{
+            id: 'research',
+            icon: '🔍',
+            title: 'Research',
+            blocks: [
+                {
+                    type: 'prose',
+                    text: 'We sorted it into an [[affinity diagram]].',
+                    link: { url: 'https://www.figma.com/board/abc', label: 'See the diagram' },
+                },
+                { type: 'prose', text: 'Testers went into an [[affinity diagram]] too.' },
+            ],
+        }],
+    };
+    render(<CaseStudyOverlay caseStudy={marked} onClose={() => {}} />);
+    const marks = screen.getAllByRole('button', { name: 'affinity diagram' });
+    expect(marks).toHaveLength(2);
+    expect(screen.queryByText(/\[\[/)).not.toBeInTheDocument();
+    const source = screen.getByRole('link', { name: /See the diagram/ });
+    fireEvent.click(marks[1]);
+    expect(source).toHaveFocus();
+});
+
 test('the sidebar lists one entry per section, with the first one current', () => {
     render(<CaseStudyOverlay caseStudy={sampleCaseStudy} onClose={() => {}} />);
     const nav = screen.getByRole('navigation', { name: 'Case study sections' });

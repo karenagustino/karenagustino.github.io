@@ -107,6 +107,11 @@ test('every block is one of the renderable types, with the fields that type need
                 if (block.type === 'prose') {
                     expect(typeof block.text).toBe('string');
                     expect(block.text.length).toBeGreaterThan(0);
+                    // An optional source link: public https, with a label.
+                    if (block.link !== undefined) {
+                        expect(block.link.url).toMatch(/^https:\/\//);
+                        expect(block.link.label).toBeTruthy();
+                    }
                 } else if (block.type === 'prototype') {
                     // A Figma share link, or a live web prototype over https.
                     expect(block.url).toMatch(/^https:\/\//);
@@ -133,10 +138,10 @@ test('every block is one of the renderable types, with the fields that type need
 });
 
 // The process link is optional, but when present it must be a real public
-// link with a label to show.
-test('every process link is public https with a label', () => {
+// link, or a PDF bundled with the site, with a label to show.
+test('every process link is public https or a bundled PDF, with a label', () => {
     published.filter((entry) => entry.process).forEach((entry) => {
-        expect(entry.process.url).toMatch(/^https:\/\//);
+        expect(entry.process.url).toMatch(/^https:\/\/|\.pdf$/);
         expect(entry.process.label).toBeTruthy();
     });
 });

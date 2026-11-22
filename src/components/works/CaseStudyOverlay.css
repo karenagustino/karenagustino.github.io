@@ -670,6 +670,47 @@
     margin: 2rem 0 0 0;
 }
 
+.case-study-prose-link {
+    margin: 0;
+}
+
+.case-study-prose-link .case-study-prototype-link {
+    display: inline-block;
+    font-style: italic;
+}
+
+/* A phrase marked in the copy: bold accent text with an asterisk, pointing to
+   the source link that carries the same asterisk. */
+.case-study-mark {
+    font: inherit;
+    font-weight: 700;
+    color: var(--color-panel-accent);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+.case-study-mark:hover,
+.case-study-mark:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+.case-study-mark-star {
+    font-style: normal;
+    font-weight: 800;
+    color: var(--color-panel-accent);
+}
+
+.case-study-mark .case-study-mark-star {
+    margin-left: 0.1em;
+}
+
+.case-study-prototype-link .case-study-mark-star {
+    margin-right: 0.35em;
+}
+
 .case-study-process .case-study-prototype-link {
     font-style: italic;
 }
