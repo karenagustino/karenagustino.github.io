@@ -22,6 +22,11 @@
      cream. The panel prints it at pixel-label sizes, so it needs to clear 4.5. */
   --color-panel-accent: #9A5310;
   --color-scrim: rgba(73, 82, 58, 0.42);
+  --color-printer-body: #7E97BC;
+  --color-printer-body-dark: #5F7799;
+  --color-printer-highlight: #A9BCD8;
+  --color-printer-slot: #2C3646;
+  --color-printer-label: #F4F6FA;
   --font-pixel: 'Silkscreen', 'Courier New', monospace;
 }
 
@@ -44,6 +49,11 @@
   --color-panel-shadow: rgba(0, 0, 0, 0.55);
   --color-panel-accent: #E08A3C;
   --color-scrim: rgba(9, 12, 19, 0.74);
+  --color-printer-body: #4E6185;
+  --color-printer-body-dark: #3A4A68;
+  --color-printer-highlight: #6E82A8;
+  --color-printer-slot: #0E1118;
+  --color-printer-label: #DCE3F0;
 }
 
 body {
