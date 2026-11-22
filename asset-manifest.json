@@ -1,20 +1,22 @@
 {
   "files": {
-    "main.css": "/static/css/main.cc58611a.css",
-    "main.js": "/static/js/main.93efca2d.js",
+    "main.css": "/static/css/main.954264bf.css",
+    "main.js": "/static/js/main.125da556.js",
     "static/js/453.1407b060.chunk.js": "/static/js/453.1407b060.chunk.js",
     "static/media/cafe-music.mp3": "/static/media/cafe-music.2963df28b36f48906f87.mp3",
+    "static/media/community-fridge-design-report.pdf": "/static/media/community-fridge-design-report.523abf8963e67eb2de08.pdf",
+    "static/media/community-fridge-preview.jpg": "/static/media/community-fridge-preview.94c1a6689bd20eb7b8c6.jpg",
     "static/media/payment-checker-preview.jpg": "/static/media/payment-checker-preview.34f797b987fad9873b87.jpg",
     "static/media/retail-bank-onboarding-preview.jpg": "/static/media/retail-bank-onboarding-preview.6730d57c131b03423964.jpg",
     "static/media/patch.png": "/static/media/patch.16a9d62f3704b584931a.png",
     "index.html": "/index.html",
     "static/media/komo.svg": "/static/media/komo.eaa850116ee27747abee5f99019e182b.svg",
-    "main.cc58611a.css.map": "/static/css/main.cc58611a.css.map",
-    "main.93efca2d.js.map": "/static/js/main.93efca2d.js.map",
+    "main.954264bf.css.map": "/static/css/main.954264bf.css.map",
+    "main.125da556.js.map": "/static/js/main.125da556.js.map",
     "453.1407b060.chunk.js.map": "/static/js/453.1407b060.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.cc58611a.css",
-    "static/js/main.93efca2d.js"
+    "static/css/main.954264bf.css",
+    "static/js/main.125da556.js"
   ]
 }
