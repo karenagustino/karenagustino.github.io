@@ -57,6 +57,118 @@
     }
 }
 
+/* Handwritten "click to print!" note with an arrow to the printer's button.
+   Placeholder for Karen's handwriting; see PrintHint in Resume.jsx.
+   Default (narrow screens): above the printer's right end, arrow pointing
+   down onto the button. Wide screens: beside the printer, arrow curling left
+   into the button. */
+.resume-print-hint {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% - 10px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    pointer-events: none;
+    color: var(--color-accent-orange);
+    transition: opacity 0.3s ease;
+    /* Above the printer body, so the arrowhead shows over it. */
+    z-index: 1;
+}
+
+.resume-print-hint.is-hidden {
+    opacity: 0;
+}
+
+.resume-print-hint-defs {
+    position: absolute;
+}
+
+.resume-print-hint-text {
+    font-family: var(--font-handwritten);
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: 0.5px;
+    /* A touch heavier, like a felt-tip. */
+    -webkit-text-stroke: 0.5px currentColor;
+    line-height: 1;
+    white-space: nowrap;
+    transform: rotate(-5deg);
+    /* Lifts the note clear of the lavender's tip. */
+    margin-bottom: 12px;
+    filter: url(#resume-marker);
+}
+
+.resume-print-hint-arrow {
+    display: block;
+    stroke: currentColor;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: url(#resume-marker);
+}
+
+.resume-print-hint-arrow--side {
+    display: none;
+}
+
+/* The tip lands over the button (centred 47px in from the printer's right). */
+.resume-print-hint-arrow--top {
+    margin-right: 25px;
+    animation: resume-hint-nudge-down 1.4s ease-in-out infinite;
+}
+
+/* Wide enough for the note to sit beside the printer: the hint becomes a
+   zero-size anchor at the printer's top-right corner (so it doesn't add to the
+   height the pinning keeps clear of the navbar) and its parts hang off it. */
+@media (min-width: 1360px) {
+    .resume-print-hint {
+        left: 100%;
+        right: auto;
+        top: 0;
+        bottom: auto;
+        width: 0;
+        height: 0;
+        display: block;
+    }
+
+    .resume-print-hint-text {
+        position: absolute;
+        left: 22px;
+        top: -40px;
+        margin: 0;
+    }
+
+    .resume-print-hint-arrow--top {
+        display: none;
+    }
+
+    /* Starts under the note and ends just right of the button. */
+    .resume-print-hint-arrow--side {
+        display: block;
+        position: absolute;
+        left: -34px;
+        top: -8px;
+        animation: resume-hint-nudge-left 1.4s ease-in-out infinite;
+    }
+}
+
+@keyframes resume-hint-nudge-down {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+}
+
+@keyframes resume-hint-nudge-left {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .resume-print-hint-arrow {
+        animation: none !important;
+    }
+}
+
 /* ---------- Printer ---------- */
 
 .resume-printer {
@@ -121,7 +233,7 @@
     box-shadow: 0 0 0 var(--color-printer-slot);
 }
 
-/* Only pressable once the receipt is fully printed. */
+/* Not pressable mid-glide, or when reduced motion shows the receipt printed. */
 .resume-printer-button:disabled {
     cursor: default;
 }
@@ -281,8 +393,18 @@
         height: 24px;
     }
 
+    /* Leaves room right of the flowers for the "click to print" arrow. */
     .resume-printer-flowers {
-        right: 36px;
+        right: 70px;
+    }
+
+    .resume-print-hint-text {
+        font-size: 1.35rem;
+    }
+
+    /* The button is centred 35px in from the right at this width. */
+    .resume-print-hint-arrow--top {
+        margin-right: 16px;
     }
 
     .resume-printer {
