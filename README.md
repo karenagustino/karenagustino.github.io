@@ -12,4 +12,6 @@ i study business and computer science at UBC Sauder, and am currently a Business
 
 send me a hello at karenagustino20@gmail.com, i'm always happy to chat ~
 
-_p.s. i love drinking tea, matcha, cafe-hopping, and video games (mildly why my portfolio is inspired by all of them) 🤭🍵 - hit me up if you have any recs!_
+_p.s. i love drinking tea, matcha, cafe-hopping, and video games (mildly why my portfolio is inspired by all of them) 🤭_ 
+
+_hit me up if you have any recs 🍵!_
