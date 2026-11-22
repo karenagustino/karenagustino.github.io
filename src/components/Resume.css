@@ -12,14 +12,49 @@
     width: 100%;
 }
 
-/* Printer + paper move together; Resume.jsx shifts this down while the
-   printer is pinned under the navbar. */
+/* Printer + paper move together. While the paper feeds, Resume.jsx sets `top`
+   and the browser holds the stage there, for as long as .resume-pin-room
+   below it is tall. With no `top` set, it simply sits in the page. */
 .resume-stage {
+    position: sticky;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    will-change: transform;
+}
+
+.resume-pin-room {
+    flex-shrink: 0;
+}
+
+/* Two garden flowers growing out of the top of the printer, swaying gently
+   like the ones in the footer. */
+.resume-printer-flowers {
+    position: absolute;
+    bottom: calc(100% - 4px);
+    right: 64px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.resume-printer-flowers svg {
+    display: block;
+    transform-origin: 50% 100%;
+    animation: resume-flower-sway 3.2s ease-in-out infinite alternate;
+    animation-delay: var(--flower-delay, 0s);
+}
+
+@keyframes resume-flower-sway {
+    from { transform: rotate(-3deg); }
+    to { transform: rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .resume-printer-flowers svg {
+        animation: none;
+    }
 }
 
 /* ---------- Printer ---------- */
@@ -114,12 +149,14 @@
 
 /* Clips the receipt to everything below the slot, so the paper looks like it
    is coming out of the printer. It keeps the receipt's full height, so the
-   page below doesn't jump while it prints. */
+   page below doesn't jump while it prints. Only the top edge clips: the sides
+   and bottom reach past the box, so the paper's drop shadow falls softly
+   under the torn edge instead of being cut off in a straight line. */
 .resume-feed {
     width: 99%;
     max-width: 900px;
     margin-top: -7px;
-    overflow: hidden;
+    clip-path: inset(0 -40px -40px -40px);
     position: relative;
     z-index: 1;
 }
@@ -242,6 +279,10 @@
 
     .resume-zigzag-edge {
         height: 24px;
+    }
+
+    .resume-printer-flowers {
+        right: 36px;
     }
 
     .resume-printer {

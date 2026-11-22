@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import useMediaQuery from '../hooks/useMediaQuery';
 import './Resume.css';
+import { buildDaisy, buildLavender, mulberry32 } from './footer/pixelPlants';
 
 const sectionTitleStyle = {
     fontWeight: 700,
@@ -119,12 +120,45 @@ const PIN_GAP = 16;
 // How long the rewind button takes to reel the paper back in.
 const REWIND_MS = 1000;
 
+// Two plants from the footer's garden, grown from a fixed seed so they are the
+// same on every visit, sitting on top of the printer.
+const FLOWER_SEED = 344;
+const FLOWER_SCALE = 1;
+
+const PrinterFlowers = React.forwardRef((props, ref) => {
+    const plants = useMemo(() => {
+        const rng = mulberry32(FLOWER_SEED);
+        return [buildDaisy(rng), buildLavender(rng)];
+    }, []);
+    return (
+        <div ref={ref} className="resume-printer-flowers" aria-hidden="true">
+            {plants.map((plant, index) => (
+                <svg
+                    key={index}
+                    width={plant.width * FLOWER_SCALE}
+                    height={plant.height * FLOWER_SCALE}
+                    viewBox={`0 0 ${plant.width} ${plant.height}`}
+                    shapeRendering="crispEdges"
+                    style={{ '--flower-delay': `${index * -1.3}s` }}
+                >
+                    {plant.cells.map((c, i) => (
+                        <rect key={i} x={c.x} y={c.y} width={c.w} height={c.h} fill={c.fill} />
+                    ))}
+                </svg>
+            ))}
+        </div>
+    );
+});
+
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
 // The receipt is tied to scroll position, in three modes:
 // - "feeding": once the printer reaches the middle of the screen it stays
 //   pinned there while scrolling feeds the paper out (scrolling up pulls it
-//   back in).
+//   back in). The pinning itself is position: sticky, so the browser holds the
+//   printer still in step with the scroll; script only sets where it pins and
+//   how far the paper is out. Moving the printer from script instead always
+//   landed a frame late, and on a fast scroll it slid and snapped back.
 // - "printed": the whole receipt is out and stays out, whichever way the page
 //   scrolls, until the visitor is back at the top of the page with the printer
 //   off screen, or presses the printer's button.
@@ -135,6 +169,8 @@ const Resume = () => {
     const stageRef = useRef(null);
     const printerRef = useRef(null);
     const receiptRef = useRef(null);
+    const roomRef = useRef(null);
+    const flowersRef = useRef(null);
     const rewindRef = useRef(() => {});
     const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
     const [moving, setMoving] = useState(false);
@@ -145,11 +181,18 @@ const Resume = () => {
         const stage = stageRef.current;
         const printer = printerRef.current;
         const receipt = receiptRef.current;
-        if (!section || !stage || !printer || !receipt) return undefined;
+        const room = roomRef.current;
+        if (!section || !stage || !printer || !receipt || !room) return undefined;
+
+        // room: how far the printer can stay pinned while the page scrolls.
+        // top: where on screen it pins, or null to leave it in the page.
+        const pin = (roomHeight, top) => {
+            room.style.height = roomHeight ? `${roomHeight}px` : '';
+            stage.style.top = top == null ? '' : `${top}px`;
+        };
 
         const reset = () => {
-            section.style.paddingBottom = '';
-            stage.style.transform = '';
+            pin(0, null);
             receipt.style.transform = 'none';
             receipt.style.transition = '';
         };
@@ -174,19 +217,19 @@ const Resume = () => {
             const height = receipt.offsetHeight;
             const nav = document.querySelector('nav');
             const navBottom = nav ? nav.getBoundingClientRect().bottom : 0;
-            // Pin the printer in the middle of whatever screen this is.
+            // Pin the printer in the middle of whatever screen this is, leaving
+            // the flowers on top of it clear of the navbar.
             const middle = (window.innerHeight - printer.offsetHeight) / 2;
+            const flowers = flowersRef.current ? flowersRef.current.offsetHeight : 0;
             return {
                 height,
                 runway: Math.min(height * FEED_SCROLL_SHARE, MAX_FEED_SCROLL),
-                pinTop: Math.max(navBottom + PIN_GAP, middle),
+                pinTop: Math.max(navBottom + PIN_GAP + flowers, middle),
             };
         };
 
-        // offset: how far the printer and paper are held down from their spot
-        // in the page. progress: 0 = paper inside the printer, 1 = fully out.
-        const apply = (offset, progress) => {
-            stage.style.transform = `translateY(${offset}px)`;
+        // progress: 0 = paper inside the printer, 1 = fully out.
+        const feed = (progress) => {
             receipt.style.transform = `translateY(calc(${(progress - 1) * 100}% - ${(1 - progress) * 40}px))`;
         };
 
@@ -212,17 +255,17 @@ const Resume = () => {
                 if (sectionTop > window.innerHeight) {
                     enterMode('feeding');
                 } else {
-                    section.style.paddingBottom = '';
-                    apply(0, 1);
+                    pin(0, null);
+                    feed(1);
                     return;
                 }
             }
 
-            // Extra room at the bottom of the section for the pinned stretch.
-            section.style.paddingBottom = `${runway}px`;
+            pin(runway, pinTop);
+            // How far the printer has been held while the page scrolled on.
             const pinned = Math.min(runway, Math.max(0, pinTop - sectionTop));
             const progress = pinned / runway;
-            apply(pinned, progress);
+            feed(progress);
 
             if (lastProgress !== -1 && progress !== lastProgress && progress > 0) shake();
             lastProgress = progress;
@@ -231,8 +274,8 @@ const Resume = () => {
                 // doesn't reveal an empty gap above the printer. The page and
                 // the scroll position shift by the same amount, so nothing on
                 // screen moves.
-                section.style.paddingBottom = '';
-                apply(0, 1);
+                pin(0, null);
+                feed(1);
                 window.scrollTo({ top: window.scrollY - runway, behavior: 'instant' });
                 enterMode('printed');
             }
@@ -252,8 +295,9 @@ const Resume = () => {
             enterMode('rewinding');
             setMoving(true);
             receipt.style.transition = 'none';
-            // Put the pinning room back (below the receipt, so nothing on screen moves).
-            section.style.paddingBottom = `${runway}px`;
+            // Put the pinning room back (below the receipt, so nothing on screen
+            // moves), but don't pin while the page glides back up.
+            pin(runway, null);
 
             const step = (now) => {
                 const t = Math.min(1, (now - started) / REWIND_MS);
@@ -261,7 +305,7 @@ const Resume = () => {
                 window.scrollTo({ top: startScroll + (targetScroll - startScroll) * eased, behavior: 'instant' });
                 // The page glides so the printer lands at the pin point just as
                 // the last of the paper goes in.
-                apply(0, 1 - eased);
+                feed(1 - eased);
                 if (t < 1) {
                     rewindFrame = window.requestAnimationFrame(step);
                     return;
@@ -293,6 +337,7 @@ const Resume = () => {
         <section id="resume-section" ref={sectionRef} className="resume-section">
             <div className="resume-stage" ref={stageRef}>
                 <div ref={printerRef} className={`resume-printer${moving ? ' is-printing' : ''}`}>
+                    <PrinterFlowers ref={flowersRef} />
                     <div className="resume-printer-body">
                         <span className="resume-printer-label">RESUME</span>
                         <span className="resume-printer-led" aria-hidden="true" />
@@ -354,6 +399,7 @@ const Resume = () => {
                     </div>
                 </div>
             </div>
+            <div ref={roomRef} className="resume-pin-room" aria-hidden="true" />
         </section>
     );
 };
